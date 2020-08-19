@@ -1,0 +1,25 @@
+bookdown::gitbook:
+  #dev: svglite
+  highlight: kate
+  css: style.css
+  split_by: section
+  config:
+    toc:
+      collapse: subsection
+      before: |
+        <li><a href="./">A Test Bookdown Book</a></li>
+      after: |
+        <li><a href="http://example1.org">Example link 1</a></li>
+        <li><a href="https://example2.org">Example link 2</a></li>
+        <br/>
+        <li><a href="https://github.com/rstudio/bookdown" target="blank">Published bookdown</a></li>
+    edit: https://github.com/phgrosjean/bookdown-test/edit/master/%s
+    view: https://github.com/phgrosjean/bookdown-test/blob/master/%s
+    #download: ["pdf", "epub"]
+bookdown::pdf_book:
+  includes:
+    in_header: preamble.tex
+  latex_engine: xelatex
+  citation_package: natbib
+bookdown::epub_book:
+  stylesheet: style.css

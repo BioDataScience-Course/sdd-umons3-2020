@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>A Test Bookdown Book</title>
+  <meta name="description" content="Template for a learndown-enhanced bookdown document." />
+  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="A Test Bookdown Book" />
+  <meta property="og:type" content="book" />
+  <meta property="og:url" content="http://phgrosjean.sciviews.org/bookdown-test/" />
+  <meta property="og:image" content="http://phgrosjean.sciviews.org/bookdown-test/images/front-cover.png" />
+  <meta property="og:description" content="Template for a learndown-enhanced bookdown document." />
+  <meta name="github-repo" content="phgrosjean/bookdown-test" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="A Test Bookdown Book" />
+  
+  <meta name="twitter:description" content="Template for a learndown-enhanced bookdown document." />
+  <meta name="twitter:image" content="http://phgrosjean.sciviews.org/bookdown-test/images/front-cover.png" />
+
+<meta name="author" content="Philippe Grosjean &amp; Guyliann Engels" />
+
+
+<meta name="date" content="2020-08-19" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+
+<link rel="next" href="intro.html"/>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<script>
+function getParameterByName(name, url) {
+  name = name.replace(/[\[\]]/g,"\\$&");
+  // Try to get the value from local storage
+  if (window.localStorage) {
+    return localStorage.getItem(name);
+  } else {
+    return '';
+  }
+}
+
+// Collect parameters and store their values (as passed by Moodle/Wordpress)
+var login       = getParameterByName('login');
+var email       = getParameterByName('email');
+var displayname = getParameterByName('displayname');
+var firstname   = getParameterByName('firstname');
+var lastname    = getParameterByName('lastname');
+var iemail      = getParameterByName('iemail');
+var iid         = getParameterByName('iid');
+var ifirstname  = getParameterByName('ifirstname');
+var ilastname   = getParameterByName('ilastname');
+var institution = getParameterByName('institution');
+var icourse     = getParameterByName('icourse');
+var ictitle     = getParameterByName('ictitle');
+var iurl        = getParameterByName('iurl');
+var iref        = getParameterByName('iref');
+
+let institutions = ['UMONS', 'noinstitution'];
+let courses = ['S-BIOG-006', 'S-BIOG-027', 'S-BIOG-921', 'nocourse'];
+
+function toggleDisplay(item, target) {
+  var style = item == target ? 'block' : 'none';
+  var elems = document.getElementsByClassName(item);
+  for (i = 0; i < elems.length; i++) {
+    var elem = elems[i];
+    elem.style.display = style;
+  }
+}
+
+function toggleInstitution(name) {
+  // Disable all institutions except that one
+  // Since they are already all hidden, just reenable it and hide noinstitution
+  toggleDisplay('noinstitution', name);
+  toggleDisplay(name, name);
+}
+
+function toggleCourse(name) {
+  // Disable all courses except that one
+  // Since they are already all hidden, just reenable it and hide nocourse
+  toggleDisplay('nocourse', name);
+  toggleDisplay(name, name);
+}
+
+function processParameters() {
+  // Content related to an institution
+  if (institution !== null) {
+    toggleInstitution(institution);
+  }
+  // Content relative to a course
+  if (icourse !== null) {
+    toggleCourse(icourse);
+  }
+  // Process other parameters too here...
+  // ...
+}
+
+
+function hideCode() {
+  //var codes = document.querySelectorAll('pre:not([class])');
+  var codes = document.getElementsByClassName('hidden-code');
+  var code, i, d, s, p;
+  for (i = 0; i < codes.length; i++) {
+    // We want to place the parent div into details instead
+    code = codes[i].parentNode;
+    p = code.parentNode;
+    d = document.createElement('details');
+    s = document.createElement('summary');
+    s.innerText = 'See the code';
+    //<details><summary>hide.code.msg</summary></details>
+    d.appendChild(s);
+    // move the code into <details>
+    p.replaceChild(d, code);
+    d.appendChild(code);
+  }
+}
+
+
+function retargetLinks() {
+  // If displayed in an iframe, open external links into parent
+  // Adapted from Yihui Xie blog
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href')) &&
+      links[i].target != null) {
+      links[i].target = '_parent';
+    }
+  }
+};
+
+window.onload = function() {processParameters(); hideCode(); retargetLinks();};
+
+function encodeQueryParam(name, first = false) {
+  var value = localStorage.getItem(name);
+  if (value === null || value == '') return '';
+  var sep = first ? '' : '&';
+  return sep + encodeURIComponent(name) + '=' + encodeURIComponent(value);
+}
+
+function encodeQueryString() {
+  // We got data from localStorage. So, if no data, no query string!
+  if (!window.localStorage) return('');
+  query = encodeQueryParam('login', true);
+  query += encodeQueryParam('email') + encodeQueryParam('displayname');
+  query += encodeQueryParam('firstname') + encodeQueryParam('lastname');
+  query += encodeQueryParam('iemail') + encodeQueryParam('iid');
+  query += encodeQueryParam('ifirstname') + encodeQueryParam('ilastname');
+  query += encodeQueryParam('institution');
+  query += encodeQueryParam('icourse') + encodeQueryParam('ictitle');
+  query += encodeQueryParam('iurl') + encodeQueryParam('iref');
+  // Detect if we have the Sepia or Night theme
+  // TODO: refine this because it is *always* detected
+  //if (document.getElementsByClassName('color-theme-1')) {
+  //  if (query == '') {
+  //    query = 'theme=Sepia';
+  //  } else {
+  //    query += '&theme=Sepia';
+  //  }
+  //}
+  //if (document.getElementsByClassName('color-theme-22')) {
+  //  if (query == '') {
+  //    query = 'theme=Night';
+  //  } else {
+  //    query += '&theme=Night';
+  //  }
+  //}
+  return query;
+}
+
+//var params = window.location.toString().split('?')[1];
+var params = encodeQueryString();
+
+if (params !== undefined && params != '') {
+  var apps = document.getElementsByClassName('app');
+  for (i = 0; i < apps.length; i++) {
+    var appitem = apps[i];
+    appitem.src = appitem.src + '?' + params;
+  }
+
+  //var h5ps = document.getElementsByClassName('h5p');
+  //for (i = 0; i < h5ps.length; i++) {
+  //  var h5pitem = h5ps[i];
+  //  h5pitem.src = h5pitem.src + '&' + params;
+  //}
+}
+
+launchApp = function(id, src) {
+  //var params = window.location.toString().split('?')[1];
+  var params = encodeQueryString();
+  if (params !== undefined && params != '') {
+    src = src + '?' + params;
+  }
+  var img = document.getElementById('img' + id);
+  var app = document.getElementById(id);
+  app.src = src;
+  app.style.display='block';
+  img.style.display='none';
+}
+
+var H5PIntegration = parent.H5PIntegration;
+var wpAJAXurl = 'https:\/\/wp.sciviews.org\/wp-admin\/admin-ajax.php';
+var debugEnabled = '0';
+var captureAllH5pContentTypes = '1';
+var h5pContentTypes = [''];
+</script>
+
+<link rel='stylesheet' id='h5p-core-styles-h5p-css'  href='https://wp.sciviews.org/wp-content/plugins/h5p/h5p-php-library/styles/h5p.css' media='all' />
+<link rel='stylesheet' id='h5p-core-styles-h5p-confirmation-dialog-css'  href='https://wp.sciviews.org/wp-content/plugins/h5p/h5p-php-library/styles/h5p-confirmation-dialog.css' media='all' />
+<link rel='stylesheet' id='h5p-core-styles-h5p-core-button-css'  href='https://wp.sciviews.org/wp-content/plugins/h5p/h5p-php-library/styles/h5p-core-button.css' media='all' />
+
+<script src='https://wp.sciviews.org/wp-includes/js/wp-embed.min.js'></script>
+
+<!--
+<script src='https://wp.sciviews.org/wp-includes/js/jquery/jquery.js?ver=1.12.4-wp'></script>
+<script src='https://wp.sciviews.org/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+-->
+
+<script src='https://wp.sciviews.org/wp-content/plugins/h5pxapikatchu/js/h5pxapikatchu-variables.js'></script>
+<script src='https://wp.sciviews.org/wp-content/plugins/h5p/h5p-php-library/js/jquery.js'></script>
+<script src='https://wp.sciviews.org/wp-content/plugins/h5p/h5p-php-library/js/h5p.js'></script>
+<script src='https://wp.sciviews.org/wp-content/plugins/h5p/h5p-php-library/js/h5p-event-dispatcher.js'></script>
+<script src='https://wp.sciviews.org/wp-content/plugins/h5p/h5p-php-library/js/h5p-x-api-event.js'></script>
+<script src='https://wp.sciviews.org/wp-content/plugins/h5p/h5p-php-library/js/h5p-x-api.js'></script>
+<script src='https://wp.sciviews.org/wp-content/plugins/h5p/h5p-php-library/js/h5p-content-type.js'></script>
+<script src='https://wp.sciviews.org/wp-content/plugins/h5p/h5p-php-library/js/h5p-confirmation-dialog.js'></script>
+<script src='https://wp.sciviews.org/wp-content/plugins/h5p/h5p-php-library/js/h5p-action-bar.js'></script>
+<script src='https://wp.sciviews.org/wp-content/plugins/h5p/h5p-php-library/js/request-queue.js'></script>
+
+
+<style type="text/css">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    background-color: #ffffff;
+    color: #a0a0a0;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #a0a0a0;  padding-left: 4px; }
+div.sourceCode
+  { color: #1f1c1b; background-color: #ffffff; }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span. { color: #1f1c1b; } /* Normal */
+code span.al { color: #bf0303; background-color: #f7e6e6; font-weight: bold; } /* Alert */
+code span.an { color: #ca60ca; } /* Annotation */
+code span.at { color: #0057ae; } /* Attribute */
+code span.bn { color: #b08000; } /* BaseN */
+code span.bu { color: #644a9b; font-weight: bold; } /* BuiltIn */
+code span.cf { color: #1f1c1b; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #924c9d; } /* Char */
+code span.cn { color: #aa5500; } /* Constant */
+code span.co { color: #898887; } /* Comment */
+code span.cv { color: #0095ff; } /* CommentVar */
+code span.do { color: #607880; } /* Documentation */
+code span.dt { color: #0057ae; } /* DataType */
+code span.dv { color: #b08000; } /* DecVal */
+code span.er { color: #bf0303; text-decoration: underline; } /* Error */
+code span.ex { color: #0095ff; font-weight: bold; } /* Extension */
+code span.fl { color: #b08000; } /* Float */
+code span.fu { color: #644a9b; } /* Function */
+code span.im { color: #ff5500; } /* Import */
+code span.in { color: #b08000; } /* Information */
+code span.kw { color: #1f1c1b; font-weight: bold; } /* Keyword */
+code span.op { color: #1f1c1b; } /* Operator */
+code span.ot { color: #006e28; } /* Other */
+code span.pp { color: #006e28; } /* Preprocessor */
+code span.re { color: #0057ae; background-color: #e0e9f8; } /* RegionMarker */
+code span.sc { color: #3daee9; } /* SpecialChar */
+code span.ss { color: #ff5500; } /* SpecialString */
+code span.st { color: #bf0303; } /* String */
+code span.va { color: #0057ae; } /* Variable */
+code span.vs { color: #bf0303; } /* VerbatimString */
+code span.wa { color: #bf0303; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A Test Bookdown Book</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preamble</a></li>
+<li class="part"><span><b>I Course I: test</b></span></li>
+<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="book-wide-references.html"><a href="book-wide-references.html"><i class="fa fa-check"></i><b>1.1</b> Book-wide references</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="book-wide-references.html"><a href="book-wide-references.html#reference-to-chapter-and-titles"><i class="fa fa-check"></i><b>1.1.1</b> Reference to chapter and titles</a></li>
+<li class="chapter" data-level="1.1.2" data-path="book-wide-references.html"><a href="book-wide-references.html#numbered-figures-and-tables"><i class="fa fa-check"></i><b>1.1.2</b> Numbered figures and tables</a></li>
+<li class="chapter" data-level="1.1.3" data-path="book-wide-references.html"><a href="book-wide-references.html#numbered-equations"><i class="fa fa-check"></i><b>1.1.3</b> Numbered equations</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="citations.html"><a href="citations.html"><i class="fa fa-check"></i><b>1.2</b> Citations</a></li>
+<li class="chapter" data-level="1.3" data-path="cache-long-computations.html"><a href="cache-long-computations.html"><i class="fa fa-check"></i><b>1.3</b> Cache long computations</a></li>
+<li class="chapter" data-level="1.4" data-path="contextual-showhide-sections.html"><a href="contextual-showhide-sections.html"><i class="fa fa-check"></i><b>1.4</b> Contextual show/hide sections</a></li>
+<li class="chapter" data-level="1.5" data-path="shiny-app.html"><a href="shiny-app.html"><i class="fa fa-check"></i><b>1.5</b> Shiny app</a></li>
+<li class="chapter" data-level="1.6" data-path="learnr-with-one-exercise-and-one-quizz.html"><a href="learnr-with-one-exercise-and-one-quizz.html"><i class="fa fa-check"></i><b>1.6</b> Learnr with one exercise and one quizz</a></li>
+<li class="chapter" data-level="1.7" data-path="a-coggle-mind-map.html"><a href="a-coggle-mind-map.html"><i class="fa fa-check"></i><b>1.7</b> A Coggle mind map</a></li>
+<li class="chapter" data-level="1.8" data-path="h5p-content.html"><a href="h5p-content.html"><i class="fa fa-check"></i><b>1.8</b> H5P content</a></li>
+<li class="chapter" data-level="1.9" data-path="add-a-gist.html"><a href="add-a-gist.html"><i class="fa fa-check"></i><b>1.9</b> Add a Gist</a></li>
+<li class="chapter" data-level="1.10" data-path="embed-a-youtube-video.html"><a href="embed-a-youtube-video.html"><i class="fa fa-check"></i><b>1.10</b> Embed a youtube video</a></li>
+<li class="chapter" data-level="1.11" data-path="special-blocks.html"><a href="special-blocks.html"><i class="fa fa-check"></i><b>1.11</b> Special blocks</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="divein.html"><a href="divein.html"><i class="fa fa-check"></i><b>2</b> Diving In</a></li>
+<li class="appendix"><span><b>Appendices</b></span></li>
+<li class="chapter" data-level="A" data-path="appendix1.html"><a href="appendix1.html"><i class="fa fa-check"></i><b>A</b> Appendix 1</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="http://example1.org">Example link 1</a></li>
+<li><a href="https://example2.org">Example link 2</a></li>
+<br/>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">A Test Bookdown Book</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">A Test Bookdown Book</h1>
+<p class="author"><em>Philippe Grosjean &amp; Guyliann Engels</em></p>
+<p class="date"><em>2020-08-19</em></p>
+</div>
+<div id="preamble" class="section level1 unnumbered">
+<h1>Preamble</h1>
+<!-- Compile the bibliography from different sources -->
+<!-- Diagnose the user login status, example in English and in French -->
+<p>Information about connected user build be {learndown} automatically:</p>
+<div class="info">
+<div id="diagnostic-en">
+<p><em>Please wait, diagnostic in course…</em></p>
+<script>
+function clearStorageEn() {
+  if (window.localStorage) {
+    localStorage.clear();
+  }
+  var msg = 'Local personal data deleted!' + '\nThe page will be reloaded...' + '\n\n(if this is an error, close the page and relaunch it from within Moodle).';
+  if (window.self !== window.parent) {
+    parent.alert(msg);
+  } else {
+    window.alert(msg);
+  }
+  window.location.href=window.location.href;
+}
+
+function diagnoseSystemEn() {
+  var container = document.getElementById('diagnostic-en');
+  if (container === null) {
+    return;
+  }
+  var content = '';
+
+  if (!window.localStorage) {
+    content = content + "<p>You are:</p>\n<ul>";
+    content = content + "\n<li>Anonymous on this site (local storage unavailable).</li>";
+    content = content + "\n<li>The content <b>is not</b> contextualized for a particular course.</li>";
+    content = content + "\n<li>Results for various exercises <b>will not be recorded</b>.</li>";
+    content = content + "\n</ul>";
+    content = content + "\n<p>If you are <i>not</i> a student that takes a course linking with this pedagogical material, this is OK, you can continue your journey... <b>Welcome!</b></p>";
+    content = content + "\n<p>On the other hand, if your cursus requires you to be properly recorded here, then close this page and restart it from your institution elearning platform (Moodle, ...). If your data are still incorrect, contact your teachers.</p>";
+
+  } else {
+    // Explore the content of the storage
+    // Students are recognized by iemail (institutional email, or Wordpress email)
+    // but possibly, their login could be used too
+    var login = localStorage.getItem('login');
+    if (login === null) {
+      login = '';
+    }
+    var email = localStorage.getItem('email');
+    if (email === null) {
+      email = '';
+    }
+    var iemail = localStorage.getItem('iemail');
+    if (iemail === null) {
+      iemail = '';
+    }
+    // Compare both emails, if they are different, display both of them
+    if (email != iemail && iemail != '') {
+      email = email + '</u> (institutional email: <u>' + iemail + ')';
+    }
+
+    // Construct an identification string
+    content = content + "<p><b>Content on these pages is contextual. </b>Please, check the following data are correct:</p>\n<ul>";
+
+    var registered = false;
+    if (email == '' && login == '') {
+      // Not registered
+      content = content + "\n<li><u>You are anonymous on this site.</u> <b>Your progress in the exercises will not be recorded.</b></li>";
+
+    } else {
+      // Registered user
+      registered = true;
+      if (login != '') {
+        content = content + "\n<li>Login&nbsp;: <u>" + login + "</u></li>";
+      }
+      if (email != '') {
+        content = content + "\n<li>Email&nbsp;: <u>" + email + "</u></li>";
+      }
+      content = content + "\n<b>Your progress in the exercises will be recorded under that identity.</b>";
+    }
+
+    // institution and icourse possibly change the content. So, must be checked!
+    var context = false;
+    var institution = localStorage.getItem('institution');
+    if (institution == null || institution == '') {
+      institution = 'undefined';
+    } else {
+      context = true;
+    }
+    var icourse = localStorage.getItem('icourse');
+    if (icourse == null || icourse == '') {
+      icourse = 'undefined';
+    } else {
+      context = true;
+      var ictitle = localStorage.getItem('ictitle');
+      if (ictitle != null && ictitle != '') {
+        icourse = ictitle + ' (' + icourse + ')';
+      }
+    }
+    content = content + "\n<li>Course&nbsp;: <u>" + icourse + "</u></li>";
+    content = content + "\n<li>Institution&nbsp;: <u>" + institution + "</u></li>";
+    content = content + "\n</ul>";
+    if (context) {
+      content = content + "<p><b>Content will be adapted to this particular context. </b>Check that these data are correct, or close this page and reopen it from your institutional elearning platform (Moodle, ...). If your data are still incorrect, contact your teachers.</p>";
+    } else {// No context
+      content = content + "<p><b>Without a particular course context, you will see a general content. </b>If this is OK... Welcome! Otherwise close this page and restart it from your institutional elearning platform (Moodle, ...). If your data are still incorrect, contact your teachers.</p>";
+    }
+
+    // If registered user and/or special context, offer to reset it
+    if (registered || context) {
+      content = content + "\n<p>If you prefer to visit this site anonymously and record no activity in the exercises, you can delete your personal informations by clicking on the button bellow.</p>";
+      content = content + '<button onclick="clearStorageEn()">Delete my personal data</button>';
+    }
+    // Those variables are possibly defined, but they are not tested here (yet)
+    //var displayname = localStorage.getItem('displayname');
+    //var firstname = localStorage.getItem('firstname');
+    //var lastname = localStorage.getItem('lastname');
+    //var ifirstname = localStorage.getItem('ifirstname');
+    //var ilastname = localStorage.getItem('ilastname');
+    //var iid = localStorage.getItem('iid');
+    //var iurl = localStorage.getItem('iurl');
+    //var iref = localStorage.getItem('iref');
+  }
+
+  container.innerHTML = content;
+}
+diagnoseSystemEn();
+</script>
+<noscript>
+<b>The system diagnostic cannot be run because Javascript is not enabled, but it is mandatory for thei site! All the interactive and contextual content will be unusable. Please, do activate Javascript…</b>
+</noscript>
+</div>
+</div>
+<p>The same one in French :</p>
+<div class="info">
+<div id="diagnostic-fr">
+<p><em>Patientez s’il-vous-plait, diagnostic en cours…</em></p>
+<script>
+function clearStorageFr() {
+  if (window.localStorage) {
+    localStorage.clear();
+  }
+  var msg = 'Informations personnelles locales effacees !' + '\nLa page va etre rechargee...' + "\n\n(s'il s'agit d'une fausse manoeuvre, fermer la page et relancez-la depuis Moodle).";
+  if (window.self !== window.parent) {
+    parent.alert(msg);
+  } else {
+    window.alert(msg);
+  }
+  window.location.href=window.location.href;
+}
+
+function diagnoseSystemFr() {
+  var container = document.getElementById('diagnostic-fr');
+  if (container === null) {
+    return;
+  }
+  var content = '';
+
+  if (!window.localStorage) {
+    content = content + "<p>Vous &ecirc;tes&nbsp;:</p>\n<ul>";
+    content = content + "\n<li>Anonyme sur ce site (stockage local indisponible).</li>";
+    content = content + "\n<li>Le contenu <b>n'est pas</b> contextualis&eacute; par rapport &agrave; un cours en particulier.</li>";
+    content = content + "\n<li>Le r&eacute;sultat de certains exercices <b>ne sera pas enregistr&eacute;</b>.</li>";
+    content = content + "\n</ul>";
+    content = content + "\n<p>Si vous n'&ecirc;tes <i>pas</i> un &eacute;tudiant qui suit un cours li&eacute; &agrave; ce mat&eacute;riel p&eacute;dagogique, c'est normal, vous pouvez continuer votre visite... <b>Bienvenue&nbsp;!</b></p>";
+    content = content + "\n<p>En revanche, si votre cours n&eacute;cessite que vous soyez d&ucirc;ment enregistr&eacute;, alors fermez cette page et relancer-l&agrave; depuis le syst&egrave;me d'apprentissage en ligne de votre Universit&eacute; (Moodle, ...). Si les donn&eacute;es sont toujours incorrectes, contactez vos enseignants.</p>";
+
+  } else {
+    // Explore the content of the storage
+    // Students are recognized by iemail (institutional email, or Wordpress email)
+    // but possibly, their login could be used too
+    var login = localStorage.getItem('login');
+    if (login === null) {
+      login = '';
+    }
+    var email = localStorage.getItem('email');
+    if (email === null) {
+      email = '';
+    }
+    var iemail = localStorage.getItem('iemail');
+    if (iemail === null) {
+      iemail = '';
+    }
+    // Compare both emails, if they are different, display both of them
+    if (email != iemail && iemail != '') {
+      email = email + '</u> (email institutionnel : <u>' + iemail + ')';
+    }
+
+    // Construct an identification string
+    content = content + "<p><b>Le contenu de ce cours est contextuel.</b> V&eacute;rifiez les informations suivantes, s'il-vous-plait&nbsp;:</p>\n<ul>";
+
+    var registered = false;
+    if (email == '' && login == '') {
+      // Not registered
+      content = content + "\n<li><u>Vous &ecirc;tes anonyme sur ce site.</u> <b>Votre progression dans les exercices ne sera pas enregistr&eacute;e.</b></li>";
+
+    } else {
+      // Registered user
+      registered = true;
+      if (login != '') {
+        content = content + "\n<li>Login&nbsp;: <u>" + login + "</u></li>";
+      }
+      if (email != '') {
+        content = content + "\n<li>Email&nbsp;: <u>" + email + "</u></li>";
+      }
+      content = content + "\n<b>Votre progression dans les exercices sera enregistr&eacute;e sous cette identit&eacute;.</b>";
+    }
+
+    // institution and icourse possibly change the content. So, must be checked!
+    var context = false;
+    var institution = localStorage.getItem('institution');
+    if (institution == null || institution == '') {
+      institution = 'ind&eacute;termin&eacute;e';
+    } else {
+      context = true;
+    }
+    var icourse = localStorage.getItem('icourse');
+    if (icourse == null || icourse == '') {
+      icourse = 'ind&eacute;termin&eacute;';
+    } else {
+      context = true;
+      var ictitle = localStorage.getItem('ictitle');
+      if (ictitle != null && ictitle != '') {
+        icourse = ictitle + ' (' + icourse + ')';
+      }
+    }
+    content = content + "\n<li>Cours&nbsp;: <u>" + icourse + "</u></li>";
+    content = content + "\n<li>Institution&nbsp;: <u>" + institution + "</u></li>";
+    content = content + "\n</ul>";
+    if (context) {
+      content = content + "<p><b>Le contenu sera adapt&eacute; en fonction de ce contexte.</b> V&eacute;rifiez qu'il est correct, sinon fermez cette page et relancer-l&agrave; depuis le syst&egrave;me d'apprentissage en ligne de votre Universit&eacute; (Moodle, ...). Si les donn&eacute;es sont toujours incorrectes, contactez vos enseignants.</p>";
+    } else {// No context
+      content = content + "<p><b>N'&eacute;tant dans aucun contexte de cours particulier, vous n'aurez acc&egrave;s qu'&agrave un contenu g&eacute;n&eacute;raliste.</b> Si c'est ce que vous souhaitez... Bienvenue&nbsp;! Sinon, fermez cette page et relancer-l&agrave; depuis le syst&egrave;me d'apprentissage en ligne de votre Universit&eacute; (Moodle, ...). Si les donn&eacute;es sont toujours incorrectes, contactez vos enseignants.</p>";
+    }
+
+    // If registered user and/or special context, offer to reset it
+    if (registered || context) {
+      content = content + "\n<p>Pour explorer ces pages de mani&egrave;re anonyme et n'enregistrer aucune activit&eacute;, vous pouvez &eacute;liminez vos informations personnelles en cliquant sur le bouton juste ci-dessous.</p>";
+      content = content + '<button onclick="clearStorageFr()">Effacer mes donn&eacute;es personnelles</button>';
+    }
+    // Those variables are possibly defined, but they are not tested here (yet)
+    //var displayname = localStorage.getItem('displayname');
+    //var firstname = localStorage.getItem('firstname');
+    //var lastname = localStorage.getItem('lastname');
+    //var ifirstname = localStorage.getItem('ifirstname');
+    //var ilastname = localStorage.getItem('ilastname');
+    //var iid = localStorage.getItem('iid');
+    //var iurl = localStorage.getItem('iurl');
+    //var iref = localStorage.getItem('iref');
+  }
+
+  container.innerHTML = content;
+}
+diagnoseSystemFr();
+</script>
+<noscript>
+<b>Le diagnostic ne peut se terminer car Javascript ne fonctionne pas, or il est indispensable pour ce site ! Tout le contenu interactif et contextuel sera inutilisable. Veuillez activer Javascript, s’il-vous-plait…</b>
+</noscript>
+</div>
+</div>
+<p>This is just a demo of the various possibilities of our {learndown}-extended bookdown format. It is intended to be used with the SciViews Box 2020.</p>
+<p><img src="images/front-cover.png" /></p>
+<hr />
+<p><em>The content of this book is distributed under a <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a> license.</em></p>
+<hr />
+<div id="system-information" class="section level5 unnumbered">
+<h5>System information</h5>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r hidden-code"><code class="sourceCode r"><span id="cb1-1"><a href="index.html#cb1-1"></a>sessioninfo<span class="op">::</span><span class="kw">session_info</span>()</span></code></pre></div>
+<pre><code># ─ Session info ───────────────────────────────────────────────────────────────
+#  setting  value                       
+#  version  R version 3.6.3 (2020-02-29)
+#  os       macOS Catalina 10.15.5      
+#  system   x86_64, darwin15.6.0        
+#  ui       X11                         
+#  language (EN)                        
+#  collate  en_US.UTF-8                 
+#  ctype    en_US.UTF-8                 
+#  tz       Europe/Brussels             
+#  date     2020-08-19                  
+# 
+# ─ Packages ───────────────────────────────────────────────────────────────────
+#  package     * version    date       lib source                            
+#  assertthat    0.2.1      2019-03-21 [1] CRAN (R 3.6.0)                    
+#  bookdown      0.18       2020-03-05 [1] CRAN (R 3.6.0)                    
+#  cli           2.0.2      2020-02-28 [1] CRAN (R 3.6.0)                    
+#  crayon        1.3.4.9000 2020-04-29 [1] Github (r-lib/crayon@dcf6d44)     
+#  digest        0.6.25     2020-02-23 [1] CRAN (R 3.6.0)                    
+#  evaluate      0.14       2019-05-28 [1] CRAN (R 3.6.0)                    
+#  fansi         0.4.1      2020-01-08 [1] CRAN (R 3.6.0)                    
+#  glue          1.4.0      2020-04-03 [1] CRAN (R 3.6.2)                    
+#  htmltools     0.4.0.9003 2020-04-29 [1] Github (rstudio/htmltools@984b39c)
+#  knitr         1.28       2020-02-06 [1] CRAN (R 3.6.0)                    
+#  learndown     1.0.0      2020-08-18 [1] local                             
+#  magick        2.4.0      2020-06-23 [1] CRAN (R 3.6.2)                    
+#  magrittr      1.5        2014-11-22 [1] CRAN (R 3.6.0)                    
+#  Rcpp          1.0.4.6    2020-04-09 [1] CRAN (R 3.6.2)                    
+#  rlang         0.4.5      2020-03-01 [1] CRAN (R 3.6.0)                    
+#  rmarkdown     2.1        2020-01-20 [1] CRAN (R 3.6.0)                    
+#  sessioninfo   1.1.1      2018-11-05 [1] CRAN (R 3.6.0)                    
+#  stringi       1.4.6      2020-02-17 [1] CRAN (R 3.6.0)                    
+#  stringr       1.4.0      2019-02-10 [1] CRAN (R 3.6.0)                    
+#  webshot       0.5.2      2019-11-22 [1] CRAN (R 3.6.0)                    
+#  withr         2.2.0      2020-04-20 [1] CRAN (R 3.6.2)                    
+#  xfun          0.13       2020-04-13 [1] CRAN (R 3.6.2)                    
+#  yaml          2.2.1      2020-02-01 [1] CRAN (R 3.6.0)                    
+# 
+# [1] /Library/Frameworks/R.framework/Versions/3.6/Resources/library</code></pre>
+
+</div>
+</div>
+
+
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+/*(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://sddb.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();*/
+</script>
+<!--<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>-->
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+<a href="intro.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/phgrosjean/bookdown-test/edit/master/index.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": "https://github.com/phgrosjean/bookdown-test/blob/master/index.Rmd",
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

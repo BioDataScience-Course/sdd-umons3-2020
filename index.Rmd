@@ -1,0 +1,54 @@
+--- 
+title: "A Test Bookdown Book"
+author: "Philippe Grosjean & Guyliann Engels"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output:
+  bookdown::gitbook:
+    info: yes
+    includes:
+      in_header: header.html
+      after_body: footer.html
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+github-repo: phgrosjean/bookdown-test
+url: 'http\://phgrosjean.sciviews.org/bookdown-test/'
+description: "Template for a learndown-enhanced bookdown document."
+cover-image: "images/front-cover.png"
+---
+
+# Preamble {-}
+
+<!-- Compile the bibliography from different sources -->
+
+```{r setup, include=FALSE, cache=FALSE}
+knitr::write_bib(c(.packages(), 'bookdown', 'knitr', 'rmarkdown'), 'packages.bib')
+```
+
+<!-- Diagnose the user login status, example in English and in French -->
+
+Information about connected user build be {learndown} automatically:
+
+`r learndown::diagnose_login(lang = "en")`
+
+The same one in French\ :
+
+`r learndown::diagnose_login(lang = "fr")`
+
+This is just a demo of the various possibilities of our {learndown}-extended bookdown format. It is intended to be used with the SciViews Box `r learndown$svbox`.
+
+![](images/front-cover.png)
+
+----
+
+_The content of this book is distributed under a [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr) license._
+
+----
+
+##### System information {-}
+
+```{r, class.source='hidden-code'}
+sessioninfo::session_info()
+```
