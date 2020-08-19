@@ -1,5 +1,5 @@
 --- 
-title: "A Test Bookdown Book"
+title: "Science des données biologiques III"
 author: "Philippe Grosjean & Guyliann Engels"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
@@ -13,37 +13,34 @@ documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: yes
-github-repo: phgrosjean/bookdown-test
-url: 'http\://phgrosjean.sciviews.org/bookdown-test/'
-description: "Template for a learndown-enhanced bookdown document."
+github-repo: 'BioDataScience-Course/sdd-umons3-2020'
+url: 'https\://wp.sciviews.org/sdd-umons3-2020/'
+description: "Tutoriel interactif pour la science des données avec R & SciViews-R III."
 cover-image: "images/front-cover.png"
 ---
 
-# Preamble {-}
+# Préambule {-}
 
-<!-- Compile the bibliography from different sources -->
 
 ```{r setup, include=FALSE, cache=FALSE}
 knitr::write_bib(c(.packages(), 'bookdown', 'knitr', 'rmarkdown'), 'packages.bib')
 ```
 
-<!-- Diagnose the user login status, example in English and in French -->
-
-Information about connected user build be {learndown} automatically:
-
-`r learndown::diagnose_login(lang = "en")`
-
-The same one in French\ :
-
 `r learndown::diagnose_login(lang = "fr")`
 
-This is just a demo of the various possibilities of our {learndown}-extended bookdown format. It is intended to be used with the SciViews Box `r learndown$svbox`.
+Cet ouvrage interactif est le troisième volume d'une série de trois ouvrages traitant de la science des données biologiques. L'écriture de cette suite de livres a débuté au cours de l'année académique 2018-2019.
+
+Pour l'année académique 2020-2021, cet ouvrage interactif est le support du cours suivant\ :
+
+- [Science des données III : exploration et prédiction, UMONS](http://applications.umons.ac.be/web/fr/pde/2020-2021/ue/US-M1-BIOL60-004-M.htm) dont le responsable est Philippe Grosjean
+
+Cet ouvrage est conçu pour être utilisé de manière interactive en ligne. En effet, nous y ajoutons des vidéos, des démonstrations interactives ainsi que des exercices sous forme de questionnaires interactifs. **Ces différents éléments ne sont, bien évidemment, utilisables qu'en ligne.**
 
 ![](images/front-cover.png)
 
 ----
 
-_The content of this book is distributed under a [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr) license._
+_Le matériel dans cet ouvrage est distribué sous licence [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr)._
 
 ----
 

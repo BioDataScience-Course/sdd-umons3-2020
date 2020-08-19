@@ -1,6 +1,6 @@
 Package: placeholder
 Type: Book
-Title: Bookdown test
+Title: SDD III UMONS version 2020
 Version: 1.0.0
 Imports: bookdown
 Depends: learndown

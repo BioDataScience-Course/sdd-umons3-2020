@@ -1,7 +1,0 @@
-# Diving In {#divein}
-
-```{r setup, include=FALSE, cache=FALSE}
-# Anything you want to do with R here
-```
-
-Now let's talk details (just to give an example of a second module).

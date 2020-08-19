@@ -14,14 +14,14 @@ h5p <- function(id, ...)
   learndown::h5p(id, baseurl = learndown$baseurl, ...)
 
 launch_shiny <- function(url, fun = "BioDataScience::runApp",
-  alt1 = "*Click to start the Shiny application*",
-  #FR alt1 = "*Cliquez pour lancer l'application Shiny*",
+  #ENalt1 = "*Click to start the Shiny application*",
+  alt1 = "*Cliquez pour lancer l'application Shiny*",
+  #ENalt2 = paste0(
+  #EN  "*Click to start or run `{fun}(\"{app}\")` in the svbox",
+  #EN  learndown$svbox, ".*"), ...)
   alt2 = paste0(
-    "*Click to start or run `{fun}(\"{app}\")` in the svbox",
+    "*Cliquez pour lancer ou exécutez `{fun}(\"{app}\")` dans la svbox",
     learndown$svbox, ".*"), ...)
-  #FR alt2 = paste0(
-  #FR "*Cliquez pour lancer ou exécutez `{fun}(\"{app}\")` dans la svbox",
-  #FR learndown$svbox, ".*"), ...)
   learndown::launch_shiny(url = url, imgdir = learndown$shiny_imgdir, fun = fun,
     alt1 = alt1, alt2 = alt2, ...)
 
@@ -32,8 +32,8 @@ launch_learnr <- function(url, fun = "BioDataScience::run", ...)
 # in style.css and header.html, respectively
 learndown::learndown_init(
   baseurl = learndown$baseurl,
-  hide.code.msg = "See the code",
-  #FR hide.code.msg = "Voir le code",
+  #EN hide.code.msg = "See the code",
+  hide.code.msg = "Voir le code",
   institutions = learndown$institutions,
   courses = learndown$courses)
 

@@ -7,14 +7,14 @@ bookdown::gitbook:
     toc:
       collapse: subsection
       before: |
-        <li><a href="./">A Test Bookdown Book</a></li>
+        <li><a href="./">Science des données biologiques III</a></li>
       after: |
-        <li><a href="http://example1.org">Example link 1</a></li>
-        <li><a href="https://example2.org">Example link 2</a></li>
+        <li><a href="https://wp.sciviews.org">Site Web du cours</a></li>
+        <li><a href="https://github.com/BioDataScience-Course">Site Github Du cours</a></li>
         <br/>
-        <li><a href="https://github.com/rstudio/bookdown" target="blank">Published bookdown</a></li>
-    edit: https://github.com/phgrosjean/bookdown-test/edit/master/%s
-    view: https://github.com/phgrosjean/bookdown-test/blob/master/%s
+        <li><a href="https://github.com/rstudio/bookdown" target="blank">Publié avec bookdown</a></li>
+    edit: https://github.com/BioDataScience-Cours/sdd-umons3-2020/edit/master/%s
+    view: https://github.com/BioDataScience-Cours/sdd-umons3-2020/blob/master/%s
     #download: ["pdf", "epub"]
 bookdown::pdf_book:
   includes:
