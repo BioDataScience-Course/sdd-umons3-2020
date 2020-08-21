@@ -4,3 +4,4 @@ The source files for the SDD-UMONS3 book edition 2020-2021, written using [bookd
 
 The content of this book is licensed under
 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr).
+
