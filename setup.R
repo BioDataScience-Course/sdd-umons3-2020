@@ -5,8 +5,7 @@ learndown <- list(
   svbox = 2020,                        # The SciViews Box version used
   institutions = "UMONS",              # Known institutions
   courses = c(
-    "S-BIOG-006", "S-BIOG-027",        # SDD1 Q1 & Q2
-    "S-BIOG-921"                       # SDD1 Charleroi
+    "S-BIOG-025"                       # SDD3
   )
 )
 

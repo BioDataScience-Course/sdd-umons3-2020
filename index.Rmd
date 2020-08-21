@@ -14,7 +14,7 @@ bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: yes
 github-repo: 'BioDataScience-Course/sdd-umons3-2020'
-url: 'https\://wp.sciviews.org/sdd-umons3-2020/'
+url: 'https\://wp.sciviews.org/sdd-umons3/'
 description: "Tutoriel interactif pour la science des données avec R & SciViews-R III."
 cover-image: "images/front-cover.png"
 ---
@@ -43,6 +43,38 @@ Cet ouvrage est conçu pour être utilisé de manière interactive en ligne. En 
 _Le matériel dans cet ouvrage est distribué sous licence [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr)._
 
 ----
+
+## Vue générale du cours {-}
+
+Le cours de **Science des données III : exploration et prédiction** est donné aux étudiants de premier Master BBMC (Biochimie, Biologie Moléculaire et Cellulaire) et BOE (Biologie des Organismes et Populations) en Faculté des Sciences de l'Université de Mons à partir de l'année académique 2020-2021 (nouvelle mouture du cours).
+
+La matière est divisée en six modules de 6h chacun en présentiel. Il nécessitera environ un tiers de ce temps (voir plus, en fonction de votre rythme et de votre technique d'apprentissage) en travail à domicile. **Cette matière fait suite au deux premiers cours dont les contenus sont considérés comme assimilés (voir https://wp.sciviews.org/sdd-umons et https://wp.sciviews.org/sdd-umons2).**
+
+<!-- A faire: un diagramme qui montre la relation entre ces différents modules, et avec les modules du cours 1 -->
+
+Les trois premiers modules de ce cours se concentrent sur les techniques d'apprentissage machine (*machine learning* en anglais) qui prennent de plus en plus d'importance de nos jours dans tous les domaines, y compris la biologie. Ces techniques utilisent des algorithmes d'apprentissage à la base de l'intelligence artificielle et du "deep learning".
+
+Ensuite, deux modules sont consacrés à des données particulières avec dépendance temporelles (les séries dites "spatio-temporelles" ou chronologiques). L'étude de phénomènes qui évoluent dans le temps est courant en biologie, et l'analyse de telles données nécessite l'utilisation de techniques statistiques adaptées que nous aborderons dans cette partie.
+
+Enfin, un dernier module sera consacré à une initiation à l'analyse de données spatialisées et à la réalisation de cartes avec R. Icic aussi, il s'agit d'un aspect important pour beaucoup de biologistes, en particuliers ceux qui travaillent sur le terrain.
+
+## Matériel pédagogique {-}
+
+Le matériel pédagogique, rassemblé dans ce syllabus interactif est aussi varié que possible. Vous pourrez ainsi piocher dans l'offre en fonction de vos envies et de votre profil d'apprenant pour optimiser votre travail. Vous trouverez\ :
+
+- le présent ouvrage en ligne,
+
+- des tutoriaux interactifs (réalisés avec un logiciel appelé `learnr`). Vous pourrez exécuter ces tutoriaux directement sur votre ordinateur, et vous aurez alors accès à des pages Web réactives contenant des explications, des exercices et des quizzs en ligne,
+
+- des slides de présentations,
+
+- des dépôts Github Classroom dans la section `BioDataScience-Course` pour réaliser et documenter vos travaux personnels.
+
+- des renvois vers des documents externes en ligne, types vidéos youtube ou vimeo, des ouvrages en ligne en anglais ou en français, des blogs, des tutoriaux, des questions sur des sites comme "Stackoverflow" ou issues des "mailing lists" R, ...
+
+```{block, type='info'}
+Tout ce matériel est accessible à partir du [site Web du cours](https://wp.sciviews.org), du présent syllabus interactif (et de Moodle pour les étudiants de l'UMONS). Ces derniers ont aussi accès au dossier ` SDD` sur `StudentTemp` en Intranet à l'UMONS. Les aspects pratiques seront à réaliser en utilisant la **'SciViews Box 2020'**, une machine virtuelle préconfigurée. Nous installerons ensemble la nouvelle version 2020 de cette SciViews Box au premier cours. Il est donc très important que vous soyez présent à ce cours, et vous pouvez venir aussi si vous le souhaitez avec votre propre ordinateur portable comme pour les cours précédents. Enfin, vous pourrez toujours poser vos questions par mail à l'adresse `sdd@sciviews.org`.
+```
 
 ##### System information {-}
 
