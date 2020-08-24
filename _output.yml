@@ -13,8 +13,8 @@ bookdown::gitbook:
         <li><a href="https://github.com/BioDataScience-Course">Site Github Du cours</a></li>
         <br/>
         <li><a href="https://github.com/rstudio/bookdown" target="blank">Publié avec bookdown</a></li>
-    edit: https://github.com/BioDataScience-Cours/sdd-umons3-2020/edit/master/%s
-    view: https://github.com/BioDataScience-Cours/sdd-umons3-2020/blob/master/%s
+    edit: https://github.com/BioDataScience-Course/sdd-umons3-2020/edit/master/%s
+    view: https://github.com/BioDataScience-Course/sdd-umons3-2020/blob/master/%s
     #download: ["pdf", "epub"]
 bookdown::pdf_book:
   includes:

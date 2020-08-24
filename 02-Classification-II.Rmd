@@ -1,0 +1,3 @@
+# Classification supervisée II {#classif2}
+
+...
