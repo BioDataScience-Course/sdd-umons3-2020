@@ -28,12 +28,6 @@ knitr::write_bib(c(.packages(), 'bookdown', 'knitr', 'rmarkdown'), 'packages.bib
 
 `r learndown::diagnose_login(lang = "fr")`
 
-Cet ouvrage interactif est le troisième volume d'une série de trois ouvrages traitant de la science des données biologiques. L'écriture de cette suite de livres a débuté au cours de l'année académique 2018-2019.
-
-Pour l'année académique 2020-2021, cet ouvrage interactif est le support du cours suivant\ :
-
-- [Science des données III : exploration et prédiction, UMONS](http://applications.umons.ac.be/web/fr/pde/2020-2021/ue/US-M1-BIOL60-004-M.htm) dont le responsable est Philippe Grosjean
-
 Cet ouvrage est conçu pour être utilisé de manière interactive en ligne. En effet, nous y ajoutons des vidéos, des démonstrations interactives ainsi que des exercices sous forme de questionnaires interactifs. **Ces différents éléments ne sont, bien évidemment, utilisables qu'en ligne.**
 
 ![](images/front-cover.png)
@@ -44,19 +38,43 @@ _Le matériel dans cet ouvrage est distribué sous licence [CC BY-NC-SA 4.0](htt
 
 ----
 
-## Vue générale du cours {-}
+<details><summary>Informations système</summary>
 
-Le cours de **Science des données III : exploration et prédiction** est donné aux étudiants de premier Master BBMC (Biochimie, Biologie Moléculaire et Cellulaire) et BOE (Biologie des Organismes et Populations) en Faculté des Sciences de l'Université de Mons à partir de l'année académique 2020-2021 (nouvelle mouture du cours).
+```{r, class.source='hidden-code'}
+sessioninfo::session_info()
+```
 
-La matière est divisée en six modules de 6h chacun en présentiel. Il nécessitera environ un tiers de ce temps (voir plus, en fonction de votre rythme et de votre technique d'apprentissage) en travail à domicile. **Cette matière fait suite au deux premiers cours dont les contenus sont considérés comme assimilés (voir https://wp.sciviews.org/sdd-umons et https://wp.sciviews.org/sdd-umons2).**
+</details>
 
-<!-- A faire: un diagramme qui montre la relation entre ces différents modules, et avec les modules du cours 1 -->
+## Vue générale des cours {-}
 
-Les trois premiers modules de ce cours se concentrent sur les techniques d'apprentissage machine (*machine learning* en anglais) qui prennent de plus en plus d'importance de nos jours dans tous les domaines, y compris la biologie. Ces techniques utilisent des algorithmes d'apprentissage à la base de l'intelligence artificielle et du "deep learning".
+Cet ouvrage interactif est le troisième volume d'une série de trois ouvrages traitant de la science des données biologiques. L'écriture de cette suite de livres a débuté au cours de l'année académique 2018-2019. Pour l'année académique 2020-2021, cet ouvrage interactif est le support des cours suivants\ :
+
+- [Science des données III : exploration et prédiction](http://applications.umons.ac.be/web/fr/pde/2020-2021/ue/US-M1-BIOL60-004-M.htm) aux premiers Masters BBMC (Biochimie, Biologie Moléculaire et Cellulaire) et BOE (Biologie des Organismes et Écologie) en Faculté des Sciences de l'Université de Mons, et dont le responsable est Philippe Grosjean
+
+- [Science des données IV : pratique](http://applications.umons.ac.be/web/fr/pde/2020-2021/ue/US-M2-BIOEFA-017-M.htm) cours à option donné aux deuxièmes années des mêmes Masters, et dont le responsable est Philippe Grosjean
+
+- [Science des données V : recherche reproductible](http://applications.umons.ac.be/web/fr/pde/2020-2021/ue/US-M2-BIOEFA-015-M.htm) cours à option donné aux deuxièmes années des mêmes Masters, et dont le responsable est également Philippe Grosjean
+
+La matière est divisée en six modules de 6h chacun en présentiel pour SDD III, deux modules plus une grosse partie de travail autour d'un projet en SDD IV, et enfin quatre modules en SDD V. Chaque module nécessitera environ un tiers de ce temps (voir plus, en fonction de votre rythme et de votre technique d'apprentissage) en travail à domicile. **Cette matière fait suite au deux premiers cours dont les contenus sont considérés comme assimilés (voir [cours SDD I](https://wp.sciviews.org/sdd-umons){target='top'} et [cours SDD II](https://wp.sciviews.org/sdd-umons2){target='top'}).**
+
+<!-- A faire: un diagramme qui montre la relation entre ces différents modules, et avec les modules des deux cours précédents -->
+
+### SDD III : exploration et prédiction {-}
+
+Les trois premiers modules de ce cours se concentrent sur les techniques de classification supervisée, encore appelées apprentissage machine (*machine learning* en anglais) qui prennent de plus en plus d'importance de nos jours dans tous les domaines, y compris la biologie. Ces techniques utilisent des algorithmes d'apprentissage à la base de l'intelligence artificielle et du "deep learning".
 
 Ensuite, deux modules sont consacrés à des données particulières avec dépendance temporelles (les séries dites "spatio-temporelles" ou chronologiques). L'étude de phénomènes qui évoluent dans le temps est courant en biologie, et l'analyse de telles données nécessite l'utilisation de techniques statistiques adaptées que nous aborderons dans cette partie.
 
-Enfin, un dernier module sera consacré à une initiation à l'analyse de données spatialisées et à la réalisation de cartes avec R. Icic aussi, il s'agit d'un aspect important pour beaucoup de biologistes, en particuliers ceux qui travaillent sur le terrain.
+Enfin, un dernier module sera consacré à une initiation à l'analyse de données spatialisées et à la réalisation de cartes avec R. Ici aussi, il s'agit d'un aspect important pour beaucoup de biologistes, en particuliers ceux qui travaillent sur le terrain.
+
+### SDD IV : pratique {-}
+
+Ce cours à option apporte quelques compléments via deux modules supplémentaires. Nous y abordons des données particulières comme les dates, les données circulaires et le texte (y compris les expressions régulières). Le second module vise à s'organiser pour gérer au mieux un gros projet. D'ailleurs, les étudiants ont à réaliser un projet de plus grande envergure que ce qu'ils ont fait jusqu'ici, sur base des analyses qu'ils ont à réaliser par ailleurs dans le cadre de leur mémoire de fin d'étude, ou sur des données similaires.
+
+### SDD V : recherche reproductible {-}
+
+Ce cours à option vient terminer la formation en science de données biologiques en approfondissant la gestion du code et des projets et en s'intéressant à un "écosystème logiciel" plus large avec les bases de données et le calcul sur le cloud. Quatre modules abordent successivement la modularisation du code, son optimisation et test, la gestion de bases de données, et enfin, l'utilisation de packages R, de calcul en parallèle et sur le cloud. Un projet mettant en œuvre ces techniques plus avancées est également réalisé par les étudiants qui ont choisi de suivre ce cours. *Le cours SDD IV est co-requis*. Il n'est donc pas possible de le choisir sans avoir assimilé les notions de SDD IV auquel il est la suite logique dans un perfectionnement des techniques.
 
 ## Matériel pédagogique {-}
 
@@ -64,20 +82,14 @@ Le matériel pédagogique, rassemblé dans ce syllabus interactif est aussi vari
 
 - le présent ouvrage en ligne,
 
-- des tutoriaux interactifs (réalisés avec un logiciel appelé `learnr`). Vous pourrez exécuter ces tutoriaux directement sur votre ordinateur, et vous aurez alors accès à des pages Web réactives contenant des explications, des exercices et des quizzs en ligne,
+- des tutoriels interactifs (réalisés avec un logiciel appelé `learnr`). Vous pourrez exécuter ces tutoriels directement sur votre ordinateur, et vous aurez alors accès à des pages Web réactives contenant des explications, des exercices et des quizzs en ligne,
 
-- des slides de présentations,
+- des diapositives de présentations,
 
-- des dépôts Github Classroom dans la section `BioDataScience-Course` pour réaliser et documenter vos travaux personnels.
+- des dépôts GitHub Classroom dans la section `BioDataScience-Course` pour réaliser et documenter vos travaux personnels.
 
-- des renvois vers des documents externes en ligne, types vidéos youtube ou vimeo, des ouvrages en ligne en anglais ou en français, des blogs, des tutoriaux, des questions sur des sites comme "Stackoverflow" ou issues des "mailing lists" R, ...
+- des renvois vers des documents externes en ligne, types vidéos youtube ou vimeo, des ouvrages en ligne en anglais ou en français, des blogs, des tutoriels, des questions sur des sites comme "Stackoverflow" ou issues des "mailing lists" R, ...
 
 ```{block, type='info'}
-Tout ce matériel est accessible à partir du [site Web du cours](https://wp.sciviews.org), du présent syllabus interactif (et de Moodle pour les étudiants de l'UMONS). Ces derniers ont aussi accès au dossier ` SDD` sur `StudentTemp` en Intranet à l'UMONS. Les aspects pratiques seront à réaliser en utilisant la **'SciViews Box 2020'**, une machine virtuelle préconfigurée. Nous installerons ensemble la nouvelle version 2020 de cette SciViews Box au premier cours. Il est donc très important que vous soyez présent à ce cours, et vous pouvez venir aussi si vous le souhaitez avec votre propre ordinateur portable comme pour les cours précédents. Enfin, vous pourrez toujours poser vos questions par mail à l'adresse `sdd@sciviews.org`.
-```
-
-##### System information {-}
-
-```{r, class.source='hidden-code'}
-sessioninfo::session_info()
+Tout ce matériel est accessible à partir du [site Web du cours](https://wp.sciviews.org){target='top'}, du présent syllabus interactif (et de Moodle pour les étudiants de l'UMONS). Ces derniers ont aussi accès au dossier ` SDD` sur `StudentTemp` en Intranet à l'UMONS. Les aspects pratiques seront à réaliser en utilisant la **'SciViews Box 2020'**, une machine virtuelle préconfigurée. Nous installerons ensemble la nouvelle version 2020 de cette SciViews Box au premier cours. Il est donc très important que vous soyez présent à ce cours, et vous pouvez venir aussi si vous le souhaitez avec votre propre ordinateur portable comme pour les cours précédents. Enfin, vous pourrez toujours poser vos questions par mail à l'adresse `sdd@sciviews.org`.
 ```
