@@ -1,0 +1,240 @@
+# (APPENDIX) Appendices {-}
+
+# Langage R {#langage}
+
+**R** (Ihaka et Gentleman 1996, R Development Core Team 2020, mais voyez aussi [http://www.r-project.org](http://www.r-project.org/)) est un fantastique environnement de travail pour réaliser des analyses statistiques, des modélisations et bien d'autres calculs scientifiques. Il est basé sur un langage à la fois puissant et fonctionnellement très riche\ : le **langage R**, lui-même basé sur le **langage S**. Historiquement, S-PLUS était un logiciel commercial d'un environnement statistique autour du langage S ayant un certain succès à la fin du vingtième siècle. R est sa contrepartie "Open Source", c'est-à-dire, gratuit et libre. Au fil du temps, la communauté ouverte de développeurs autour de R s'est agrandie, tandis que S-PLUS n'a pas reçu le même niveau d'attention. Aujourd'hui, R est un langage dominant, alors que S (et S-PLUS) ont pratiquement totalement disparu.
+
+La richesse de R est telle qu'elle vous permet d'effectuer tout type d'analyse ou de graphique statistique, sans jamais être bridé par les possibilités du logiciel. Lorsque vous voulez réaliser une analyse ou un graphique qui n'existe pas encore dans R, son langage vous permet de le programmer vous-même. La licence "Open Source" de R vous autorise ensuite de redistribuer librement votre nouvelle fonction à tout le monde. C'est cette approche "Open source", autant que la puissance de son langage qui font le succès de R. Ainsi, au fil du temps, la quasi-totalité des méthodes statistiques a été progressivement (re)développée sous R par une large communauté d'utilisateurs devenus programmeurs. De plus, les *nouvelles* techniques statistiques sont maintenant souvent *d'abord* développée en R (ou en Python, surtout dans le domaine du "machine learning"/"deep learning"). Donc, R et Python sont deux langage informatiques incontournables pour la science des données. R est plus indiqué pour le biologiste car il nécessite un peu moins de connaissances en programmation pure et dure pour pouvoir l'utiliser (par exemple, le nombre de type d'objets de base différents est moins large, ce qui en facilite le choix pour un utilisateur qui ne connais pas la différence entre `list`, `tuple`, `dictionnary` en Python, pour le même usage, il utilisera toujours le type `list` en R).
+
+Aujourd'hui, plusieurs centaines de **packages** additionnels sont disponibles (un package R est une extension contenant des nouvelles fonctions, voir [http://cran.r-project.org](http://cran.r-project.org/)) pour étendre les fonctionnalités de votre environnement de travail R. Les facilités offertes pour de nouveaux développements sont telles que bien des statisticiens qui créent de nouvelles techniques, le font maintenant directement dans R. Cela signifie que R est en développement constant, et est à jour dans de nombreux domaines de la statistique, même ceux en pleine évolution, comme par exemple le "data mining", le "machine learning", ou encore, la bioinformatique.
+
+Une telle richesse fonctionnelle a, par contre, un revers. Étant donné que R contient des dizaines de milliers de fonctions différentes, réparties dans des centaines de packages, et que son langage est puissant au point de s'adapter à toutes les situations rencontrées en statistiques, son apprentissage est relativement abrupt. Avant d'être réellement productif dans R, il faut assimiler un grand nombre de notions, parfois assez pointues. Le travail nécessaire peut rebuter plus d'un débutant, qui s'orientera alors vers un logiciel moins riche, mais plus simple à aborder, et qui donnera plus rapidement quelques résultats. A moyen et long terme, c'est un mauvais choix\ : soit cet utilisateur décide délibérément de s'en tenir aux fonctions limitées de son logiciel "facile", soit il faudra quand même un jour ou l'autre qu'il apprenne à utiliser un vrai logiciel statistique professionnel, tel que R... alors dans ce cas, pourquoi ne pas commencer tout de suite ?
+
+La meilleure façon d'étudier R, **c'est en l'utilisant**. Les ingrédients pour votre progression sont\ :
+
+1. Votre **motivation**, principalement poussée par les différentes questions que vous vous posez et qui pourraient être résolues en utilisant R.
+2. Votre **capacité à l'auto-apprentissage** pour arriver à résoudre ce problèmes. Il est naturellement beaucoup plus facile et rapide de demander à un spécialiste... mais qu'apprendrez-vous de cette façon ? Pas grand chose ! C'est pour cette raison que ces notes ne vous présenteront que les bases,... et vous apprendra surtout à en découvrir plus **par vous-même**. Ne sous-estimez jamais votre potentiel à résoudre les problèmes par vous-même. Non seulement, vous en tirerez une immense satisfaction, mais également, vous apprendrez à résoudre les problèmes futurs plus rapidement ! Ainsi, même si vous avez l'impression de perdre votre temps en tournant en rond, la persévérance est toujours payante au long terme.
+3. La **documentation et les livres**. Utilisez-les et abusez-en ! Il existe des milliers de pages sous la forme d'aide en ligne, de foires-aux-questions (FAQ), de cours en lignes, et d'autres ouvrages dédiés à R. Considérez-les comme votre principale source d'inspiration.
+4. Seulement si vous avez essayé de résoudre le problème par vous-même et que vous avez consulté toute la documentation disponible, sans obtenir la solution, alors **n'hésitez pas à consulter un expert**. Une solution existe probablement. Vous pouvez poser la question à des collègues ou des amis, mais je vous conseille d'utiliser surtout l'excellent **liste de diffusion R-Help** (voyez [http://cran.r-project.org](http://cran.r-project.org/)). Cette liste de diffusion est très active. Elle est fréquentée par la plupart des experts mondiaux du langage R, et ces experts vous répondent généralement en l'espace de quelques heures\ !
+
+Bien que cette approche de l'auto-apprentissage soit certainement la plus efficace, il est quand même très difficile d'aborder un système aussi complexe que R tout seul depuis le début. Ce cours introductif est là pour vous mettre le pied à l'étrier, en vous familiarisant avec les notions clefs à comprendre pour pouvoir comprendre et décrypter l'abondante littérature sur R.
+
+## Introduction au langage de R
+
+> L’expérience montre que l’interface graphique, si elle facilite les premiers pas, est bien souvent contre-productive parce que l’utilisateur guidé par les menus et les boites de dialogues se lance moins volontiers dans l’écriture de scripts et dans l’exploration des nombreuses fonctions qui ne sont pas reprises dans ces menus. Ne vous laissez donc pas intimider, et dites-vous bien que vous allez largement rattraper le temps passé à apprendre le langage S, grâce aux habitudes de travail efficaces que vous aurez acquises en même temps!
+
+Cette partie a pour but de vous permettre de vous initier facilement à R, et aussi, de vous donner une idée de l'étendue de ses possibilités. Étant donné qu'aucun prérequis n'est nécessaire (à part savoir utiliser un ordinateur), nous commencerons par les bases élémentaires qui peuvent être parcourues rapidement par ceux qui ont l'habitude de manipuler des langages matriciels tels que Matlab, Gauss ou encore S-PLUS. Plus loin, nous aborderons aussi des notions plus complexes à l'intention des plus expérimentés. Que les débutants ne s'effrayent donc pas s'ils décrochent un moment donné: ils pourront toujours reprendre les points difficiles plus tard lorsqu'ils auront assimilé les bases.
+
+### Lancer R
+
+Une fois installé, sous Windows, R est accessible par défaut soit à partir d'un raccourci sur le bureau, soit à partir d'une entrée dans le menu ***Démarrer***.
+
+- Double-cliquez sur l'icône **'R 2.2.1**' sur le bureau, ou activez le menu** *****Démarrer -&gt; Programme -&gt; R -&gt; R 2.2.1***. Nous n'avons pas besoin, ici, des outils complémentaires de SciViews-R.
+- Sous Windows, vous vous trouvez face à une fenêtre appelée **RGui** avec quelques menus et à l'intérieur une seule sous-fenêtre est ouverte: la fenêtre de commandes ou **R Console **dans laquelle vous allez pouvoir entrer les commandes, à moins que vous n'ayez configuré l'application en mode **SDI**, auquel cas, vous n'aurez qu'une suele fenêtre nommée **R Console.**
+
+### Premières commandes
+
+Dans la fenêtre de commande de R, apparaît un entête (qui indique la version, les termes de licence ainsi que quelques instructions de base) et puis le **prompt** qui se présente sous la forme d'un signe "plus grand que" (&gt;). Ce dernier indique que R est prêt à recevoir une commande qu'il interprètera aussitôt qu'elle sera rentrée.
+
+- Taper *1+1{enter}* (où {enter} signifie appuyer sur la touche entrée du clavier). R répond:
+
+    [1] 2
+
+R est un langage matriciel. Ce qui signifie qu'il retourne toujours une matrice (ou un vecteur, à la rigueur), fût-elle d'une seule ligne et d'une seule colonne comme ici. Le \[1\] indique que le résultat commence au premier (et seul) élément de la matrice,… et cet élément contient le résultat de votre calcul, soit 2… magique, non?
+
+- Pour créer une séquence, on peut entrer deux chiffres séparés par ":", le premier indiquant le début de la séquence et le second en indiquant la fin. Entrez *1:5*, R répond :
+
+    [1] 1 2 3 4 5
+
+Cette fois-ci, on a un vecteur de 5 éléments contenant la séquence générée.
+
+- Les calculs sur les vecteurs et matrices se font tout naturellement. Entrer: *1:5+1* et vous obtiendrez:
+
+    [1] 2 3 4 5 6
+
+R a créé la séquence et a additionné 1 à chacun de ses éléments. L'opérateur ":" est donc prioritaire sur l'addition, tout comme la multiplication est prioritaire sur l'addition dans par exemple 2\*3+1 signifiant (2\*3)+1. Essayez de prédire les résultats que donneront *(1:5)+1* et *1:(5+1)*?
+
+- Essayez aussi des calculs plus complexes. Vous pouvez utiliser +, -, \*, /, ^ (exposant), log(), exp(), sin(), cos(), tan(), etc… Entrez par exemple *log((10:5)^2)+sin(1:3)*. Dans cette dernière commande, log() et sin() sont des **fonctions** (notez que log est le logarithme népérien). Ces fonctions prennent des **arguments** qui sont à placer entre parenthèses. R fait un usage intensif des fonctions. Pour cette raison, on dit que R est un **langage fonctionnel** (comme Matlab). R comporte plusieurs milliers de fonctions! Et nous verrons plus loin que vous pouvez facilement créer vos propres fonctions personnalisées pour étendre encore ses possibilités.
+
+- Notez aussi que vous pouvez éditer la ligne de commande (flèches ***gauche*** et ***droite***, ***home***, ***end***, ***del***, ***backspace***, etc…). De plus, les flèches ***haut*** et ***bas*** vous permettent de naviguer dans **l'historique des commandes**, ce qui permet de rappeler des commandes entrées précédemment pour les éditer. Exercez-vous à récupérer et modifiez les commandes précédentes par ce biais.
+
+- R accepte aussi des commandes incomplètes. Dans ce cas, il modifie le prompt et affiche *+* pour vous indiquer qu'il attend la suite. Entrez par exemple *log( {enter}*, puis à la ligne suivante, terminez votre commande par: *10) {enter}*.
+
+- Toute syntaxe incorrecte est immédiatement sanctionnée par un message d'erreur. Dans ce cas, la navigation dans l'historique est très utile: appuyez sur la flèche ***haut*** pour rappeler la commande erronée et corrigez-là.
+
+- Une fonction très utile est *c()* qui permet de concaténer différents éléments au sein d'un même vecteur. Entrez par exemple *c(1,3,5,8,10) {enter}*, puis revenez à l'expression précédente (flèche ***haut***) et ajoutez *^2 {enter}*.
+
+- Enfin, "\#" sert à ajouter un commentaire en fin de ligne. Entrez par exemple *cos(c(-pi, 0, pi)) \# mon commentaire*. Vous constaterez que tout ce qui suit le \# est ignoré par l'interpréteur de commande. Si vous omettez le \# dans cette ligne, R tentera d'interpréter le 'mon commentaire' et considèrera dès lors que l'entrée est erronée! Les commentaires sont utiles lorsque l'on désire naviguer dans l'historique en mode interactif, mais aussi et surtout dans les scripts et fonctions personnalisées que nous verrons plus loin.
+
+### Variables et assignation
+
+- Le calcul direct est bien évidemment limité. On est tout de suite tenté de sauvegarder les résultats dans des variables. Cela se fait par l'opérateur d'**assignation** &lt;-, mais depuis la version 1.4.1 de R, le signe égal (*=*) est également accepté, conformément à la plupart des autres langages informatiques. Une assignation se fait donc par: *Nom.de.variables &lt;- expression* (ou *Nom.de.variable &lt;- expression*). Les noms de variables peuvent contenir les caractères A-Z, a-z, 1-0 et . (le point), doivent commencer par une lettre et sont **sensibles à la casse** (la variable A est différente de la variable a!!!). Entrez par exemple *A &lt;- log(1:10)*. R n'imprime rien parce que le résultat est stocké dans la variable A. Pour voir ce que cette variable contient, entrer simplement son nom à la ligne de commande: A. Essayez aussi d'entrer a (vous obtiendrez un message "object not found", ce qui démontre bien que "a" n'est pas équivalent à "A" comme nom de variable!
+
+- Un petit commentaire utile pour les habitués de S-PLUS qui utilisent le trait de soulignement pour les affectations (*A\_1* est en effet équivalent à *A &lt;- 1* ou encore *A = 1*). L’utilisation de ce symbole n'est plus autorisées dans les dernières versions de R. Perdez donc cette habitude d’utiliser le trait souligné comme signe d’affectation… De toutes façons, un code rempli de *A\_1* et autres *machin\_chose* est tout bonnement illisible!
+
+- Les variables sont manipulées dans les expressions comme dans tout langage. Ex: *B &lt;- exp(A); B*. Notez que ; (le point-virgule) sépare plusieurs commandes entrées sur la même ligne.
+
+- Pour connaître les variables actuellement stockées en mémoire, utilisez les fonctions *objects()* ou *ls()* ou dans Windows, l'entrée de menu ***Misc -&gt; List objects***.
+
+- Pour supprimer une ou plusieurs variables, utilisez la fonction *remove()* ou *rm()*. Pour supprimer tout, utilisez *remove(list = ls())* ou dans Windows, l'entrée de menu ***Misc -&gt; Remove all objects***. Exemple, pour supprimer la variable B, vous entrerez: *remove(B)* (vérifiez que cette variable est bien éliminée de la mémoire grâce à *ls()*).
+
+> Remarque: utilisez fréquemment ces dernières fonctions. Les variables ont tendance à s'accumuler très vite dans votre environnement de travail, et grignotent petit à petit la mémoire vive de votre ordinateur. Alors, pensez à détruire régulièrement celles qui ne vous servent plus!
+
+### Quitter R et sauvegarder les variables, notion de workspace
+
+- Pour quitter R sous Windows, vous pouvez utiliser le menu **File -&gt; Exit** ou la fonction *q()* (comme dans toutes les autres versions). Vous obtenez alors le message: "**save workspace image?, oui/non/annuler**". Qu'est-ce que cela signifie? Nous allons vous l'expliquer, mais voyons d'abord d'autres notions qui sont indispensables pour le comprendre… Ne sortez pas de R maintenant et cliquez donc sur "annuler" pour revenir à votre session de travail R actuelle.
+
+- R travaille toujours par rapport au **répertoire courant**. Pour connaître le répertoire courant, utilisez: *getwd()*. Pour changer le répertoire courant, utilisez: *setwd()* ou sous Windows, l'entrée de menu ***File -&gt; Change dir…***. Attention! Les chemins de fichiers sont représentés selon la **notation Unix**. Cela signifie que le backslash (\\) comme dans "c:\\temp" est remplacé par le slash (/), par exemple: "c:/temp". Vous pouvez aussi utiliser le double backslash (\\\\), comme dans: "c:\\\\temp". Comme les répertoires et les noms de fichiers sont représentés dans des **chaînes de caractères** dans R, ils sont entourés de guillemets, comme toute autre chaîne de caractères manipulée dans R. Nous allons maintenant changer le répertoire courant vers "c:\\temp" (ou tout autre répertoire de votre choix). Pour cela, entrez: *setwd("c:/temp")*. Une fois que cela est fait, sortez de R en entrant *q()*, puis répondez "oui" au message demandant de sauvegarder le workspace.
+
+- Aller voir à l'aide de l'explorateur de Windows dans le fameux répertoire "c:\\temp". Vous devriez y trouver (entre autres) deux fichiers nommés ***.RData***** **et ***.Rhistory***. Le premier contient vos variables correspondant à la dernière session R qui a été terminée avec "c:\\temp" comme répertoire courant et pour laquelle vous avez répondu "oui" à la sauvegarde en quittant R. Le second contient l'historique de vos commandes de cette même session. Double-cliquez à présent sur le fichier ***.Rdata***. R se lance avec la traditionnelle bannière d'accueil, mais à présent, vous devez lire une ligne supplémentaire avant le prompt:
+    *\[Previously saved workspace restored\]*
+
+- Faites un *ls()* pour lister les variables en mémoire… vous devez retrouver "A". Entrez *A*… la variable doit contenir la même chose que lorsque vous aviez quitté R. Maintenant, utilisez la flèche** haut** plusieurs fois. Vous devez retrouver les différentes commandes que vous aviez entrées à la session précédente!
+
+- A présent que vous avez compris comment R sauvegarde les variables et comment il enregistre l'historique des commandes dans le répertoire courant, vous pouvez créer autant de répertoires séparés que vous voulez avoir de projets distincts. Prenez soin de toujours démarrer et arrêter R dans le répertoire courant correspondant au projet en cours.
+
+### Obtenir de l'aide dans R
+
+Il est impossible de connaître par cœur la syntaxe des milliers de fonctions qui constituent l'environnement R! D'autant plus que de nombreux **packages** additionnels (actuellement près de 500!) viennent encore compléter cet environnement. Pour ces raisons, R offre des fonctions très efficaces de recherche et d'aide en ligne contextuelle. Il est vital que vous connaissiez ces fonctions pour pouvoir progresser.
+
+- Si vous connaissez le nom de la fonction recherchée, vous pouvez utiliser *help()* ou *? *ou encore l'entrée de menu ***Help -&gt; R language (standard)…*** sous Windows pour obtenir l'aide de cette fonction. Entrez par exemple *?log*. Fermez le fenêtre d'aide lorsque vous l'aurez consultée.
+
+- Remarque: vous pouvez ouvrir autant de fenêtres d'aide simultanément que vous voulez sous Windows! Dans d’autres systèmes, il se peut que l’aide apparaisse en ligne à la console de commande, de sorte que vous ne pouvez afficher qu’un seul fichier d’aide à la fois,… mais dans tous les cas, l’aide au format HTML peut vous venir en secours pour visionner son texte en même temps que vous éditez votre commande: *help(maFonction, htmlhelp = TRUE)*.
+
+- Si vous connaissez une partie du nom de la fonction, mais que vous n'êtes pas certain de l'orthographe de son nom complet, vous utiliserez *apropos()* ou l'entrée de menu ***Help -&gt; Apropos…*** sous Windows. Essayez par exemple *apropos(log)*. Vous serez peut-être impressionnés par le nombre de fonctions de R qui contiennent "log" dans leur nom. Je vous l'ai dit: R est extrêmement riche et comporte des milliers de fonctions! Vous pouvez tout faire ou presque avec ces fonctions. Certaines fonctions correspondent même à des traitements statistiques uniques qui n'existent pas (encore?) dans d'autres logiciels ;-)
+
+- A la fin du fichier d'aide, il y a presque toujours des exemples exécutables à l'aide de la fonction… *example()*. Par exemple, vous pouvez lancer l'exemple de la fonction *example()* à l'aide de: *examples(example)*… (vous me suivez?).
+
+- Une fonction a un certain nombre d'arguments (dans la parenthèse). Si on désire seulement se rappeler ces arguments sans forcément ouvrir une fenêtre d'aide, on peut utiliser *args()*. Tapez: *args(log)*. Remarque: cette astuce ne marche pas pour toutes les fonctions (je ne rentre pas dans les détails; on peut toujours utiliser *help()* dans les cas où cela ne fonctionne pas)!
+
+- Si on veut pouvoir se promener dans l'aide et non pas uniquement afficher l'aide relative à une seule fonction, il vaut mieux lancer sa version HTML à l'aide de *help.start()* ou ***Help -&gt; R language (html)…*** sous Windows. Dans l'aide HTML, on a en plus accès aux manuels, à un moteur de recherche, et à l'aide sur tous les packages installés (je reviendrai plus tard sur la notion de package). Par exemple, recherchez "log" dans "***Search engine & keywords***". Lorsque vous avez sous les yeux la page d'aide de la fonction *log()*, déplacez-vous vers la section "***See also***". Cliquez sur le lien *sqrt* et vous serez transportés vers la page d'aide de cette dernière fonction.
+
+> La rubrique "**See also**" est extrêmement pratique pour en apprendre plus sur les fonctions apparentées à celles que l'on utilise… et donc, de proche en proche, pour en apprendre plus sur le langage de R tout entier!
+
+## Les packages
+
+R est modulaire (on peut lui rajouter des fonctions). De plus, comme il contient un très grand nombre de fonctions, toutes ne sont pas chargées en mémoire par défaut. Les fonctions optionnelles sont installables à l'aide de **packages** que l'on peut également charger à partir du site de R à [*http://cran.r-project.org*](http://cran.r-project.org/). Les packages de R sont équivalents aux toolboxes de Matlab (pour ceux qui connaissent ce dernier logiciel)… Sauf que… les toolboxes de Matlab sont payantes (et chères) et que les packages de R sont, eux, gratuits!!!
+
+- Pour obtenir la liste des packages en mémoire, utilisez les instruction: *(.packages())* ou *search()* ou encore l'entrée de menu ***Misc -&gt; List search path*** sous Windows. Les deux dernières méthodes ne listent pas que les packages en mémoire, mais également les environnements de travail global (*.GlobalEnv*) et autres (*Autoloads* par exemple).
+
+- Pour obtenir la liste de tous les packages installés sur la machine, mais pas nécessairement chargés, recourrez à l'aide HTML et cliquez sur le lien "***Packages***", ou alors entrez l'instruction *.packages(all = TRUE)*.
+
+- Comme exercice, allez voir la fonction *decloess()* dans le package ***pastecs*** dans l'aide HTML.
+
+- Ensuite, retournez à R et rentrez *?decloess*, ainsi que *example(decloess)*. La fonction n'est pas reconnue par R (sauf si vous n’avez pas quitté R après avoir installé les packages additionnels, comme indiqué dans la partie I). Pourtant elle existe, puisque vous l'avez trouvée dans l'aide HTML! En fait, elle fait partie du package **pastecs** qui n'est pas chargé en mémoire, et donc, qui est "hors de portée" du moteur de calcul de R dans l'environnement actuel!
+
+- Pour charger le package en mémoire, il faut utiliser la fonction *library()*. Entrez: *library(pastecs)*, puis *search()*. Un nouvel item "package:pastecs" apparaît dans la liste, indiquant que le package correspondant est chargé en mémoire.
+
+- Maintenant, entrez à nouveau *?decloess* et *example(decloess)*. Ces instructions doivent à présent être correctement reconnues et interprétées par R.
+
+- Un dernier mot à propos des packages: ils contiennent aussi des séries de données types pour les exemples, bien utiles pour se faire la main sur les fonctions qu'on découvre. Pour connaître les séries de données disponibles, utilisez la fonction *data()*.
+
+- Pour charger en mémoire des données, par exemple ***marphy*** du package pastecs, utilisez: *data(marphy)*. Vous pouvez maintenant représenter ces données graphiquement à l'aide de *plot(marphy)* (remarque: le graphique que vous voyez est un "matrix plot"), puis *plot.ts(marphy)* pour tracer les séries spatio-temporelles.
+
+- Enfin, de même qu'on libère la mémoire en éliminant des variables qui ne sont plus utilisées à l'aide de *rm()*, on a tout intérêt à décharger les packages qui ne sont plus utiles à l'aide de *detach("package:PKGNAME")*. Ainsi, pour refermer le package pastecs, entrez: *detach("package:pastecs")*, puis faites un *search()* pour vérifier que l'entrée n'existe plus dans la liste des environnements chargés en mémoire.
+
+> Remarque: il est évidemment idiot, et donc interdit, de décharger le package 'base' de la mémoire car celui-ci contient les fonctions de … base de R, sans lesquelles ce dernier ne peut pas fonctionner, et donc même pas se refermer proprement (c'est-à-dire, en sauvegardant les variables courantes, sic!). Pour la petite histoire, l’idée de décharger la package de base de R n’avait tellement pas effleuré l’esprit de ses programmeurs qu’ils n’avaient même pas pensé à interdire cette opération dans les premières versions de R. Ce n’est qu’après plusieurs années qu’un petit malin a découvert la faille… qui a été très rapidement corrigée!
+
+## Petite demo
+
+- Il est temps de découvrir un peu différentes possibilités de R tout en faisant une petite pose typographique! Entrez *demo()*. Vous obtenez la liste des démos disponibles. Faites ensuite: *demo(graphics)* (passez de la fenêtre graphique à la console alternativement et tapez *{enter}* dans la fenêtre console pour progresser dans la démo), puis *demo(image)*. Comme vous pouvez le constater, R a des possibilités graphiques très poussées, y compris le formatage des équations mathématiques dans les figures, chose peu courante (même pas dans Matlab\ !), mais très utile pour obtenir des graphiques de qualité publication.
+
+- Pour avoir un impression du type de sorties pour les résultats statistiques, entrez *demo(lm.glm)* pour les modèles linéaires et linéaires généralisés (ANOVA, régression,…) et *demo(nlm)* pour des exemples de modèles non linéaires. Vous ne devez pas nécessairement tout comprendre, mais examinez les sorties textuelles pour vous faire une idée de la puissance de R. Testez aussi les autres démos si cela vous amuse...
+
+## Bases du langage R
+
+### Quelques notions sur les variables
+
+Voici quelques notions élémentaires concernant les variables dans le langage R.
+
+- Les vecteurs et matrices numériques de dimension 2 ou au-delà sont les variables de base. Les nombres qu'ils contiennent sont complétés de quelques valeurs spéciales: ***NA***, ainsi que ***NaN***, ***–Inf*** et ***Inf***. ***NA*** pour "Not Available" indique un trou ou une valeur manquante dans un jeu de données. ***NaN*** pour "Not a Number" indique le résultat d'une opération qui ne renvoie pas un nombre. La plupart du temps, il est traité comme ***NA***. ***–Inf*** et ***Inf*** se passent de tout commentaire… Entrez par exemple successivement: *B &lt;- c(1, 2, NA, 3)*, *B^2*, *0/0*, *log(0)*. Notez que dans beaucoup de langages "non scientifiques", les deux dernières commandes provoquent des erreurs,… alors que dans R, elles sont traitées correctement!
+
+- Il existe bien sûr des chaînes de caractères qui peuvent être traitées également sous forme de vecteurs ou de matrices. Ex: *A &lt;- c("oui", "non", "peut-être")*, *paste("Alors, c'est", A, "?")*.
+
+- Les tests logiques et les valeurs logiques ***TRUE*** et ***FALSE*** existent aussi. Essayez par exemple: *1 == 2/2, log(5) &gt; 2*, *1:5 &gt;= 3*, *A &lt;- c(TRUE, TRUE, FALSE)*, *A != TRUE*, *!A* (le test d'égalité se note "=="; le test d'inégalité est "!="; "&lt;=" veut dire inférieur ou égal à; "&gt;=" signifie supérieur ou égal à; "&lt;" et "&gt;" sont les opérateurs inférieur à et supérieur à, respectivement, et "!" est l'opérateur de négation, c'est-à-dire: ce qui est vrai devient faux et vice versa). Notez au passage les variables spéciales ***TRUE*** et ***FALSE***. Ce sont des **mots réservés** du langage, au même titre que **if**, **else**, **while**, etc., et qui ne peuvent pas être utilisés comme noms de variables.
+
+Les variables **TRUE** et **FALSE** peuvent aussi s'abréger en **T** et **F**. Par contre, contrairement aux premières, **T** et **F** ne sont pas des mots réservés, et leur utilisation peut donc s’avérer dangereuse dans le cas ou l’on assigne d’autres valeurs à ces variables. Il est par exemple parfait permis de faire les assignations suivantes: T &lt;- FALSE; F &lt;- TRUE. Donc, maintenant, **TRUE** est **FALSE** et **FALSE** est **TRUE** partout où vous utilisez **T** et **F**\ ! Allez donc débusquer ce genre d’erreur dans plusieurs centaines de lignes de code si vous prenez la (mauvaise) habitude d’utiliser **T** et **F** à tour de bras. Pour cette raison, l’utilisation de **T** et **F** dans le code des packages est interdite depuis la version 1.6.0 de R et est sanctionnée par un message d’erreur à la compilation du package… Donc, autant prendre tout de suite des bonnes habitudes. Le jour où vous compilerez vos propres packages, ce ne sera alors plus un problème pour vous.
+
+- Les matrices sont créées entre autre à l'aide de la fonction *array()*, et indexées à l'aide de *\[\]*. Entrez: *A &lt;- array(1:6, dim = c(2, 3)); A* (notez que le premier indice représente les lignes et le second indice représente les colonnes). Pour comprendre comment récupérer et/ou modifier des éléments de cette matrice, étudiez l'effet des instructions suivantes: *A\[1, 2\]*, *A\[ , 3\]*, *B=A\[2, 2:3\]; B*, *A\[1, 2\] &lt;- 0; A*.
+
+- En réalité, les variables R peuvent être incroyablement plus complexes: elles peuvent être des variables **objets** qui ont une **classe** et des **méthodes** déterminées (nous verrons cela plus loin), elles peuvent comporter différents **attributs**, les lignes et les colonnes peuvent avoir des **noms** et elles peuvent même contenir du code exécutable, voire tout un environnement de travail (si, si)! Etudions maintenant les attributs et les noms de lignes et de colonnes. *attributes(A)* liste tous les attribut de la variable A (on voit que les dimensions de la matrice sont un attribut). Pour ajouter un attribut, on utilise *attr(var, "attribut")*. Entrez à titre d'exemple: *attr(A, "commentaire") &lt;- "Une matrice exemple..."*, puis faites à nouveau *attributes(A)*, et ensuite *A.* Vous pouvez ajouter autant d'attributs que vous voulez à une variable. Certains attributs, tels que "dim" ne sont pas listés lorsqu'on interroge la variable. Les attributs "exotiques" sont, quant-à eux, listés après le contenu de la variable elle-même.
+
+- Autre propriété utile: vous pouvez nommer les lignes et les colonnes d'une matrice. Par exemple, tapez successivement: *colnames(A) &lt;- c("col1", "col2", "col3")*, *rownames(A) &lt;- c("ligne1", "ligne2")*, *A*. Pour nommer les éléments d'un vecteur, on utilisera plutôt la fonction *names()*, tout simplement. Entrez à présent: *A\[, "col2"\]*. Vous voyez que, une fois que vous avez nommé des colonnes, vous pouvez utiliser ces noms pour les sélectionner dans la matrice, en lieu et place de leur numéro.
+
+- Il y a encore plusieurs autres types de variables que nous ne verrons pas ici (consultez les manuels de R installés avec le logiciel). Un autre type de variable mérite toutefois notre attention car il est très important, il s'agit du type ***liste***. Une liste est en fait le rassemblement de plusieurs variables sous une seule. Elle permet donc de rassembler plusieurs éléments qui ont un lien entre eux et donc, d'organiser de façon logique vos données. Vous comprendrez sans doute mieux sur base d'un exemple. Entrez l'instruction suivante: *B &lt;- list(name = "Jack", age = 50, nombre.d.enfants = 3, age.enfants = c(2, 5, 10)); B*. Pour accéder à un élément d'une liste, on utilise *list$element*. Par exemple: *B$age* ou *B$age.enfants\[2\]*.
+
+Comme on peut le voir, les moyens de stocker et de manipuler les données dans R sont extrêmement nombreux et souples… Au chapitre suivant, nous étudierons de manière plus extensive le type de données ***data frame*** qui est le type par excellence pour représenter un tableau de données statistiques brutes, et par là même, le moyen privilégié pour importer et exporter les données de et vers d'autres logiciels.
+
+### Le data frame
+
+Le type de données de base utilisées en statistiques est souvent décrit comme un tableau bidimensionnel "cas *versus* variables". Chaque ligne représente un "cas" (ou individu, quadras, station, etc…) et chaque colonne représente une variable (c'est-à-dire, une "caractéristique", ou mesure qualitative, semi-quantitative, voire quantitative effectuée sur les différents cas). A première vue, s'agissant d'un tableau bidimensionnel, on doit pouvoir représenter ce type de données dans une matrice numérique… d'autant plus que R permet de nommer les lignes et les colonnes, ce qui facilite le repérage des différentes entités. En fait, c'est souvent plus compliqué! Les différentes variables peuvent en effet être de nature différente: numériques (entières, voire réelles ou même complexes, ou encore sous forme de dates), semi-quantitatives ou sous forme de classe (comme "petit"/"moyen"/"grand", "présent"/"absent", "bleu"/"vert"/"jaune", etc.), voire textuelles (le nom d'une espèce, d'un lieu, etc…). Or il n'est pas possible de rassembler tous ces types différents dans une seule matrice, parce qu'une matrice n'admet qu'un seul type de données dans toutes ses colonnes. Pour palier à cette limitation, R utilise le ***data frame*** qui permet de choisir librement le contenu de chaque colonne!
+
+- Pour voir un exemple de data frame avec des variables de type différent, ouvrez le fichier de données exemple "ToothGrowth" qui correspond à une étude de l'effet de la vitamine C sur la croissance des dents de cobayes (donc, un sujet qui nous passionne tous, bien entendu!). Pour cela, faites *data(ToothGrowth)* et visionnez le fichier en entrant: *ToothGrowth*.
+
+- R permet d'éditer ce type de fichier à la manière d'un tableur grâce aux fonctions *edit()* et *fix()*. Sous Windows, on peut aussi utiliser l'entrée de menu ***Edit -&gt; Data editor…***. On peut par précaution sauver le tableau modifié dans une autre variable, à l'aide de l'instruction *var.new &lt;- edit(var.orig)*. De même, on peut créer un tableau vide que l'on remplira à la main grâce à: *var &lt;- edit(data.frame())*. Pour éditer le tableau "ToothGrowth" et sauver les modifications dans la variable "myToothGrowth", entrez *myToothGrowth &lt;- edit(ToothGrowth)*, modifiez quelques valeurs et fermez le tableur. Ensuite, vérifiez que vos modifications sont bien enregistrées dans la variable *myToothGrowth* en tapant son nom à la ligne de commande.
+
+- Pour exporter votre tableau modifié dans un format lisible par n'importe quel autre logiciel, utilisez la fonction *write.table()*. Cette fonction a une syntaxe complexe qui reflète les nombreuses possibilités qu'elle offre pour formater le fichier créé (faites *?write.table* pour prendre connaissance de ces options). Nous allons simplement exporter notre tableau avec les options par défaut dans le répertoire c:\\temp. Pour cela, entrez: *write.table(myToothGrowth, file = "c:/temp/FormationPASTECS2002/mytable.txt")* (n'oubliez pas d'utiliser le slash / à la place du backslash \\ pour indiquer l'arborescence des répertoires). Ouvrez maintenant l'explorateur de Windows et vérifiez que le fichier a bien été créé. Double-cliquez dessus pour l'ouvrir dans Notepad. Si vous disposez d'Excel sur votre ordinateur, vous pouvez le lancer pour y ouvrir le fichier créé et vérifier qu'Excel peut également le lire.
+
+- La fonction jumelle pour lire un tableau dans un fichier ASCII est *read.table()* (avec d'ailleurs autant d'options!). Faites: *myTable &lt;- read.table("c:/temp/FormationPASTECS2002/mytable.txt")* pour relire le fichier et l'inclure dans la variable "myTable". Ensuite, listez cette variable (entrez *myTable*) pour vérifier le résultat.
+
+- Remarque: afin de faciliter l’importation de fichiers utilisant différents séparateurs de champs et différentes décimales, d’autres fonctions d’importation existent qui vous permettent de lire ces différents fichiers sans devoir modifier constamment les valeurs par défaut des paramètres de la fonction. Ainsi *read.csv()* lit des fichiers séparés par des virgules et ayant un point comme séparateur décimal. *read.cvs2()* lit des fichiers dont les champs sont séparés par un point virgule et dont la virgule sert de séparateur décimal. Enfin, *read.delim()* et *read.delim2()* importent des fichiers textes avec la tabulation comme séparateur de champ (se note "\\t"), et respectivement le point ou la virgule comme séparateur décimal. Pour plus d’informations, voyer l’aide en ligne, *?read.table*.
+
+- Pour finir, effacez vos variables "myToothGrowth" et "myTable" par: *rm(myToothGrowth, myTable)*. Vous pouvez effacer le fichier créé directement depuis R grâce à l'instruction *file.remove("c:/temp/FormationPASTECS2002/mytable.txt")*.
+
+### Distributions statistiques
+
+Tout logiciel statistique qui se respecte se doit de posséder des fonctions pour générer aléatoirement des nombres selon différentes distributions statistiques( normale, chi2, binomiale, etc.), et pour obtenir les probabilités associées à de telles distributions. R n'échappe pas à cette règle, et naturellement (richesse fonctionnelle oblige), il offre même beaucoup plus de distributions que les classiques (distributions multinormales, Cauchy, Weibull, Wilcoxon,…) soit de base, soit dans des packages additionnels. Nous n'aborderons ici que les rudiments concernant les distributions statistiques, leurs analyses et leurs représentations graphiques.
+
+- Pour générer aléatoirement des nombres ayant une distribution normale de moyenne nulle et d'écart type unité, on utilise la fonction *rnorm()*. Exemple pour 100 valeurs aléatoires: *A &lt;- rnorm(100)*. Faites ensuite successivement *mean(A)* (moyenne) et *sd(A)* (écart type) puis *plot(A)*, *hist(A)*, *boxplot(A)* et *qqnorm(A); qqline(A)*.
+
+- Étudions un autre exemple de distribution, plus complexe cette fois-ci (l'exemple est tiré de "An Introduction to R" qui accompagne votre version du logiciel):
+
+    data(faithful)
+    attach(faithful)
+    summary(eruptions)
+    fivenum(eruptions)
+    stem(eruptions)
+    hist(eruptions)
+
+- Pour obtenir une plus belle représentation graphique de l'histogramme de cette distribution, y compris une estimation de sa densité lissée, vous pouvez utiliser:
+
+    hist(eruptions, seq(1.6, 5.2, 0.2), prob = TRUE, col = 7)
+    lines(density(eruptions, bw = 0.1), lwd = 2, col = 4)
+    rug(eruptions)
+
+### Deux exemples d'analyses dans R
+
+Je vous propose maintenant de réaliser deux analyses classiques: une analyse en composantes principales et une classification du jeu de données ***marbio*** disponible dans le package **pastecs**. Vous verrez ainsi comment la logique objet s'articule dans R: une première fonction crée un objet qui contient tout ce qu'il faut pour poursuivre l'analyse, voire en faire des présentations graphiques de différentes façons… Et c'est l'utilisateur qui décide, en appelant telle ou telle fonction de ce qu'il veut obtenir ensuite. On est très loin ici du déballage systématique d'une ribambelle de résultats à la suite d'une commande unique, en espérant que l'utilisateur trouvera ce qui l'intéresse parmi tout cela, comme c'est le cas dans beaucoup d'autres logiciels statistiques! Naturellement, puisque l'utilisateur est véritablement aux commandes de son analyse, il doit à tout moment savoir exactement ce qu'il fait. Ceci est souvent vu comme un désavantage, et se traduit par l'expression "trop complexe" dans la bouche de certains, alors même qu'en fait cette organisation ne présente pratiquement que des avantages et force l'utilisateur à bien comprendre les tenants et les aboutissants de son analyse!
+
+- Chargez la librairie pastecs et le jeu de données "marbio" par: *library(pastecs)* et *data(marbio)*. On a également besoin de: *library(mva)*.
+
+- Pour effectuer l'ACP, vous rentrerez:
+
+    marbio.pca <- princomp(log(marbio + 1), cor = TRUE)
+    summary(marbio.pca)
+    plot(marbio.pca)\# Notez le graphique produit ici…
+    biplot(marbio.pca)
+
+- Pour effectuer une classification d'un sous-ensemble de marbio, vous pouvez utiliser:
+
+    mb.log <- t(log(marbio\[1:10, 1:10\]+1))
+    marbio.dist <- dist(mb.log, "eucl") \# Matrice de distance
+    h <- hclust(marbio.dist, "average") \# Classification
+    plot(h, hang = -1)\# Notez le graphique produit ici!
+    rect.hclust(h, k = 3)
+
+- Au chapitre des avantages de l'organisation des analyses dans R, signalons notamment que le logiciel est à même d'interpréter au mieux des commandes telles que *summary()*, *plot()*, *hist()*, *predict()*,… Par exemple, dans les deux traitements précédents, la même fonction *plot()* a des effets radicalement différents selon qu'elle est appliquée au résultat d'un ACP (cas 1) ou d'une classification (cas 2). Dans le premier cas, cette fonction a tracé ce que l'on appelle l'"éboulis" des valeurs propres de l'ACP qui permet de déterminer le nombre d'axes que l'on devrait conserver. Dans le second cas, la même fonction a tracé un dendrogramme, c'est-à-dire, la meilleure représentation graphique pour une classification. Comment R a-t-il pu déterminer tout seul quel type de graphe choisir? En fait, ceci est une conséquence de son organisation **objet**. Les deux analyses créent des objets différents, et chaque objet utilise sa propre version de la fonction *plot()*, version la plus adaptée dans son contexte. De telles fonctions qui réalisent des traitements différents selon l'objet considéré sont dites **méthodes** de l'objet. Même si les puristes diront qu'il ne s'agit pas à 100% d'une organisation objet, R par le biais de ses **objets** et **méthodes**, offre une organisation de type objet. Et cette organisation est à la fois très puissante et très souple.
+
+### Scripts et fonctions personnalisées
+
+Comme nous venons de le voir au chapitre précédent, la moindre analyse nécessite de nombreuses commandes et il est vite usant de les rentrer dans la console R. Le mode de travail interactif à la console est très utile pour expérimenter différentes choses, mais son principal défaut est de ne permettre de rentrer qu'une seule commande à la fois. R peut heureusement également interpréter des scripts, qui contiennent eux, plusieurs commandes successives rassemblées dans un même fichier.
+
+- La façon la plus simple pour créer un script qui contient toutes les commandes du chapitre précédent est de sauver et d'ouvrir ensuite l'historique des commandes dans Tinn-R pour l'éditer. Vous pouvez forcer la sauvegarde de l'historique des commandes sans nécessairement quitter R à l'aide de: *savehistory()*.
+
+- Lancez maintenant Tinn-R (ou tout autre éditeur de fichiers textes si vous utilisez un autre système d’exploitation que Windows) et ouvrez votre fichier ***.Rhistory*** qui se trouve dans le répertoire courant de R. Supprimer toutes les lignes qui ne correspondent pas au chapitre précédent et enregistrer votre fichier modifié (prenez l'habitude d'utilisez l'extension .R pour reconnaître vos scripts R d'autres fichiers sur le disque dur).
+
+- Maintenant, revenez à R et exécutez-y votre script à l'aide d'une instruction de type *source("c:/temp/myscript.R") *(adaptez bien entendu en fonction de votre ficiher script) ou sous Windows, via le menu ***File -&gt; Source R code…***. Vous pouvez modifier votre script dans Tinn-R qui est toujours ouvert, le resauver et le réexécuter dans R autant de fois que vous voulez, et donc le retravailler et tester la version modifiée par ce biais.
+
+- Avant d'en terminer avec l'édition de code, je voudrais vous montrer comme il est facile de créer des fonctions personnalisées dans R. Entrez le code suivant dans la console R: *cube &lt;- function(x) {x^3}* puis *cube(1:3)*. Et oui, vous venez de créer une nouvelle fonction qui s'appelle "cube" et qui élève un vecteur ou une matrice à la puissance 3! Quoique cette fonction soit très simple, la création d'une fonction personnalisée, même complexe, se fait toujours de cette façon dans R. Bien sûr, vous créerez plutôt vos fonctions complexes dans un fichier de code à extension .R que vous éditerez comme nous venons de le voir pour notre script. L'étape suivante est de créer un package pour redistribuer votre œuvre. Cela nécessite bien entendu quelques étapes supplémentaires (création de l'aide en ligne et des exemples, compilation du package,…), mais rien de très compliqué!
+
+- Enfin pour clore ce chapitre, je voudrais vous signaler que le code de toutes les fonctions de R est disponible en clair dans l'environnement et peut être utilisé librement comme base pour vos fonctions personnalisées. Entrez par exemple *cube*, puis *log* et enfin *ls* (soit le nom de fonctions, mais sans entrer les parenthèses et les arguments). Le code des fonctions correspondantes est imprimé dans la console! Vous reconnaîtrez le code de votre fonction personnalisée "cube". La fonction *log()*, pour des raisons de performance, fait appel à une fonction interne écrite en C (*.Internal(…)*). La fonction *ls()* est un peu plus complexe, comme vous pouvez le voir. Les fonctions existantes sont une excellente source d'inspiration pour apprendre à programmer correctement vos propres fonctions personnalisées dans R\ !
