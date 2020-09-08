@@ -8,6 +8,75 @@ SciViews::R
 
 ## Dates
 
+<!----- G.E.
+Tout ce dont on veut parler dans ce module
+
+- date, POSIXlt (POSIXct), lubridate, difftime
+
+- conversion des caractères en date
+
+- anytime
+
+- nanotime
+
+- benchmark
+--->
+
+La gestion du temps et les variables de temps peuvent sembler simple d'apparence. Nous savons facilement déterminer la date et l'heure qu'il est en regardant une montre et un calendrier. Répondez à la question suivante :
+
+est ce que le temps dure exactement 365 jours ? 
+
+Vous savez que c'est une approximation et que c'est un système complexe que nous allons tenter de simplifier ci-dessous. 
+
+Si on tient compte du calendrier grégorien, des fuseaux horaire, du temps universel coordonnée, des fuseaux horaires, de l'heure d'éte, .... On s'aperçoit que le temps est complexe. 
+
+Le calendrier grégorien et le calendrier le plus utilisé actuellement dans le monde. Il comprend
+
+Ce calendrier définit qu'une année comprend 4 trimestres, 12 mois. Les mois varie entre 28 et 31 jours. Une semaine comprend 7 jours. Une années comprend 365 jours à l'exception des années bissextiles.
+
+Si vous n'avez pas mal de tête, on continue. 
+
+Les fuseaux horaires ont eu pour objectif de définir une heure commune pour une espace géographique déterminé. C'est l'utilisation de chemin de fer qui a rendu la mise en place d'une heure commune indispensable. 
+
+En pratique, une échelle de temps est utilisée comme référence par la majorité des pays du globe. Il s'agit du temps universel coordonné (UTC, *coordinated universal time*). Le terme GMT était utilisé précédemment. Il signifiait *Greenwich Mean time*.  A ce temps de référence, on va ajouter ou soustraire un nombre entier (avec des exceptions comme dans tout système avec l'ajout ou la soustraction d'un nombre entier plus 30 ou 45 minutes.)
+
+UTC est un compromis entre le temps atomique international et temps universel. Il faut savoir que le temps universel coordonné est synchronisé avec la rotation de la Terre qui n'est pas fixe. Le service international de la rotation terrestre et des systèmes de référence décide de l'ajout de seconde, une seconde intercaire (*leap second*) à UTC comme le premier janvier 2009. 
+
+![Les Fuseaux horaires usuels](images/07-donnees/world_time_zones_map.png)
+
+Après avoir lu ces quelques notions, pensez vous toujours que le temps est simple ? 
+
+Il nous reste plus qu'à voir comment le temps est géré dans R.
+
+On retrouve les principaux objets suivant dans R pour gérer les temps : `Date`, `POSIXct`, `POSIXlt`, `difftime`. Le package lubridate propose en plus `Period`.
+
+L'objet `Date` va s'intéresser au objet de temps qui référence le jour, le mois et l'année. Le jour 0 d'un objet date est le 1970-01-01.
+
+```{r}
+(date <- as_date(now()))
+class(date)
+```
+
+L'objet `POSIXt` est un objet plus précis qui tient compte 
+```{r}
+(datetime <- now())
+class(datetime)
+```
+
+```{r}
+(diff <- today() - ymd("1979-10-14"))
+class(diff)
+```
+
+
+##### Pour en savoir plus {-} 
+
+<!--- G.E.
+Liste provisoire de lien utilé pour écrire ce module
+---->
+
+- [Travailler avec des dates dans R](https://dhaine.github.io/clinicR/src/20150506-date.html)
+
 ## Données textuelles
 
 ### Encodages
