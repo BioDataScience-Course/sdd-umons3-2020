@@ -2,4 +2,222 @@
 
 # Données particulières {#data}
 
-...
+```{r setup, results='hide', warning=FALSE, include=FALSE}
+SciViews::R
+```
+
+## Dates
+
+## Données textuelles
+
+### Encodages
+
+Nous avons tous déjà été confronté à ce genre de caractères `Ã©` ou `�`. Il s'agit d'un problème d'encodage. Vous avez certainement entendu les termes suivants ASCII, UTF-8, LATIN-1,... 
+
+La problématique est de convertir une chaine de caractères en bits qui sera interprété par l'ordinateur. Il faut donc attribuer à chaque caractère un code unique. Cette série de code vont permettre la traduction des caractères. Les fameux termes cité précédemment sont les encodages qui permette cette traduction. 
+
+Historiquement, le code américain normalisé pour l’échange d'informations (*ASCII*, American Standard Code for Information Interchange) a été l'un des premiers système d'encodage proposé. Cette proposition était simple et adpatée uniquement à l'anglais. Il ne prenait par exemple pas en compte les nombreux accents de la langue française. Il s'en suit du développement de plusieurs systèmes d'encodages avec des adaptions spécifique au très nombreuses langues mondiales comme **ISO 8859** pour les langues latines (*ISO 8859-1*, *latin_1*) ou encore ISO-2020 pour les langues asiatiques.
+
+Afin de réduire les problèmes d'encodage, l'idée de proposée un jeu universel de caractères est de développé, *ISO 10646*. Le consortium Unicode propose une surcouche à cette norme appelé *unicode*. Vous vous en doutez que plus il va y avoir des caractères plus le système d'encodage sera lourd et va utiliser de la capacité 
+
+L'*UTF-32*, puis *UTF-16* et enfin l'*UTF-8* est proposé afin d'économiser de la mémoire de l'ordinateur. L'*UTF-8* est compatible avec l'ASCII ce qui permet de réutiliser d'anciens programmes. 
+
+Nous vous conseillons donc de toujours employer le format **UTF-8**. 
+
+##### Pour en savoir plus {-} 
+
+<!--- G.E.
+Liste provisavoire des liens utiles utilisé pour rédiger la section précédente.
+--->
+
+-  [Encodages de caractères pour débutants](https://www.w3.org/International/questions/qa-what-is-encoding.fr)
+
+- [Tutoriel : Comprendre les encodages](http://sdz.tdct.org/sdz/comprendre-les-encodages.html)
+
+### Traitements de texte
+
+On utilise des chaînes de caractères dans de nombreux contexte : 
+
+- nom de fichier
+- analyse de texte
+- analyse de date 
+- coordonnées
+- ADN/ARN
+- facteur-niveaux
+- ...
+
+Afin de manipuler des chaînes de caractères, de nombreuses fonctions sont disponibles. Nous utiliserons principalement les fonctions du package `stringr`.
+
+```{r}
+library(stringr)
+```
+
+Partons de la chaîne de caractères suivante :
+
+```{r}
+string <- "Je suis étudiant en science des données biologiques"
+```
+
+Répondez à la question suivante : Quel est la longueur de cette chaîne de caractère ?
+
+```{r}
+length(string)
+str_length(string) # ou bien la version en R de base nchar(string)
+```
+
+Vous attendiez vous à ces deux résultats ? La fonction length() renvoie la longueur de l'objet. La fonction str_length() (ou bien nchar()) renvoie le dénombrement des caractères au sein d'une chaine de caractère. 
+Reposons nous la même question cette fois ci avec un vecteur de chaînes de caractères.
+
+```{r}
+strings <- c("Je suis étudiant en science des données biologiques", "Je suis le cours de sdd4", "J'aime appliquer les concepts de la science des données lors d'expérience en biologie")
+
+length(strings)
+str_length(strings) # ou bien la version en R de base nchar(strings)
+```
+
+Cet exemple montre une fois de plus l'importance de lire l'aide d'une fonction et de tenter de faire des tests très simple pour s'assurer de bien comprendre la fonction et ces arguments. Les noms des fonctions sont très importants et peuvent parfois vous porter à confusion.  
+
+Au sein d'un laboratoire, vous êtes engagé pour développer une nouvelle méthode de dosage de nitrate. Imaginons que vous avez attribué un identifiant à 6 expériences que vous avez réalisées en routine lors de dosages des nitrates. 
+
+Nous pouvons observer que le nom de fichier suit la logique suivante
+
+> nom de l'expérience + numéro de l'expérience + méthode employée + date
+
+```{r}
+id <- c(
+  "Nitrate.1100.Version1.2019-10-21", "Nitrate.1101.Version2.2019-10-21",
+  "Nitrate.1109.Version1.2019-10-24","Nitrate.1110.Version2.2019-10-24",
+  "Nitrate.1114.Version1.2019-10-26","Nitrate.1115.Version2.2019-10-26")
+id
+```
+Votre chef vous demande de lui présenter les documents en lien avec les dosages de nitrate version 2 que vous avez développé.  Il est possible de le faire avec une simple instruction.
+
+```{r}
+str_subset(id, "Version2")
+```
+A la suite de votre réunion, votre chef vous demande de modifier le nom de vos dossiers car il ne respecte pas les conventions de notation en vigueur dans le laboratoire. Votre supérieur vous demande donc de remplacer toutes les majuscules par des minuscules. Avec la bonne fonction dans R, cela est réalisable en une seule instruction simple.
+
+```{r}
+str_to_lower(id)
+```
+Il vous demande également de remplacer **tous** les `.` par des `_`. 
+
+```{r}
+str_replace_all(id, ".","_")
+```
+Vous attendiez vous à ce résultat ? Nous sommes sûrs que non. Avez-vous lu l'aide de la fonction ? L'argument `pattern` utilise une expression régulière et pas une simple chaîne de caractères. Les expressions régulières sont des outils puissants lorsqu'ils sont judicieusement employés. Afin de remplacer les `.` par des `_`, il aurait fallu utiliser :
+
+```{r}
+id %>.%
+  stringr::str_to_lower(.) %>.%
+  stringr::str_replace_all(., "\\.","_") -> id_new
+id_new
+```
+En effet, le `.` a une signification particulière lors de l'utilisation de l'expression régulière que nous allons voir dans la section suivante.
+
+##### Pour en savoir plus {-}
+
+- [Introduction to stringr](https://stringr.tidyverse.org/articles/stringr.html). Ce poste propose une introduction en anglais au package `stringr`
+
+- [From base R](https://stringr.tidyverse.org/articles/from-base.html). Ce poste propose en anglais une comparaison entre les fonctions de R de base et les fonctions du package de `stringr`
+
+### Expression régulière
+
+La syntaxe de base des expressions régulières est proposée ci-dessous
+
+- qui débute par chien : "^nitrate"
+- qui termine par chien : "nitrate$"
+- qui cherche nitrate et le mot nitrite  : "(nitrate|nitrite)"
+- qui se répète plusieurs fois : 
+      + ? de 0 à 1 fois
+      + + 1 ou plusieurs
+      + * 0 ou plusieurs
+      + -{2,6}répétitions comprise entre 2 et 6 fois
+- ., n'importe quels caractères
+- .*, n'importe quels caractère après
+- [0-9] un chiffre de 0 à 9 on peut également utiliser \\ d (double backslah du à R)
+- [a-z]
+– [A-Z]
+- [^0-9] je veux tous les caractères sauf un chiffre
+
+Si je veux rechercher un point je dois écrire \\.
+
+##### A vous de jouer {-}
+
+```{block2, type='bdd'}
+Il n'est possible de véritablement comprendre les expressions régulières qu'en réalisant des exercices. Nous vous proposons donc de réaliser les exercices proposés sur le site [RegexOne](https://regexone.com/). Les exercices sont nombreux et interactifs. 
+````
+
+Dans R, Le package `regexplain` propose des `Addins` pour vous aider à utiliser les expressions régulières dans R. Ces expressions régulières sont souvent utilisables dans toutes les fonctions `stringr` que nous avons vu précédemment.
+
+
+##### Pour en savoir plus {-}
+
+- [Regexone](https://regexone.com/) : Tutoriel interactif en anglais pour apprendre a utiliser les expressions régulières.
+
+- [Tutoriel pour maîtriser les expressions régulières](https://www.lucaswillems.com/fr/articles/25/tutoriel-pour-maitriser-les-expressions-regulieres) : Article de blog en français pour apprendre les bases des expressions régulières.
+
+### Variables facteurs
+
+Partons d'une expérience sur la croissance de scléractiniaires. Nous avons donc un vecteur ci-dessous qui correspond à au nom abrégé des espèces étudiées. Le nombre d'espèces est fini. Chaque est espèce correspond donc à un groupe d'individus d'une même espèce. 
+
+```{r}
+species <- c("s.hystrix", "p.damicornis", "a.millepora", "p.damicornis", "a.millepora", "s.hystrix", "s.hystrix", "p.damicornis", "a.millepora", "p.damicornis", "a.millepora", "s.hystrix", "a.millepora")
+
+species
+# format de la variables :  species
+class(species)
+```
+
+Afin de gérer ce type de variable, on utilise les variables facteurs dans R.
+
+
+La gestion correcte des variables facteurs dans R est particulière et peut mener à des erreurs. Nous vous conseillons la lecture de cet article sur le sujet [Wrangling categorical data in R](https://peerj.com/preprints/3163/).
+
+
+En R de base, la fonction qui permet de transformer une variable en une variable facteur est factor(). On retrouve des variantes à ces fonctions comme as.factor(), as.ordered() (ou encore as_factor() du package forcats). Nous vous conseillons d'utiliser factor() car cette fonction permet une meilleure gestion des variables facteurs. Il est important de comprendre la logique de gestion des facteurs dans R. Afin de gagner de la mémoire, R va attribuer à chaque niveau d'une variable facteur un nombre entier. Les niveaux vont être attribués par ordre alphabétique.
+
+```{r}
+species_fac <- factor(species)
+species_fac
+
+# Niveau de la variable species_fac
+levels(species_fac)
+# entiers associé à ces niveaux
+as.integer(species_fac)
+```
+Pour une variable d'une taille conséquente, on s'aperçoit qu'une variable facteur utilise moins d'espace en mémoire qu'une variable caractère.
+
+```{r}
+species_length <- sample(species, size = 10000, replace = TRUE)
+
+object.size(species_length)
+object.size(as.factor(species_length))
+```
+
+Dans notre exemple, l'espace nécessaire est moitié moins important. Rappelez-vous que la première version de R date de 1993. La préoccupation de la mémoire était très importante à l'époque. De nombreuses fonctions plus anciennes vont utilisées de préférence des variables facteurs. Par exemple, la fonction read.csv() va par défaut tenter de transformer une variable caractère en une variable facteur alors que la fonction read_csv() du package `readr` va laisser la variable en caractère. Nous vous conseillons d'importer vos données en caractère et des les transformer en variable facteur si cela est nécessaire. 
+
+Afin de permettre de travailler plus facilement avec une variable facteur, de nombreuses fonctions sont à votre disposition comme la fonction recode() du package `dplyr` ou encore des fonctions disponibles dans le package `forcats`.
+
+```{r}
+recode(species_fac,
+       "a.millepora" = "acropora.millepora",
+       "p.damicornis" = "pocillopora_damicornis",
+       "s.hystrix" = "seriatopora_hystrix")
+```
+
+```{block2, type='warning'}
+Les variables facteurs sont utiles mais il faut toujours prendre le temps de bien comprendre chaque niveau de la variable. Soyons encore plus vigilant si les données sont amenées à évoluer au cours du temps. 
+```
+
+##### Pour en savoir plus {-}
+
+- [Chapter 15 Factors in R For Data Science](https://r4ds.had.co.nz/factors.html) : Le chapitre 15 du livre R for Data Science traite des variables facteurs.
+
+- [Wrangling categorical data in R](https://peerj.com/preprints/3163/) : un article en anglais sur la différence d'approche entre la gestion des variables facteurs en R de base et avec tidyverse.
+
+- [Introduction to forcats](https://forcats.tidyverse.org/articles/forcats.html) : une introduction en anglais au package forcats.
+
+## Données circulaires
+
+
