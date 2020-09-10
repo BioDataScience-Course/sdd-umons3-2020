@@ -51,7 +51,7 @@ On retrouve les principaux objets suivant dans R pour gérer les temps : `Date`,
 L'objet `Date` va s'intéresser au objet de temps qui référence le jour, le mois et l'année. Le jour 0 d'un objet date est le 1970-01-01. Il s'agit de l'heure Unix (mais nous ne détaillerons pas cette notion).
 
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(lubridate)
 (date <- as_date(now()))
 class(date)
@@ -72,7 +72,13 @@ diff == diff1 # on peut vérifier que diff et diff1 sont identiques.
 class(diff)
 ```
 
-Le package `lubridate` comprend des fonctions très utile pour convertir des chaînes de caractères en date. Regardez par vous même pour en déduire la logique simple ci-dessous :
+### Conversion d'une chaine de caractère en date
+
+En pratique vous serez souvent amené à convertir des chaînes de caractères en variable de temps. Pour ce faire, le package `lubridate` comprend des fonctions très utile pour convertir des chaînes de caractères en date. 
+
+Regardez par vous même pour en déduire la logique simple ci-dessous :
+
+- Les dates
 
 ```{r}
 ymd("2015-Jan-25")
@@ -81,14 +87,97 @@ dmy("25/01/2015")
 mdy("01/25/15")
 ```
 
+- Les heures
+
+```{r}
+hm("01:10 am")
+hms("20/10:01")
+hms("20:10:01")
+```
+
+- Les dates et heures
+
+```{r}
+ymd_hm("2010-10-01T2010")
+ymd_hms("2015-Jan-25 12:25:35")
+```
+
+
+Par défaut, ce package utilise le temps universel coordonné. Il est cependant possible de définir le fuseau horaire avec l'argument tz.
+
+```{r}
+ymd_hms(now(), tz = "Europe/Amsterdam")
+```
+
+Ces fonctions sont capables de gérer des formats de dates différentes en même temps. Essayez cependant d'éviter ce genre d'erreurs d'encodage.
+
+```{r}
+ymd_hms(c("2015-Jan-25 12:25:35", "2015-01-15T122535", "2015/01/25 12:25:35"), tz = "Europe/Amsterdam")
+```
+
+<details>
+<summary>Plus de détails...</summary>
+Pour avoir plus de flexibilité, il est possible d'utiliser la fonction `parse_date_time()` qui va permettre de spécifier des formats spécifique. 
+
+- Année
+    + %Y : 4 chiffres
+    + %y : 2 chiffres
+- Mois
+    + %m : 2 chiffres
+    + %b : nom abrégé
+    + %B : nom complet
+- Jour 
+    + %d : 2 chiffres
+- Heure
+    + %H : 0-23h
+    + %i combiné avec %p : 0-12 suivi am/pm
+    + %M : minutes
+    + %S : secondes entières
+    + %OS : secondes réelles
+    + %Z : fuseau horaire
+    + %z : décalage par rapport à UTC : +0100 (plus 1h)
+- Valeurs à ignorer
+    + %. : ignore des caractère non numérique
+    + %* : ignore une suite de caractères non numériques
+</details>
+
+Vous serez un jour confronté à un tableau de données du type suivante avec plusieurs colonnes qui renseigne sur le temps de la prise de mesure. 
+
+```{r}
+(df <- tibble(
+  annee = c(2010, 2011, 2012, 2013),
+  mois = c(01, 01, 01, 01),
+  jour = c(01, 01, 01, 01)
+))
+```
+
+Rassurez vous, il n'est pas nécessaire de combiner les 3 colonnes puis de les transformer en variable temporelle. La fonction `make_date()` permet de créer un variable qui combine nos trois colonnes. Il existe la même variante pour `make_datetime()`.
+
+```{r}
+df %>.%
+  mutate(., date = make_date(annee, mois, jour))
+```
+
+### Temps biologique
+
+Lorsque vous étudiez un phénomène biologique, il faut vous poser la question de la temporalité de votre expérience. 
+
+- Est ce que votre expérience dure quelques heures ? quelques jours ? quelques mois ? 
+
+
+<!----- G.E.
+TODO : DIVISION des années avec la logique de pastecs
+
+Imaginons que vous étudiez la croissance d'organisme sur plusieurs années.  Certainement exliqué dans les séries temporelles donc renvoyer vers ce module là
+
+TODO : simplification des dates (un organisme biologique s'en fiche d'une année bissextiles) que nous soyons le dimanche 5 janvier. On s'intéresse au nombre de jour ou d'heure depuis le début de la manip.
+----->
 
 ##### Pour en savoir plus {-} 
 
-<!--- G.E.
-Liste provisoire de lien utilé pour écrire ce module
----->
-
 - [Travailler avec des dates dans R](https://dhaine.github.io/clinicR/src/20150506-date.html)
+
+- [Chapter 16 Dates and times in R For Data Science](https://r4ds.had.co.nz/dates-and-times.html) : Le chapitre 16 du livre R for Data Science traite des variables temporelles.
 
 ## Données textuelles
 
