@@ -1,4 +1,4 @@
-book_filename: "sdd-umons3-2020"
+book_filename: 'sdd-umons3-2020'
 repo: 'https://github.com/BioDataScience-Course/sdd-umons3-2020'
 output_dir: '../wp.sciviews.org/htdocs/sdd-umons3-2020'
 clean: [packages.bib, bookdown.bbl]
