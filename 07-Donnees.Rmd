@@ -158,20 +158,72 @@ df %>.%
   mutate(., date = make_date(annee, mois, jour))
 ```
 
+##### A vous de jouer ! {-}
+
+```{r, echo=FALSE, results='asis'}
+assignation("sdd4_module07", part = "I",
+  url = "https://github.com/BioDataScience-Course/sdd4_module07",
+  course.urls = c(
+    'S-BIOG-043' = "https://classroom.github.com/a/...."),
+  toc = "Assignation : Conversion de caractères en date, partie I")
+```
+
 ### Temps biologique
 
 Lorsque vous étudiez un phénomène biologique, il faut vous poser la question de la temporalité de votre expérience. 
 
-- Est ce que votre expérience dure quelques heures ? quelques jours ? quelques mois ? 
+> Est ce que votre expérience dure quelques heures ? quelques jours ? quelques mois ? plusieurs années ?
 
+Cette question est cruciale pour traiter vos données. Prenons 3 petits cas pratiques théorique. 
 
-<!----- G.E.
-TODO : DIVISION des années avec la logique de pastecs
+- La croissance de coraux sur 30 jours.
 
-Imaginons que vous étudiez la croissance d'organisme sur plusieurs années.  Certainement exliqué dans les séries temporelles donc renvoyer vers ce module là
+Vous réalisez une expérience sur la croissance d'une espèce de corail durant 30 jours en aquarium. Cette expérience débute le 20 septembre 2019.
 
-TODO : simplification des dates (un organisme biologique s'en fiche d'une année bissextiles) que nous soyons le dimanche 5 janvier. On s'intéresse au nombre de jour ou d'heure depuis le début de la manip.
------>
+```{r}
+corals <- tibble::tibble(
+  weight = 2 + exp(0.02 * 0:29),
+  date = lubridate::ymd("2019-09-20") + lubridate::ddays(0:29),
+  nb = 0:29
+)
+
+corals <- labelise(
+  corals,
+  label = list(
+    weight = "Masse", date = "Date", nb = "Temps"),
+  units = list(
+    weight = "g", nb = "jour"))
+
+a <- chart(corals, weight ~ date) +
+  geom_line() +
+  geom_point() 
+  
+b <- chart(corals, weight ~ nb) +
+  geom_line() +
+  geom_point()
+
+combine_charts(list(a,b), nrow = 2)
+```
+On comprend rapidement que le second graphique est plus intéressant. Il n'est pas nécessaire de connaître les dates précises lorsque l'on étudie al croissance d'un organisme dans un aquarium sur 30 jours.
+
+- Le temps perdu dans les embouteillages.
+
+Lorsque l'on étudie le temps perdu dans les bouchons à Bruxelles. Il sera très important de spécifier les jours de la semaine. En effet, nous savons que les bouchons vont varier entre la semaine ou le weekend ou encore lors d'un jour férié. On ne peut donc pas se passer d'une date précise lorsque l'on étudie ce genre de phénomène.
+
+- L'évolution de la température sur 20 ans.
+
+Lorsque l'on étudie des séries temporelles en écologie, on ne s'intéresse pas aux années bissextiles ou qu'un mois dure 29 ou 31 jours. 
+
+Le package `pastecs` propose de diviser une année en multiple de 4, 12, 48 périodes de temps, ... Une fréquence de 48 correspond environ à la semaine. Le tableau ci-dessous représente le temps en biologie.
+
+| Temps | Période |
+|-|-|
+| Année | 1 |
+| mois | 12 |
+| semaines | 48 |
+| jours | 384 |
+
+En biologie, on va s'intéresser principalement à es cycles particuliers comme le cycle circadien, la succession des saisons, le cycle lunaire,...
 
 ##### Pour en savoir plus {-} 
 
@@ -197,9 +249,6 @@ Nous vous conseillons donc de toujours employer le format **UTF-8**.
 
 ##### Pour en savoir plus {-} 
 
-<!--- G.E.
-Liste provisavoire des liens utiles utilisé pour rédiger la section précédente.
---->
 
 -  [Encodages de caractères pour débutants](https://www.w3.org/International/questions/qa-what-is-encoding.fr)
 
@@ -321,6 +370,16 @@ Il n'est possible de véritablement comprendre les expressions régulières qu'e
 
 Dans R, Le package `regexplain` propose des `Addins` pour vous aider à utiliser les expressions régulières dans R. Ces expressions régulières sont souvent utilisables dans toutes les fonctions `stringr` que nous avons vu précédemment.
 
+##### A vous de jouer ! {-}
+
+```{r, echo=FALSE, results='asis'}
+assignation("sdd4_module07", part = "II",
+  url = "https://github.com/BioDataScience-Course/sdd4_module07",
+  course.urls = c(
+    'S-BIOG-043' = "https://classroom.github.com/a/...."),
+  toc = "Assignation : Les données textuelles, partie II")
+```
+
 
 ##### Pour en savoir plus {-}
 
@@ -341,7 +400,6 @@ class(species)
 ```
 
 Afin de gérer ce type de variable, on utilise les variables facteurs dans R.
-
 
 La gestion correcte des variables facteurs dans R est particulière et peut mener à des erreurs. Nous vous conseillons la lecture de cet article sur le sujet [Wrangling categorical data in R](https://peerj.com/preprints/3163/).
 
@@ -392,3 +450,8 @@ Les variables facteurs sont utiles mais il faut toujours prendre le temps de bie
 ## Données circulaires
 
 
+## Récapitulatif des exercices
+
+Ce module vous a permis de prendre connaissance des principes de bases des données temporelles et des données textuelles. Pour évaluer votre compréhension de cette matière vous aviez les exercices suivants à réaliser\ :
+
+`r show_ex_toc()`
