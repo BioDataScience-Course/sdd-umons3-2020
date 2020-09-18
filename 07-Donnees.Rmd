@@ -82,10 +82,10 @@ Regardez par vous même pour en déduire la logique simple ci-dessous :
 
 ```{r}
 ymd("2015-Jan-25")
-dmy("25 janvier 2015")
-dmy("25/01/2015")
 mdy("01/25/15")
 ```
+
+`r h5p(19, height = 270, toc = "Sélectionnez la bonne réponse")`
 
 - Les heures
 
@@ -102,6 +102,7 @@ ymd_hm("2010-10-01T2010")
 ymd_hms("2015-Jan-25 12:25:35")
 ```
 
+`r h5p(20, height = 270, toc = "Complétez le blanc.")`
 
 Par défaut, ce package utilise le temps universel coordonné. Il est cependant possible de définir le fuseau horaire avec l'argument tz.
 
