@@ -137,10 +137,22 @@ Dans la littérature, vous pouvez également retrouver les noms suivants : *F1-s
 - *Balanced accuracy* 
 
 $$\frac{(specificity + recall)}{2}$$
+
+Vérifie ta compréhension des métriques à l'aide du tutoriel sur la matrice de confusion.
+
+`r learnr("C01La_confusion", title = "La matrice de confusion", toc = "Tutoriel : matrice de confusion")`
+
+
+
 <details><summary>Pour en savoir plus</summary>
 
 [Statistics calculated on confusion matrix](https://github.com/BioDataScience-Course/sdd_lesson/blob/2019-2020/sdd3_01/more/confusion_matrix.pdf)
 
-TODO : Ajouter les autres statistiques sur les matrice de confusion.
-
 </details>
+
+
+## Récapitulatif des exercices
+
+Dans ce module 1,  vous aviez à réaliser les exercices suivants\ :
+
+`r show_ex_toc()`
