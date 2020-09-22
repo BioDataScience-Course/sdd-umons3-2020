@@ -62,7 +62,7 @@ La matrice de confusion est représenté sous la forme d'un tableau de contingen
 |       | **Espèce 1**              | **Espèce 2**              | **Espèce 3**              | **Espèce 4**              |
 | --------------------------- | ------------------------- | ------------------------- | ------------------------- | ------------------------- |
 | **Espèce 1**                | correct                   | erreur            | erreur            | erreur            |
-| **Espèce 2**                | \alert{erreur}            | correct                   | erreur            | erreur            |
+| **Espèce 2**                | erreur            | correct                   | erreur            | erreur            |
 | **Espèce 3**                | erreur            | erreur            | correct                   | erreur            |
 | **Espèce 4**                | erreur           | erreur            | erreur            | correct                   |
 
@@ -92,11 +92,13 @@ Les paramètres principaux sont
 
 - FN : Faux négatif (*False Negative*). C'est le nombre d'items classé dans le groupe d'intérêt qui ne sont d'un autre groupe. Concernant nos mandoras, il s'agit du nombre d'items qui ne sont pas classé comme des mandora et qui sont des mandoras. 
 
+`r h5p(21, height = 270, toc = "Répondez aux questions")`
+
 ### Les métriques
 
 De très nombreuses métriques existent afin de quantifier la qualité d'un modèle sur base de la matrice de confusion. 
 
-```{r}
+```{r, echo=FALSE, message=FALSE}
 conf_mat <- data.frame("Positif" = c("TP", "FP"), "Négatif" = c("FN", "TN"), row.names = c("Positif", "Négatif"))
 
 knitr::kable(conf_mat, caption = "Matrice de confusion théorique dont les colonnes représentent la classification par ordinateur et les lignes la classification manuelle.")
