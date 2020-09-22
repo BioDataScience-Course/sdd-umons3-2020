@@ -66,7 +66,7 @@ La matrice de confusion est représenté sous la forme d'un tableau de contingen
 | **Espèce 3**                | erreur            | erreur            | correct                   | erreur            |
 | **Espèce 4**                | erreur           | erreur            | erreur            | correct                   |
 
-Prenons cette matrice de confusion qui s'intéresse à  trois fruits.
+Prenons cette matrice de confusion qui s'intéresse à trois fruits.
 
 ```{r, echo=FALSE, message=FALSE}
 conf <- data.frame( "Orange" = c( 25, 0, 1), "Mandora" = c(0, 16, 9), "Mineola" = c(0,8, 18),  row.names = c("Orange", "Mandora", "Mandarine"))
@@ -153,6 +153,6 @@ Vérifie ta compréhension des métriques à l'aide du tutoriel sur la matrice d
 
 ## Récapitulatif des exercices
 
-Dans ce module 1,  vous aviez à réaliser les exercices suivants\ :
+Dans ce module 1, vous aviez à réaliser les exercices suivants\ :
 
 `r show_ex_toc()`
