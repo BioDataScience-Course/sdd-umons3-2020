@@ -2,4 +2,143 @@
 
 # Classification supervisée I {#classif1}
 
-...
+Nous avons déjà abordé dans le cours de [science des données biologiques partie 2]( `r paste0(learndown$baseurl, "sdd-umons2")` ){target='top'} la notion de classification. Rappelez-vous, la **classification** sert à regrouper les individus d'un jeu de données en différents groupes ou **classes**
+
+Lorsque vous avez utilisé la classification hiérarchique ou le dendrogramme, vous avez réalisé de la classification _non_ supervisée. La classification _non_ supervisée permet de choisir des classes librement. 
+
+Nous allons aborder dans les prochains modules **classification supervisée**. La classification supervisée permet d'utiliser un ordinateur pour apprendre à classer des objets selon nos propres objectifs ("machine learning" en anglais). 
+
+## Principe
+
+Un jeu de données est composé d'observations (les lignes du tableau) et de variables (les colonnes du tableau) sur ces observations. En classification supervisée, les observations se nomment les **items** et les variables se nomment les **attributs**. 
+
+Par exemple, en taxonomie assistée par ordinateur, on cherche à automatiser le dépouillement d'un échantillon en identifiant de manière automatique (ou semi-automatique) la faune et/ou la flore qui le compose. L'approche la plus souvent employée est l'analyse d'image pour mesurer les objets. Il s'agit donc d'une reconnaissance sur base de critères morphologiques. Les organismes qui composent la faune et/ou la flore sont les items et les critères morphologiques sont les attributs. Je suis sur que vous avez déjà rêver d'avoir qui fait vos identifications à votre place.
+
+Parmi tous les items, on va choisir un sous-ensemble représentatif que l'on classe manuellement sans erreur. On obtient donc un ensemble de groupes connus et distincts. On va diviser ce sous-ensemble en un **set d'apprentissage** et un **set de test**. 
+
+La classification supervisée va se décomposer en 3 phases. 
+
+1. Apprendre : un algorithme est **entrainé** (paramétré) pour classer les items sur base du **set d’apprentissage**.
+
+2. Tester : les **performances** de l’outil de classification sont évaluées à l’aide du **set de test**.
+
+3. Déployer : si l'outil de classification obtient des performances satisfaisantes, il est utilisé pour classer **automatiquement** tous les items.
+
+La classification supervisée s'utilise généralement sur des gros jeux de données contenant des dizaines de milliers, des centaines de milliers, voire des millions, ou d'avantage d'observations.
+
+Il y a de très nombreux domaines d'applications aux machine learning comme en médecine. On utilise le machine learning pour analyser les mesures effectuées par un appareil comme un scanner, un système de radiographie aux rayons X, un électrocardiogramme ou électroencéphalogramme, etc. Il faut s'attendre que dans quelques années, les algorithmes seront plus précis que les médecins dans ce type d'analyse.
+
+### Condition d'application 
+
+Ces outils ont très certainement éveillé votre curiosité. Imaginez qu'à l'avenir, il ne sera peut plus utile d'apprendre la classification des bourdons. Un ordinateur pourra le faire à votre place. 
+
+Il y a néanmoins certaines conditions d'application afin de pouvoir utiliser efficacement le machine learning. 
+
+- Tous les groupes sont connus et disjoints
+
+- La classification manuelle est réalisée sans erreur
+
+- Les mesures utilisées sont suffisamment discriminantes
+
+- Toute la variabilité est représentée dans le set d’apprentissage
+
+- Le système est statique: pas de changement des caractéristiques des items à classer
+
+
+## Performances de l'algorithme
+
+Avant de nous lancer dans la découverte de différents algorithmes, nous commençons par s'intéresser aux outils qui permettent d'étudier la qualité d'un outil de classification.
+
+### Matrice de confusion
+
+L'outil le plus important pour évaluer la qualité d'un algorithme de classification supervisée est la **matrice de confusion**.
+
+```{block2, type='warning'}
+L’évaluation doit toujours se faire sur un échantillon indépendant du set d’apprentissage. C'est pour cela que nous devons avoir 2 sets. Le set d'apprentisage et le set de test. 
+````
+
+La matrice de confusion est représenté sous la forme d'un tableau de contingence à double entrée qui croise les groupes prédits par l'ordinateur avec les groupes prédits manuellement pour ces mêmes objets. En cas de concordance, les objets sont dénombrés sur la diagonale de cette matrice carrée. Donc, tous les dénombrements hors diagonale représentent des erreurs faites par l'ordinateur (en vertu de l'hypothèse de base que le classement manuel est fait san ambiguïté et sans erreurs). 
+
+|       | **Espèce 1**              | **Espèce 2**              | **Espèce 3**              | **Espèce 4**              |
+| --------------------------- | ------------------------- | ------------------------- | ------------------------- | ------------------------- |
+| **Espèce 1**                | correct                   | erreur            | erreur            | erreur            |
+| **Espèce 2**                | \alert{erreur}            | correct                   | erreur            | erreur            |
+| **Espèce 3**                | erreur            | erreur            | correct                   | erreur            |
+| **Espèce 4**                | erreur           | erreur            | erreur            | correct                   |
+
+Prenons cette matrice de confusion qui s'intéresse à  trois fruits.
+
+```{r, echo=FALSE, message=FALSE}
+conf <- data.frame( "Orange" = c( 25, 0, 1), "Mandora" = c(0, 16, 9), "Mineola" = c(0,8, 18),  row.names = c("Orange", "Mandora", "Mandarine"))
+
+knitr::kable(conf, col.names = c("Orange", "Mandora", "Mandarine"),caption = "Matrice de confusion dont les colonnes représentent la classification par ordinateur et les lignes la classification manuelle.")
+```
+
+Si nous nous intéressons à la qualité de notre algorithme pour classer les Mandora. Nous pouvons réduire notre matrice de confusion de la manière suivante.
+
+```{r, echo=FALSE, message=FALSE}
+mandora <- data.frame("Mandora" = c("16 = TP", "9 = FP"), "Pas mandora" = c("8 = FN", "44 = TN"),   row.names = c("Mandora", "Pas mandora"))
+
+knitr::kable(mandora,col.names = c("Mandora", "Pas Mandora"), caption = "Matrice de confusion dont les colonnes représentent la classification par ordinateur et les lignes la classification manuelle.")
+```
+
+Les paramètres principaux sont
+
+- TP : Vrai positif (*True Positive*). C'est le nombre d'items du groupe d'intérêt correctement classé. Concernant nos mandoras, il s'agit du nombre d'items classé comme des mandoras par l'ordinateur et qui sont des mandoras.
+
+- TN : Vrai négatif (*True Negative*). C'est le nombre d'items classé dans tous les autres groupes comme un autre groupe. Concernant nos mandoras, il s'agit du nombre d'items qui ne sont pas classé comme des mandoras et qui ne sont pas des mandoras. 
+
+- FP : Faux positif (*False Positive*). C'est le nombre d'items des autres groupes qui sont classé dans notre groupe d'intérêt. Concernant nos mandoras, il s'agit du nombre d'items classé comme des mandoras et qui ne sont pas des mandoras. 
+
+- FN : Faux négatif (*False Negative*). C'est le nombre d'items classé dans le groupe d'intérêt qui ne sont d'un autre groupe. Concernant nos mandoras, il s'agit du nombre d'items qui ne sont pas classé comme des mandora et qui sont des mandoras. 
+
+### Les métriques
+
+De très nombreuses métriques existent afin de quantifier la qualité d'un modèle sur base de la matrice de confusion. 
+
+```{r}
+conf_mat <- data.frame("Positif" = c("TP", "FP"), "Négatif" = c("FN", "TN"), row.names = c("Positif", "Négatif"))
+
+knitr::kable(conf_mat, caption = "Matrice de confusion théorique dont les colonnes représentent la classification par ordinateur et les lignes la classification manuelle.")
+```
+
+- Taux de reconnaissance global (*Accuracy*)
+
+$$\frac{(TP+TN)}{(TP+TN+FP+FN)}$$
+- Erreur globale (*Error*)
+
+$$1-\frac{(TP+TN)}{(TP+TN+FP+FN)}$$
+
+- Taux de vrai positif (*Recall*) 
+
+$$\frac{TP}{(TP+FN)}$$
+
+Dans la littérature, vous pouvez également retrouvr les noms suivants : *Sensitivity*, *True Positive Rate (TPR)*, *Power*, *Probability of detection*.
+
+- Spécificité (*specificity*)
+
+$$\frac{TN}{(TN+FP)}$$
+Dans la littérature, vous pouvez également retrouver les noms suivants : *True Negative Rate (TNR)*, *Selectivity*.
+
+- Précision (*Precision*)
+
+$$\frac{TP}{(TP+FP)}$$
+
+Dans la littérature, vous pouvez également retrouver les noms suivants : *Positive Predicted Value (PPV)*, *Reproducibility*, *Repeatability*.
+
+- Score F (*F-measure*)
+
+$$2 \cdot \frac{(precision \cdot recall)}{(precision + recall)}$$
+
+Dans la littérature, vous pouvez également retrouver les noms suivants : *F1-score*, *harmonic mean of precision and recall*
+
+- *Balanced accuracy* 
+
+$$\frac{(specificity + recall)}{2}$$
+<details><summary>Pour en savoir plus</summary>
+
+[Statistics calculated on confusion matrix](https://github.com/BioDataScience-Course/sdd_lesson/blob/2019-2020/sdd3_01/more/confusion_matrix.pdf)
+
+TODO : Ajouter les autres statistiques sur les matrice de confusion.
+
+</details>
