@@ -162,10 +162,10 @@ df %>.%
 ##### A vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("sdd4_module07", part = "I",
-  url = "https://github.com/BioDataScience-Course/sdd4_module07",
+assignation("D07Ga_data", part = "I",
+  url = "https://github.com/BioDataScience-Course/D07Ga_data",
   course.urls = c(
-    'S-BIOG-043' = "https://classroom.github.com/a/...."),
+    'S-BIOG-043' = "hhttps://classroom.github.com/a/4eN9dBmf"),
   toc = "Assignation : Conversion de caractères en date, partie I")
 ```
 
@@ -374,13 +374,12 @@ Dans R, Le package `regexplain` propose des `Addins` pour vous aider à utiliser
 ##### A vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("sdd4_module07", part = "II",
-  url = "https://github.com/BioDataScience-Course/sdd4_module07",
+assignation("D07Ga_data", part = "II",
+  url = "https://github.com/BioDataScience-Course/D07Ga_data",
   course.urls = c(
-    'S-BIOG-043' = "https://classroom.github.com/a/...."),
+    'S-BIOG-043' = "hhttps://classroom.github.com/a/4eN9dBmf"),
   toc = "Assignation : Les données textuelles, partie II")
 ```
-
 
 ##### Pour en savoir plus {-}
 
