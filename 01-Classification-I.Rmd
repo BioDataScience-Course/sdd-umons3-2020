@@ -2,69 +2,84 @@
 
 # Classification supervisée I {#classif1}
 
-Nous avons déjà abordé dans le cours de [science des données biologiques partie 2]( `r paste0(learndown$baseurl, "sdd-umons2")` ){target='top'} la notion de classification. Rappelez-vous, la **classification** sert à regrouper les individus d'un jeu de données en différents groupes ou **classes**
+##### Objectifs {-}
 
-Lorsque vous avez utilisé la classification hiérarchique ou le dendrogramme, vous avez réalisé de la classification _non_ supervisée. La classification _non_ supervisée permet de choisir des classes librement. 
+- Comprendre le principe général de la classification supervisée
 
-Nous allons aborder dans les prochains modules **classification supervisée**. La classification supervisée permet d'utiliser un ordinateur pour apprendre à classer des objets selon nos propres objectifs ("machine learning" en anglais). 
+- Être capable d'utiliser l'algorithme et la fonction R `lda()` d'analyse discriminante linéaire
 
-## Principe
+- Maîtriser les matrices de confusion
 
-Un jeu de données est composé d'observations (les lignes du tableau) et de variables (les colonnes du tableau) sur ces observations. En classification supervisée, les observations se nomment les **items** et les variables se nomment les **attributs**. 
+- Comprendre la logique et être capable d'utiliser les différentes métriques calculables sur base de la matrice de confusion
 
-Par exemple, en taxonomie assistée par ordinateur, on cherche à automatiser le dépouillement d'un échantillon en identifiant de manière automatique (ou semi-automatique) la faune et/ou la flore qui le compose. L'approche la plus souvent employée est l'analyse d'image pour mesurer les objets. Il s'agit donc d'une reconnaissance sur base de critères morphologiques. Les organismes qui composent la faune et/ou la flore sont les items et les critères morphologiques sont les attributs. Je suis sur que vous avez déjà rêver d'avoir qui fait vos identifications à votre place.
+##### Prérequis {-}
 
-Parmi tous les items, on va choisir un sous-ensemble représentatif que l'on classe manuellement sans erreur. On obtient donc un ensemble de groupes connus et distincts. On va diviser ce sous-ensemble en un **set d'apprentissage** et un **set de test**. 
+Si ce n'est déjà fait, vous devez installer et vous familiariser avec la 'SciViews Box' nouvelle mouture. RStudio et (R) Markdown ne doivent plus avoir de secrets pour vous. Vous devez aussi maîtriser les bases de Git et de GitHub (avoir un compte GitHub, savoir cloner un dépôt localement, travailler avec GitHub Desktop pour faire ses "commits", "push" et "pull"). L'ensemble de ces outils a été abordé dans le cours de [science des données biologiques partie 1]( `r paste(learndown$baseurl, "sdd-umons2", sep = "/")` ).
 
-La classification supervisée va se décomposer en 3 phases. 
+Nous avons déjà abordé dans le cours de [science des données biologiques partie 2]( `r paste(learndown$baseurl, "sdd-umons2", sep = "/")` ) la notion de **classification non supervisée**. De même, la modélisation (via les **régressions**) a aussi fait l'objet d'une attention particulière dans le cours précédent. Toutes ces connaissances vont servir de pilier de base pour ce que nous étudierons ensemble dans ce module, ainsi que dans les deux suivants cobncernant la classification supervisée.
 
-1. Apprendre : un algorithme est **entrainé** (paramétré) pour classer les items sur base du **set d’apprentissage**.
+## Principes de base
 
-2. Tester : les **performances** de l’outil de classification sont évaluées à l’aide du **set de test**.
+Rappelez-vous, la **classification** sert à regrouper les individus d'un jeu de données en différents groupes ou **classes**. Lorsque vous avez utilisé la classification hiérarchique ou le dendrogramme, vous avez réalisé de la classification _non_ supervisée. La classification _non_ supervisée permet de choisir des classes librement sur base de l'information contenue dans le jeu de données. 
 
-3. Déployer : si l'outil de classification obtient des performances satisfaisantes, il est utilisé pour classer **automatiquement** tous les items.
+Nous allons aborder maintenant la **classification supervisée**. La classification supervisée permet d'utiliser un ordinateur pour lui faire apprendre à classer des objets selon nos propres critères que nous spécifions par ailleurs (*"machine learning"* en anglais). Par exemple, en biologie, nous sommes amenés à classer le vivant (la fameuse classification taxonomique selon la [nomenclature binomiale de Linné](https://www.tela-botanica.org/2018/11/carl-von-linne-pere-de-la-classification-des-plantes-missionbotanique/)). Nous pourrions être amenés à nous faire seconder par un ordsinateur pour classer nos plantes en herbier, nos insectes en collections, ... ou nos photos d'oiseaux ou de poissons. A partir du moment où nous pouvons collecter ou mesurer différents caractéristiques quantitatives ou qualitatives sur chaque individu, et que pour certains, nous en connaissons le nom scientifique, la classification supervisée pourrait être utilisée pour classer automatiquement d'autres individus, uniquement sur base des mêmes mesures.
 
-La classification supervisée s'utilise généralement sur des gros jeux de données contenant des dizaines de milliers, des centaines de milliers, voire des millions, ou d'avantage d'observations.
+Un jeu de données est composé d'observations (les lignes du tableau) et de variables (les colonnes du tableau) sur ces observations. En classification supervisée, les observations se nomment les **items** (nos différents spéciments de plantes, insectes, ...) et les variables se nomment les **attributs** (les variables quantitatives ou qualitatives mesurées sur chaque spécimen). 
 
-Il y a de très nombreux domaines d'applications aux machine learning comme en médecine. On utilise le machine learning pour analyser les mesures effectuées par un appareil comme un scanner, un système de radiographie aux rayons X, un électrocardiogramme ou électroencéphalogramme, etc. Il faut s'attendre que dans quelques années, les algorithmes seront plus précis que les médecins dans ce type d'analyse.
+En taxonomie assistée par ordinateur, nous cherchons donc à accélérer le dépouillement de gros échantillons en identifiant de manière automatique (ou semi-automatique) la faune et/ou la flore qui le compose. L'approche la plus souvent employée est l'analyse d'image pour mesurer des caractères visuels sur ces photographies. Il s'agit donc d'une reconnaissance sur base de critères morphologiques. Les organismes qui composent la faune et/ou la flore sont les items et les critères morphologiques sont les attributs. Vous avez certainement déjà rêvé d'avoir quelqu'un qui fait vos identifications à votre place... pourquoi pas votre ordinateur\ ?!
 
-### Condition d'application 
+Parmi tous les items, on va choisir un sous-ensemble représentatif que l'on classe manuellement sans erreur. On obtient donc un ensemble de groupes connus et distincts. On va diviser ce sous-ensemble en un **set d'apprentissage** pour entraîner l'algorithme de classification, et un **set de test** pour en vérifier les performances. 
 
-Ces outils ont très certainement éveillé votre curiosité. Imaginez qu'à l'avenir, il ne sera peut plus utile d'apprendre la classification des bourdons. Un ordinateur pourra le faire à votre place. 
+La classification supervisée va se décomposer en réalité en trois phases. 
 
-Il y a néanmoins certaines conditions d'application afin de pouvoir utiliser efficacement le machine learning. 
+1. **Apprentissage**\ : un algorithme est **entrainé** (paramétré) pour classer les items sur base du **set d’apprentissage**.
 
-- Tous les groupes sont connus et disjoints
+2. **Test**\ : les **performances** de l’outil de classification (on dit aussi, le **classifieur**) sont évaluées à l’aide du **set de test**.
 
-- La classification manuelle est réalisée sans erreur
+3. **Déploiement**\ : si le classifieur obtient des performances satisfaisantes, il est utilisé pour classer **automatiquement** tous les autres items du jeu de données.
 
-- Les mesures utilisées sont suffisamment discriminantes
+La classification supervisée s'utilise généralement sur des gros jeux de données contenant des dizaines de milliers, des centaines de milliers, voire des millions d'observations, voire même d'avantage.
 
-- Toute la variabilité est représentée dans le set d’apprentissage
+Il y a de très nombreux domaines d'applications de ces techniques de classification supervisée de type *"machine learning"*. Par exemple en médecine, ces techniques s'utilisent pour analyser les mesures effectuées par un scanner, un système de radiographie aux rayons X, un électrocardiogramme ou électroencéphalogramme, ... pour y détecter des anomalies. Votre moteur de recherche favori sur Internet utilise ces techniques pour classer les pages en "pertinentes" et "non pertinentes". La reconnaissance vocale ou de l'écriture manuscrite entrent dans cette catégorie également, de même que l'analyse de sentiment sur base de texte (quelle est l'état d'esprit de l'auteur du texte sur base des mots et expressions qu'il utilise). Il faut s'attendre à ce que dans quelques années, des algorithmes plus efficaces, et des ordinateurs plus puissants pourront effectuer des tâches aujourd'hui dévolues à des spécialistes, comme le médecin spécialisé en radiographie pour l'exemple cité plus haut. Nous sommes même à l'aube des véhicules capables de conduire tous seuls, sur base de l'analyse des images fournies par leurs caméras\ !
 
-- Le système est statique: pas de changement des caractéristiques des items à classer
+### Conditions d'application 
 
+Ces outils ont très certainement éveillé votre curiosité. Imaginez qu'à l'avenir il ne sera peut plus utile d'apprendre la classification des bourdons. Un ordinateur pourra le faire à votre place. 
 
-## Performances de l'algorithme
+Il y a néanmoins certaines conditions d'application à satisfaire préalablement afin de pouvoir utiliser efficacement le "machine learning"\ : 
 
-Avant de nous lancer dans la découverte de différents algorithmes, nous commençons par s'intéresser aux outils qui permettent d'étudier la qualité d'un outil de classification.
+- **Tous les groupes sont connus et disjoints**. Chaque item appartient à une et une seule classe (sinon, refaire un découpage plus judicieux des classes). Un individu ne peut appartenir simultanément à deux ou plusieurs classes, et nous ne pouvons pas rencontrer d'items n'appartenant à aucune classe. Éventuellement rajouter une classe fourre-tout nommée "autre" pour que cette condition puisse être respectée.
+
+- **La classification manuelle est réalisée sans erreur** dans les sets d'apprentissage et de test. C'est une contrainte forte. Vérifiez soigneusement vos sets avant utilisation. Éventuellement, recourez à l'avis de plusieurs spécialistes et établissez un *consensus*, ou éliminez les cas litigieux... mais attention alors à ne pas déroger à la condition suivante\ ! 
+
+- **Toute la variabilité est représentée dans le set d’apprentissage**. Vous devez vous assurer de rassembler les individus représentant toute la variabilité de chaque classe pour la phase d'apprentissage (et si possible de test aussi).
+
+- **Les mesures utilisées sont suffisamment discriminantes entre les classes**. Vous devez vous arranger pour définir et mesurer des attributs qui permettent de séparer efficacement les classes. Vous pourrez le constater visuellement en représentant, par exemple deux attributs quantitatifs sur un graphique en nuage de points, et en y plaçant les items en couleurs différentes en fonction de leur classe. Si des regroupements bien distincts sont visible sur le graphique, vous êtes bons, ... sinon c'est mal parti. Utilisez éventuellement des techniques comme l'analyse des composantes principales (ACP) pour visualiser de manière synthétique un grand nombre d'attributs. L'**ingénierie et sélection judicieuse des attributs** est une partie cruciale, mais difficile de la classification supervisée de type "machine learning". L'apprentissage profond ("deep learning") tente de s'en débarrasser en incluant cette partie du travail dans le programme d'apprentissage lui-même.
+
+- **Le système est statique\ : pas de changement des attributs des items à classer par rapport à ceux des sets d'apprentissage et de test**. Des situations typiques qui peuvent se produire et qui ruinent votre travail sont un été particulièrement chaud et sec par rapport aux saisons pendant lesquelles des plantes ont été prélevées pour le set d'apprentissage. Par conséquent, vos fleurs ont des caractéristiques morphologiques différentes suite à cette longue canicule et sont donc moins bien, voire, totalement mal classées. Un autre exemple serait le changement d'appareil d'IRM qui donne des images légèrement différentes du précédent. Le set d'apprentissage du premier IRM ne permet alors peut-être pas de créer un classifieur capable de classer valablement les analyses réalisées avec le second appareil.
+
+En pratique, ces conditions d'application ne sont *pas* remplies strictement dans les faits, mais le but est de s'en rapprocher le plus possible. Par exemple, il est impossible en pratique de garantir qu'il n'y ait absolument *aucune* erreur dans les sets d'apprentissage et de test. Si le taux d'erreur reste faible (quelques pourcents voire encore moins), l'impact de ces erreurs sera suffisamment négligeable. Par contre, avec 20 ou 30% d'erreurs, par exemple, nous ne pourrons plus travailler valablement.
+
+## Mesure de performances
+
+Avant de nous lancer dans la découverte de différents algorithmes, nous devons nous intéresser aux outils et métriques qui permettent d'étudier la qualité d'un outil de classification dans l'étape de test.
 
 ### Matrice de confusion
 
 L'outil le plus important pour évaluer la qualité d'un algorithme de classification supervisée est la **matrice de confusion**.
 
 ```{block2, type='warning'}
-L’évaluation doit toujours se faire sur un échantillon indépendant du set d’apprentissage. C'est pour cela que nous devons avoir 2 sets. Le set d'apprentisage et le set de test. 
+L’évaluation doit toujours se faire sur un échantillon indépendant du set d’apprentissage. C'est pour cela que nous devons avoir deux sets indépendants\ : le set d'apprentisage et le set de test.
 ````
 
-La matrice de confusion est représenté sous la forme d'un tableau de contingence à double entrée qui croise les groupes prédits par l'ordinateur avec les groupes prédits manuellement pour ces mêmes objets. En cas de concordance, les objets sont dénombrés sur la diagonale de cette matrice carrée. Donc, tous les dénombrements hors diagonale représentent des erreurs faites par l'ordinateur (en vertu de l'hypothèse de base que le classement manuel est fait san ambiguïté et sans erreurs). 
+La matrice de confusion est représentée sous la forme d'un *tableau de contingence à double entrée* qui croise les groupes prédits par l'ordinateur avec les groupes prédits manuellement pour ces mêmes items. En cas de concordance, les items sont dénombrés sur la diagonale de cette matrice carrée. Donc, tous les dénombrements hors diagonale représentent des erreurs faites par l'ordinateur (en vertu de l'hypothèse de base que le classement manuel est fait sans ambiguïté et sans erreurs). 
 
 |       | **Espèce 1**              | **Espèce 2**              | **Espèce 3**              | **Espèce 4**              |
 | --------------------------- | ------------------------- | ------------------------- | ------------------------- | ------------------------- |
-| **Espèce 1**                | correct                   | erreur            | erreur            | erreur            |
-| **Espèce 2**                | erreur            | correct                   | erreur            | erreur            |
-| **Espèce 3**                | erreur            | erreur            | correct                   | erreur            |
-| **Espèce 4**                | erreur           | erreur            | erreur            | correct                   |
+| **Espèce 1**                | **correct**                   | erreur            | erreur            | erreur            |
+| **Espèce 2**                | erreur            | **correct**                   | erreur            | erreur            |
+| **Espèce 3**                | erreur            | erreur            | **correct**                   | erreur            |
+| **Espèce 4**                | erreur           | erreur            | erreur            | **correct**                   |
 
 Prenons cette matrice de confusion qui s'intéresse à trois fruits.
 
@@ -88,15 +103,15 @@ Les paramètres principaux sont
 
 - TN : Vrai négatif (*True Negative*). C'est le nombre d'items classé dans tous les autres groupes comme un autre groupe. Concernant nos mandoras, il s'agit du nombre d'items qui ne sont pas classé comme des mandoras et qui ne sont pas des mandoras. 
 
-- FP : Faux positif (*False Positive*). C'est le nombre d'items des autres groupes qui sont classé dans notre groupe d'intérêt. Concernant nos mandoras, il s'agit du nombre d'items classé comme des mandoras et qui ne sont pas des mandoras. 
+- FP : Faux positif (*False Positive*). C'est le nombre d'items des autres groupes qui sont classé dans notre groupe d'intérêt. Concernant nos mandoras, il s'agit du nombre d'items classé comme des mandoras par l'ordinateur et qui ne sont pas des mandoras. 
 
-- FN : Faux négatif (*False Negative*). C'est le nombre d'items classé dans le groupe d'intérêt qui ne sont d'un autre groupe. Concernant nos mandoras, il s'agit du nombre d'items qui ne sont pas classé comme des mandora et qui sont des mandoras. 
+- FN : Faux négatif (*False Negative*). C'est le nombre d'items classé dans le groupe d'intérêt qui sont d'un autre groupe. Concernant nos mandoras, il s'agit du nombre d'items qui ne sont pas classé comme des mandoras par l'ordinateur mais qui en sont. 
 
 `r h5p(21, height = 270, toc = "Répondez aux questions")`
 
 ### Les métriques
 
-De très nombreuses métriques existent afin de quantifier la qualité d'un modèle sur base de la matrice de confusion. 
+De très nombreuses métriques existent afin de quantifier l'ajustement d'un modèle sur base de la matrice de confusion. 
 
 ```{r, echo=FALSE, message=FALSE}
 conf_mat <- data.frame("Positif" = c("TP", "FP"), "Négatif" = c("FN", "TN"), row.names = c("Positif", "Négatif"))
@@ -107,32 +122,43 @@ knitr::kable(conf_mat, caption = "Matrice de confusion théorique dont les colon
 - Taux de reconnaissance global (*Accuracy*)
 
 $$\frac{(TP+TN)}{(TP+TN+FP+FN)}$$
+
+Il s'agit d'une métrique qui quantifie globalement le modèle et qui se généralise facilement à plus de deux classes.
+
 - Erreur globale (*Error*)
 
 $$1-\frac{(TP+TN)}{(TP+TN+FP+FN)}$$
+
+L'erreur globale est donc, le complément du taux de reconnaissance global et la somme des deux est toujours de 100%.
 
 - Taux de vrai positif (*Recall*) 
 
 $$\frac{TP}{(TP+FN)}$$
 
-Dans la littérature, vous pouvez également retrouvr les noms suivants : *Sensitivity*, *True Positive Rate (TPR)*, *Power*, *Probability of detection*.
+Dans la littérature, vous pouvez également retrouver les noms suivants\ : *Sensitivity*, *True Positive Rate (TPR)*, *Power*, *Probability of detection*. Le "Recall" est une métrique centrale dans la mesure où elle se focalise, pour une classe donnée, sur la fractions d'items du set d'apprentissage que l'ordinateur a pu trouver. Cela répond donc à une question particulière du type\ : "est-ce que je suis capable d'aller trouver mes items d'intérêt dans l'ensemble".
 
 - Spécificité (*specificity*)
 
 $$\frac{TN}{(TN+FP)}$$
-Dans la littérature, vous pouvez également retrouver les noms suivants : *True Negative Rate (TNR)*, *Selectivity*.
+Dans la littérature, vous pouvez également retrouver les noms suivants\ : *True Negative Rate (TNR)*, *Selectivity*. La spécificity apparait complémentaire au "Recall", même si traditionnellement, on complète souvent "Recall" par précision (voir ci-dessous).
 
 - Précision (*Precision*)
 
 $$\frac{TP}{(TP+FP)}$$
 
-Dans la littérature, vous pouvez également retrouver les noms suivants : *Positive Predicted Value (PPV)*, *Reproducibility*, *Repeatability*.
+Dans la littérature, vous pouvez également retrouver les noms suivants\ : *Positive Predicted Value (PPV)*, *Reproducibility*, *Repeatability*. La précision s'intéresse à une question très différente du "Recall", mais néanmoins complémentaire\ : "quelle est la fraction effectivement de classe X que l'ordinateur a classé comme X\ ?"
+
+Si la classification ne peut se faire sans erreurs (cas le plus fréquent), nous pouvons améliorer la précision mais au détriment du "recall", ou vice-versa. Selon le contexte, nous avons plutôt intérêt à favoriser l'un ou l'autre. Par exemple, pour le dépistage du COVID-19, il vaut mieux un test avec un "recall" le plus élevé possible (pour ne pas déclarer des patients malades comme faussement sains), quitte à sacrifier un peu la précision (avoir une fraction un peu plus grande de faux positifs dans la fraction de la population considérée comme atteinte par le test... et qui ferait une quarantaine inutilement). 
+
+Dans d'autres situation, il vaut mieux, au contraire favoriser la précision. Si nous voulons inclure des sujets atteints d'une maladie rare dans une étude, nous n'aurons pas intérêt à échantillonner la population au hasard. En effet, notre échantillon contiendra trop d'individus sains par rapport aux rares malades. Nous pourrions alors utiliser la classification supervisée pour déterminer qui est malade ou sain, et ensuite effectuer un échantillonnage stratifié dans les deux classes (50% de chaque classe dans l'échantillon final pour notre étude). Évidemment dans ce cas, si la précision est très faible, nous aurons énormément de faux positifs dans la fraction détectée comme malade. Cela réduirait alors la représentativité des individus malades dans l'échantillon, par rapport à un classifieur qui montre une précision plus grande pour la classe des malades.
+
+Ces deux exemples sont plutôt extrêmes. Dans la majorité des cas, nous recherchons plutôt un bon équilibre entre "recall" et précision, et ce, pour toutes les classes. Les mesures suivantes de score *F* ou "balanced accuracy" tentent de synthétiser "recall" et précision, ou "recall" et spécificité en un seule nombre pour une classe données, afin de représenter au mieux cette recherche d'un compromis entre les deux.
 
 - Score F (*F-measure*)
 
 $$2 \cdot \frac{(precision \cdot recall)}{(precision + recall)}$$
 
-Dans la littérature, vous pouvez également retrouver les noms suivants : *F1-score*, *harmonic mean of precision and recall*
+Dans la littérature, vous pouvez également retrouver les noms suivants\ : *F1-score*, *harmonic mean of precision and recall*
 
 - *Balanced accuracy* 
 
