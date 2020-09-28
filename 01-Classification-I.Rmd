@@ -22,7 +22,7 @@ Nous avons déjà abordé dans le cours de [science des données biologiques par
 
 Rappelez-vous, la **classification** sert à regrouper les individus d'un jeu de données en différents groupes ou **classes**. Lorsque vous avez utilisé la classification hiérarchique ou le dendrogramme, vous avez réalisé de la classification _non_ supervisée. La classification _non_ supervisée permet de choisir des classes librement sur base de l'information contenue dans le jeu de données. 
 
-Nous allons aborder maintenant la **classification supervisée**. La classification supervisée permet d'utiliser un ordinateur pour lui faire apprendre à classer des objets selon nos propres critères que nous spécifions par ailleurs (*"machine learning"* en anglais). Par exemple, en biologie, nous sommes amenés à classer le vivant (la fameuse classification taxonomique selon la [nomenclature binomiale de Linné](https://www.tela-botanica.org/2018/11/carl-von-linne-pere-de-la-classification-des-plantes-missionbotanique/)). Nous pourrions être amenés à nous faire seconder par un ordsinateur pour classer nos plantes en herbier, nos insectes en collections, ... ou nos photos d'oiseaux ou de poissons. A partir du moment où nous pouvons collecter ou mesurer différents caractéristiques quantitatives ou qualitatives sur chaque individu, et que pour certains, nous en connaissons le nom scientifique, la classification supervisée pourrait être utilisée pour classer automatiquement d'autres individus, uniquement sur base des mêmes mesures.
+Nous allons aborder maintenant la **classification supervisée**. La classification supervisée permet d'utiliser un ordinateur pour lui faire apprendre à classer des objets selon nos propres critères que nous spécifions par ailleurs (*"machine learning"* en anglais). Par exemple, en biologie, nous sommes amenés à classer le vivant (la fameuse classification taxonomique selon la [nomenclature binomiale de Linné](https://www.tela-botanica.org/2018/11/carl-von-linne-pere-de-la-classification-des-plantes-missionbotanique/)). Nous pourrions être amenés à nous faire seconder par un ordinateur pour classer nos plantes en herbier, nos insectes en collections, ... ou nos photos d'oiseaux ou de poissons. A partir du moment où nous pouvons collecter ou mesurer différents caractéristiques quantitatives ou qualitatives sur chaque individu, et que pour certains, nous en connaissons le nom scientifique, la classification supervisée pourrait être utilisée pour classer automatiquement d'autres individus, uniquement sur base des mêmes mesures.
 
 Un jeu de données est composé d'observations (les lignes du tableau) et de variables (les colonnes du tableau) sur ces observations. En classification supervisée, les observations se nomment les **items** (nos différents spéciments de plantes, insectes, ...) et les variables se nomment les **attributs** (les variables quantitatives ou qualitatives mesurées sur chaque spécimen). 
 
@@ -175,6 +175,40 @@ Vérifie ta compréhension des métriques à l'aide du tutoriel sur la matrice d
 [Statistics calculated on confusion matrix](https://github.com/BioDataScience-Course/sdd_lesson/blob/2019-2020/sdd3_01/more/confusion_matrix.pdf)
 
 </details>
+
+## Analyse discriminante linéaire
+
+```{r}
+# idee de l'exerice de présentation
+SciViews::R
+library(mlearning)
+
+
+zoo <- data.io::read("zooplankton", package = "data.io")
+vec <- c("Decapod", "Malacostracan", "Poecilostomatoid")
+
+zoo %>.%
+  filter(., class %in% vec) %>.%
+  mutate(., class = droplevels(class)) -> zoo_red
+
+n <- nrow(zoo_red)
+n_learning <- round(n * 7/10)
+set.seed(164)
+learning <- sample(1:n, n_learning)
+zoo_learn <- zoo_red[learning, ]
+zoo_test <- zoo_red[-learning, ]
+
+zoo_lda <- lda(
+  formula = class ~ .,
+  data = zoo_learn)
+
+zoo_pred <- predict(zoo_lda, zoo_test)$class
+
+zoo_conf <- confusion(zoo_pred, zoo_test$class)
+# Toutes les métriques sont disponibles d'un coup our toutes les classes ici!
+summary(zoo_conf)
+plot(zoo_conf)
+```
 
 
 ## Récapitulatif des exercices

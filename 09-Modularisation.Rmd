@@ -2,4 +2,136 @@
 
 # Modularisation {#modularisation}
 
-...
+#### Objectifs {-}
+
+- Apprendre à modulariser son code
+
+- Appréhender les notions liées aux fonctions
+
+- Apprendre à écrire des fonctions
+
+- Apprendre à documenter une fonction
+
+#### Prérequis {-}
+
+Pour comprendre les notions dans ce module, vous devez être capables de travailler dans RStudio et d'être familiarisé avec les scripts R et les fichiers R Markdown. Les fonctions sont, dans R, les briques de construction. 
+
+## Les fonctions
+
+A chaque fois que vous utilisez R vous employez des fonctions sans plus y porter attention comme la fonction `mean()` par exemple. Vous pouvez cependant écrire vos propres fonctions qui seront adapté à votre problématique. La règle est assez simple, **si vous répétez des blocs de codes plus de deux fois, il faut réaliser une fonction**. 
+
+L’utilisation de fonctions a plusieurs avantages : 
+
+- On évite de répéter des blocs de codes plusieurs fois
+
+- On limite les possibilités de bug
+
+- On rend notre code plus lisible
+
+Une fonction se présente comme ci-dessous :
+
+```{r, eval = FALSE}
+my_function(arg1, arg2)
+```
+
+La fonction porte un nom explicite suivi de parenthèses. A l’intérieur des parenthèses, on retrouve les arguments de la fonction.
+
+```{block2, type ="info"}
+Plusieurs fonction portant sur une même problématique se regroupe dans un package comme vous avez également l'habitude d'en utiliser comme `data.io`, `chart`, `knitr`. Néanmoins, ces notions ne seront pas détaillé au sein de ce module. Le package est très utile lorsque vous devez employer vos fonctions dans plusieurs projets différents.
+```
+
+### Nom de la fonction et de ses arguments
+
+Si il y a bien une question qui va vous prendre la tête et qui requiert généralement un certain temps de réfléxion c'est le nom de votre fonction et de ces arguments. Un nom mal choisi et/ou farfelu voue votre fonction à l'oubli. Il faut essayer d'avoir un nom court et évoquant le rôle de la fonction. Essayez de respecter la convention suivante qui veut que le nom d'une fonction est un verbe et le nom des arguments sont des noms. De plus, il est de plus en plus courant de respecter le snake_case (tout est en minuscule séparé par des sous-tirets)
+
+```{block2, type = "warning"}
+Au final, vous verrez que R n'est pas homogène. R est un language qui évolue au cours du temps et ce depuis 1993, ce qui explique ce manque d'homogénéité. Cependant, restez cohérent, fixez vous vos propres conventions et respectez les. 
+
+Imaginons que vous écrivez plusieurs fonctions : 
+
+- CV()
+
+- Rescale01()
+
+- reg_lin()
+
+- TriMesTer()
+
+- MonIncroyable_fonction()
+
+Ne faites pas cela !!!!!! Soyez cohérent
+```
+
+Tout comme pour le noms des fonctions, le noms des arguments est important. Les arguments se doivent d'être clairs. Il existe néanmoins des conventions d'usages 
+
+- `x`, `y`, `z`: vecteurs
+
+- `w` : un vecteur de pondérations (w est le diminutif de *weights*)
+
+- `df` : un tableau de données (*dataframe*)
+
+- `i`, `j` : indice numériques (par exemple pour spécifier les colonnes et les lignes d'un tableau de données)
+
+- `n` : une longueur particulière ou un nombre de lignes
+
+- `p` : un nombre de colonnes
+
+Vous retrouverez en plus des arguments comme  `na.rm`. Il s'agit également d'arguments conventionnels. Si vous avez le besoin d'exprimer la présence de valeur manquante dnas le but de les exclure de la fonction, ajoutez cette argument dans votre fonction.
+
+# Documenter sa fonction 
+
+La documentation d’une fonction est une étape souvent négligée. Cependant, une fonction bien documentée est une fonction qui sera employée à l’avenir. Les fonctions mal documentées sont des fonctions qui seront généralement peu employées, souvent mal employées et enfin oubliées. Lorsque l'on souhaite écrire une fonction, il convient de la documenter directement. La documentation se fait par le biais de deux outils principalement que vous pouvez visualiser avec 
+
+- L'aide à la fonction. Il s'agirat d'une documention plutot courte 
+
+```{r, eval = FALSE}
+?sd()
+
+?dplyr::filter()
+```
+
+En plaçant votre curseur sur votre fonction,  cliquez sur l'onglet Code puis Insert Roxygen Skeleton. Une squelette de documentation s'ajoute à votre fonction.
+
+```{r}
+#' coefficient of variation (CV)
+#'
+#' @param x a vecteur of numbers
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' vec <- rnorm()
+#' vec <- rnorm(mean = 10, sd = 5, n = 10)
+#' cv(vec)
+cv <- function(x) {
+  (sd(x)/mean(x))*100
+}
+```
+
+- Une vignette. Une vignette est un document au format R Markdown qui va détailler tout le cheminement qui vous as mené à votre fonction finale. Toutes les fonctions ne diposent pas d'une vignette comme vous pouvez vous en doutez.
+
+```{r, eval = FALSE}
+# Pour prendre connaissance des vignettes disponible dans un package
+vignette(package = 'dplyr')
+    
+# Visualiser une vignette particulière
+vignette("dplyr", package = 'dplyr')
+```
+
+
+#### Pour en savoir plus {-}
+
+- [Comment créer une fonction dans R ? : function](https://abcdr.thinkr.fr/comment-creer-une-fonction-dans-r-function/) abcdR explique l'écriture des fonctions dans R en français.
+
+- [Ecrire vos propres fonctions R](http://www.sthda.com/french/wiki/ecrire-vos-propres-fonctions-r) stdah explique l'écriture des fonction dans R en français.
+
+- [Writing functions in Nice R Code](https://nicercode.github.io/intro/writing-functions.html) Nice R code propose une explication sur l'écriture des fonctions pour les débutants en anglais. 
+
+- [Functions in Nice R Code](https://nicercode.github.io/guides/functions/) Nice R code propose une suite d'explication sur les fonctions à [Writing functions in Nice R Code](https://nicercode.github.io/intro/writing-functions.html) également en anglais.
+
+- [Chapter 19: Functions in R for DataScience](https://r4ds.had.co.nz/functions.html) R for datascience propose un chapitre consacré à l'écriture des fonctions dans R en anglais. Ce livre est également disponible en français mais uniquement de manière payante chez eyrolles <https://www.eyrolles.com/Informatique/Livre/r-pour-les-data-sciences-9782212675719/> .
+
+- [chapter Functions in Advence R](http://adv-r.had.co.nz/Functions.html) Advence R propose un chapitre consacré à l'écriture de fonction en anglais. Il permet de compléter vos connaissances suite à la lecture de [Chapter 19: Functions in R for DataScience](https://r4ds.had.co.nz/functions.html) 
+
+- [Chapter 10: Writing your own functions in An introduction to R](https://cran.r-project.org/doc/manuals/R-intro.html#Writing-your-own-functions) An introdcution to R propose un chapitre consacré à l'écriture de fonctions en anglais. 

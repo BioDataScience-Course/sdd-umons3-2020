@@ -1,3 +1,59 @@
 # Packages et cloud {#packages}
 
-...
+#### Objectifs {-}
+
+- Appréhender les notions liées aux packages
+
+- Apprendre à créer un package
+
+- ...
+
+#### Prérequis {-}
+
+Vous devez  être familiarisés avec l'écriture et la documentation de fonction.
+
+Vous devez également être familiarisés avec les tests unitaires.
+
+# Le package
+
+A chaque utilisation R, vous employez des fonctions sans plus y porter attention comme la fonction `labelise()` par exemple. Cette fonction provient du package `data.io`. Un package est tout simplement un ensemble de fonction documentés, de jeu de données, des applications shiny,... Vous pouvez très facilement retrouver des informations sur les packages que vous utilisez en cliquant sur l'onglet `Packages` dans RStudio. Vous y trouverez la liste des packages que vous avez sur votre ordinateur, une courte description et le numéro de la version de ce package. Nous reviendrons plus en details sur le numéro de version lors de la création de votre premier package.
+
+L’utilisation de package a de nombreux avantages : 
+
+- On évite de répéter des fonctions dans des script R de projets en projets.
+
+- On limite les possibilités de bug entre les script R.
+
+- Les fonctions d'un package sont documentée.
+
+- On rend notre code plus lisible
+
+## Création d'un package
+
+Afin de nous aider dans la création d'un package, le package [usethis](https://usethis.r-lib.org) a été mis au point pour simplifier et proposer un workflow cohérent de création de package R. 
+
+### Nom d'un package
+
+Avant de vous lancer dans la création d'un package, il faut lui trouver un nom. Le choix du nom d'un package est compliqué. Il est cependant possible d'employer la fonction available() pour vous aider
+
+```{r, eval=FALSE}
+available::available(name= "nom_potentiel_du_package")
+```
+
+<!---- G.E.
+- description d'un package
+- devtools_history.R pour la reprodctibilité
+- license
+- vignette
+- documentation
+- gestion de versions
+- readme
+- intégration continue
+- ...
+--->
+
+##### Pour en savoir plus {-}
+
+- [Créer un package r en quelques minutes](https://thinkr.fr/creer-package-r-quelques-minutes/) : Courte explication sur la création d'un package R
+
+- [usethis](https://usethis.r-lib.org) : Documentation d'un package qui aide à réaliser des package.
