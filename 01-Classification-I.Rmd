@@ -2,6 +2,10 @@
 
 # Classification supervisée I {#classif1}
 
+```{r setup, results='hide', warning=FALSE, include=FALSE}
+SciViews::R
+```
+
 ##### Objectifs {-}
 
 - Comprendre le principe général de la classification supervisée
@@ -169,47 +173,117 @@ Vérifie ta compréhension des métriques à l'aide du tutoriel sur la matrice d
 `r learnr("C01La_confusion", title = "La matrice de confusion", toc = "Tutoriel : matrice de confusion")`
 
 
-
 <details><summary>Pour en savoir plus</summary>
 
-[Statistics calculated on confusion matrix](https://github.com/BioDataScience-Course/sdd_lesson/blob/2019-2020/sdd3_01/more/confusion_matrix.pdf)
+Vous pouvez retrouver des indices supplémentaires via la lien suivant : [Statistics calculated on confusion matrix](https://github.com/BioDataScience-Course/sdd_lesson/blob/2019-2020/sdd3_01/more/confusion_matrix.pdf)
 
 </details>
 
 ## Analyse discriminante linéaire
 
-```{r}
-# idee de l'exerice de présentation
-SciViews::R
-library(mlearning)
+Il existe de très nombreux algorithmes de classifications supervisées. Nous allons commencer la découverte des principaux algorithmes avec l'analyse discriminante linéaire. Cette analyse recherche la meilleure discrimination possible des groupes par rotation des axes, en diagonalisant la matrice variance-covariance intergroupe, ce qui revient à calculer les combinaisons linéaires des variables initiales qui séparent le mieux ces groupes.
 
-
-zoo <- data.io::read("zooplankton", package = "data.io")
-vec <- c("Decapod", "Malacostracan", "Poecilostomatoid")
-
-zoo %>.%
-  filter(., class %in% vec) %>.%
-  mutate(., class = droplevels(class)) -> zoo_red
-
-n <- nrow(zoo_red)
-n_learning <- round(n * 7/10)
-set.seed(164)
-learning <- sample(1:n, n_learning)
-zoo_learn <- zoo_red[learning, ]
-zoo_test <- zoo_red[-learning, ]
-
-zoo_lda <- lda(
-  formula = class ~ .,
-  data = zoo_learn)
-
-zoo_pred <- predict(zoo_lda, zoo_test)$class
-
-zoo_conf <- confusion(zoo_pred, zoo_test$class)
-# Toutes les métriques sont disponibles d'un coup our toutes les classes ici!
-summary(zoo_conf)
-plot(zoo_conf)
+```{block2, type = 'note'}
+Est-ce que le principe de cet algorithme ne te rappelle rien ? Evidement que oui, cet algorithme se base sur les mêmes principes que l'ACP. 
 ```
 
+Partons d'un exemple pratique sur 3 populations de manchots adultes proches de la station de recherche PALMER en antarctique. 
+
+```{r}
+penguins <-read("penguins", package = "palmerpenguins")
+```
+
+La fonction skim() nous donne un aperçu du contenu de ce jeu de données. Si vous voulez des informations supplémentaires, consultez la page d'aide du jeu de données ou [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/). 
+
+```{r}
+skimr::skim(penguins)
+```
+
+Ce jeu de données comprend `r ncol(penguins)` variables et `nrow(penguins)` individus. On observe la présence de quelques données manquantes que nous supprimons avant de continuer.
+
+```{r}
+penguins <- drop_na(penguins)
+```
+
+Le graphique ci-dessous propose un nuage de points pour différencier ces 3 espèces. On observe une répartition assez bonne entre nos trois espèces selon les 2 variables étudiées. Ce graphique nous laisse penser que l'algorithme de classification a de grandes chances d'être efficace pour séparer ces 3 espèces.
+
+```{r}
+chart(penguins, bill_length_mm ~ flipper_length_mm %color=% species) +
+  geom_point() +
+  labs(y = "Longueur du bec [mm]", x = "Longueur des nageoires [mm]", color = "Espèces")
+```
+
+*N'hésitez pas à explorer par vous même ce jeu de données.*
+
+Le jeu de données est découpé en un set d'apprentissage et un set de test. On décide de garder 7/10 des observations pour le set d'apprentissage.
+
+```{r}
+n <- nrow(penguins)
+n_learning <- round(n * 7/10)
+n_learning
+```
+On sépare nos observations en deux. On utilise cependant la fonction set.seed() afin de fixer l'aléatoire et d'avoir des résultats reproductibles. 
+
+```{r}
+# On fixe l'aléatoire avec la fonction set.seed()
+set.seed(41)
+learning <- sample(1:n, n_learning)
+penguins_learn <- penguins[learning, ]
+penguins_test <- penguins[-learning, ]
+```
+
+Le set d'apprentissage comprend `r nrow(penguins_learn)` et le set de test comprend `r nrow(penguins_test)`. Nous utilisons le package `mlearning` pour réaliser nos algorithmes dans ce cours. La fonction mlLda() propose une structure que nous avons déjà employée à de nombreuses reprises. Il faut fournir la formule (`formula=`) et le set d'apprentissage (`data=`). Dans notre cas, nous souhaitons prédire l'espèce à l'aide de plusieurs attributs.
+
+```{r}
+library(mlearning)
+
+penguins_lda <- mlLda(
+  formula = species ~ island + bill_length_mm + bill_depth_mm + flipper_length_mm + body_mass_g + sex ,
+  data = penguins_learn)
+
+penguins_lda
+```
+
+
+Nous allons maintenant vérifier les performances de ce classifieur avec la matrice de confusion. Nous commençons par prédire les classes de notre set de test avec notre lda.
+
+```{r}
+penguins_pred <- predict(penguins_lda, penguins_test)
+```
+
+Nous réalisons ensuite une matrice de confusion pour étudier les performances de notre outil. La fonction plot() de notre objet de type `confusion` nous donne une version de la matrice de confusion simple à lire.
+
+```{r}
+penguins_conf <- confusion(penguins_pred, penguins_test$species)
+plot(penguins_conf)
+```
+
+Notre algorithme a commis une erreur sur les observations étudiées. On obtient tout le détail des métriques que nous avons vu précédemment en faisant appel à la fonction `summary()`.
+
+```{r}
+summary(penguins_conf)
+```
+
+
+Vérifie ta compréhension de l'analyse discriminante linéaire à l'aide du tutoriel suivant. métriques à l'aide du tutoriel sur la matrice de confusion.
+
+`r learnr("C01Lb_lda", title = "Analyse discriminante linéaire", toc = "Tutoriel : analyse discriminante linéaire")`
+
+### Pièges et astuces
+
+L'exemple proposé précédemment est volontairement très simple afin de comprendre les principes de base de la classification supervisée avec un algorithme simple.
+
+TODO 
+
+
+
+```{r, echo=FALSE, results='asis'}
+assignation("C01Ga_ml1", part = "I",
+  url = "https://github.com/BioDataScience-Course/C01Ga_ml1",
+  course.urls = c(
+    'S-BIOG-025' = "https://classroom.github.com/a/-5ulh9Fw"),
+  toc = "Assignation : Utilisation de l'analyse discriminante linéaire.")
+```
 
 ## Récapitulatif des exercices
 
