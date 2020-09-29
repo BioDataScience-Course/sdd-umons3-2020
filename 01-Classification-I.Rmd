@@ -199,10 +199,12 @@ La fonction skim() nous donne un aperçu du contenu de ce jeu de données. Si vo
 skimr::skim(penguins)
 ```
 
-Ce jeu de données comprend `r ncol(penguins)` variables et `nrow(penguins)` individus. On observe la présence de quelques données manquantes que nous supprimons avant de continuer.
+Ce jeu de données comprend `r ncol(penguins)` variables et `nrow(penguins)` individus. On observe la présence de quelques données manquantes que nous supprimons avant de continuer. Nous supprimons également la variable année qui ne nous intéresse pas.
 
 ```{r}
-penguins <- drop_na(penguins)
+penguins %>.%
+  drop_na(penguins) %>.%
+  select(., -year) -> penguins
 ```
 
 Le graphique ci-dessous propose un nuage de points pour différencier ces 3 espèces. On observe une répartition assez bonne entre nos trois espèces selon les 2 variables étudiées. Ce graphique nous laisse penser que l'algorithme de classification a de grandes chances d'être efficace pour séparer ces 3 espèces.
@@ -239,6 +241,11 @@ library(mlearning)
 
 penguins_lda <- mlLda(
   formula = species ~ island + bill_length_mm + bill_depth_mm + flipper_length_mm + body_mass_g + sex ,
+  data = penguins_learn)
+
+# on peut simplifier l'écriture de la formule condensée.
+penguins_lda <- mlLda(
+  formula = species ~ .,
   data = penguins_learn)
 
 penguins_lda
