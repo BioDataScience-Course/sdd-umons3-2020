@@ -193,26 +193,40 @@ Partons d'un exemple pratique sur 3 populations de manchots adultes proches de l
 penguins <-read("penguins", package = "palmerpenguins")
 ```
 
+
 La fonction skim() nous donne un aperçu du contenu de ce jeu de données. Si vous voulez des informations supplémentaires, consultez la page d'aide du jeu de données ou [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/). 
 
 ```{r}
 skimr::skim(penguins)
 ```
 
-Ce jeu de données comprend `r ncol(penguins)` variables et `nrow(penguins)` individus. On observe la présence de quelques données manquantes que nous supprimons avant de continuer. Nous supprimons également la variable année qui ne nous intéresse pas.
+Ce jeu de données comprend `r ncol(penguins)` variables et `nrow(penguins)` individus. On observe la présence de quelques données manquantes que nous supprimons avant de continuer. Nous allons également renommer et donner un labels à nos variables.
+
+```{r}
+penguins <- rename(penguins, bill_length = bill_length_mm, bill_depth = bill_depth_mm, 
+                   flipper_length = flipper_length_mm, body_mass = body_mass_g)
+
+penguins <- labelise(penguins, 
+    label = list(species = "Espèces", island= "Iles", bill_length = "Longueur du bec",
+                 bill_depth = "Epaisseur du bec", flipper_length = "Longueur des nageoirs", 
+                 body_mass = "Masse",sex = "Sex", year = "Année de la mesure"),
+    units = list(bill_length = "mm", bill_depth = "mm", flipper_length = "mm", body_mass = "g"))
+```
+
+
+Nous nous intéressons uniquement aux variables explicatives numériques. 
 
 ```{r}
 penguins %>.%
   drop_na(penguins) %>.%
-  select(., -year) -> penguins
+  select(., -year, -island, -sex) -> penguins
 ```
 
 Le graphique ci-dessous propose un nuage de points pour différencier ces 3 espèces. On observe une répartition assez bonne entre nos trois espèces selon les 2 variables étudiées. Ce graphique nous laisse penser que l'algorithme de classification a de grandes chances d'être efficace pour séparer ces 3 espèces.
 
 ```{r}
-chart(penguins, bill_length_mm ~ flipper_length_mm %color=% species) +
-  geom_point() +
-  labs(y = "Longueur du bec [mm]", x = "Longueur des nageoires [mm]", color = "Espèces")
+chart(penguins, bill_length ~ flipper_length %color=% species) +
+  geom_point() 
 ```
 
 *N'hésitez pas à explorer par vous même ce jeu de données.*
@@ -240,7 +254,7 @@ Le set d'apprentissage comprend `r nrow(penguins_learn)` et le set de test compr
 library(mlearning)
 
 penguins_lda <- mlLda(
-  formula = species ~ island + bill_length_mm + bill_depth_mm + flipper_length_mm + body_mass_g + sex ,
+  formula = species ~ bill_length + bill_depth + flipper_length + body_mass,
   data = penguins_learn)
 
 # on peut simplifier l'écriture de la formule condensée.
@@ -278,11 +292,9 @@ Vérifie ta compréhension de l'analyse discriminante linéaire à l'aide du tut
 
 ### Pièges et astuces
 
-L'exemple proposé précédemment est volontairement très simple afin de comprendre les principes de base de la classification supervisée avec un algorithme simple.
+Tout comme cela avait déjà été expliqué lors de la présentation de l' [ACP]( `r paste(learndown$baseurl, "sdd-umons2/?iframe=wp.sciviews.org/sdd-umons2-2020/analyse-en-composantes-principales.html", sep = "/")` ), il est crucial de bien nettoyer son jeu de données avant de réaliser une ADL. Il est également très important de vérifier que les relations sont linéaires. Sinon il faut transformer les données de manière appropriée. Rappelez-vous que l’ADL s’intéresse aux corrélations linéaires entre vos variables.
 
-TODO 
-
-
+C'est maintenant à vous d'appliquer dans un travail individuel les concepts liés à l'ADL
 
 ```{r, echo=FALSE, results='asis'}
 assignation("C01Ga_ml1", part = "I",
