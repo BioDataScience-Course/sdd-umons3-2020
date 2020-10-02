@@ -36,6 +36,8 @@ Parmi tous les items, on va choisir un sous-ensemble représentatif que l'on cla
 
 La classification supervisée va se décomposer en réalité en trois phases. 
 
+![Les trois phases de la classification supervisée.](images/01-classification1/machine_learning.png)
+
 1. **Apprentissage**\ : un algorithme est **entrainé** (paramétré) pour classer les items sur base du **set d’apprentissage**.
 
 2. **Test**\ : les **performances** de l’outil de classification (on dit aussi, le **classifieur**) sont évaluées à l’aide du **set de test**.
@@ -61,6 +63,8 @@ Il y a néanmoins certaines conditions d'application à satisfaire préalablemen
 - **Les mesures utilisées sont suffisamment discriminantes entre les classes**. Vous devez vous arranger pour définir et mesurer des attributs qui permettent de séparer efficacement les classes. Vous pourrez le constater visuellement en représentant, par exemple deux attributs quantitatifs sur un graphique en nuage de points, et en y plaçant les items en couleurs différentes en fonction de leur classe. Si des regroupements bien distincts sont visible sur le graphique, vous êtes bons, ... sinon c'est mal parti. Utilisez éventuellement des techniques comme l'analyse des composantes principales (ACP) pour visualiser de manière synthétique un grand nombre d'attributs. L'**ingénierie et sélection judicieuse des attributs** est une partie cruciale, mais difficile de la classification supervisée de type "machine learning". L'apprentissage profond ("deep learning") tente de s'en débarrasser en incluant cette partie du travail dans le programme d'apprentissage lui-même.
 
 - **Le système est statique\ : pas de changement des attributs des items à classer par rapport à ceux des sets d'apprentissage et de test**. Des situations typiques qui peuvent se produire et qui ruinent votre travail sont un été particulièrement chaud et sec par rapport aux saisons pendant lesquelles des plantes ont été prélevées pour le set d'apprentissage. Par conséquent, vos fleurs ont des caractéristiques morphologiques différentes suite à cette longue canicule et sont donc moins bien, voire, totalement mal classées. Un autre exemple serait le changement d'appareil d'IRM qui donne des images légèrement différentes du précédent. Le set d'apprentissage du premier IRM ne permet alors peut-être pas de créer un classifieur capable de classer valablement les analyses réalisées avec le second appareil.
+
+- **Toutes les classes ont des représentants dans les sets**. Il parait assez évident que si le set d'apprentissage ne contient aucun item pour une classe, l'algorithme de classification nevpeut pas être entrainé à reconnaitre celle classe-là. Par contre, il est également indispensable que le set de test soit pourvu d'un minimum d'items par classe, afin d'établir correctement une estimation des performances du classifieur pour **chaque** classe. attention avec une répartition aléatoire entre apprentissage et test pour des très petits peus de données à ce que cette situation n'apparaissent pas par le biais du hasard.
 
 En pratique, ces conditions d'application ne sont *pas* remplies strictement dans les faits, mais le but est de s'en rapprocher le plus possible. Par exemple, il est impossible en pratique de garantir qu'il n'y ait absolument *aucune* erreur dans les sets d'apprentissage et de test. Si le taux d'erreur reste faible (quelques pourcents voire encore moins), l'impact de ces erreurs sera suffisamment négligeable. Par contre, avec 20 ou 30% d'erreurs, par exemple, nous ne pourrons plus travailler valablement.
 
@@ -179,13 +183,25 @@ Vous pouvez retrouver des indices supplémentaires via le lien suivant\ : [Stati
 
 ## Analyse discriminante linéaire
 
-Il existe de très nombreux algorithmes de classification supervisée. Nous allons commencer la découverte des principaux algorithmes avec l'analyse discriminante linéaire. Cette analyse recherche la meilleure discrimination possible des groupes par rotation des axes, en diagonalisant la matrice variance-covariance intergroupe, ce qui revient à calculer les combinaisons linéaires des variables initiales qui séparent le mieux ces groupes.
+Il existe de très nombreux algorithmes de classification supervisée. Nous allons commencer la découverte des principaux algorithmes avec l'analyse discriminante linéaire. Cette analyse recherche la meilleure discrimination possible des groupes par rotation des axes, en diagonalisant la **matrice variance-covariance inter-groupes**, ce qui revient à calculer les combinaisons linéaires des variables initiales qui séparent le mieux ces groupes.
 
 ```{block2, type = 'note'}
 Le principe de cet algorithme ne te rappelle rien\ ? Evidemment que oui, cet algorithme se base sur les mêmes principes que l'ACP. 
 ```
 
-Partons d'un exemple pratique sur 3 populations de manchots adultes proches de la station de recherche PALMER en antarctique. 
+Il n'est pas utile ici de rentrer dans les détails mathématiques. Comme vous connaissez déjà les variances inter/intra-groupes (cf. [ANOVA](https://wp.sciviews.org/sdd-umons/?iframe=wp.sciviews.org/sdd-umons-2020/anova-%25C3%25A0-un-facteur.html)) d'une part, et le principe de rotation des axes de l'[ACP](https://wp.sciviews.org/sdd-umons2/?iframe=wp.sciviews.org/sdd-umons2-2020/analyse-en-composantes-principales.html) d'autre part, vous êtes à même de comprendre le principe de l'ADL en combinant ces deux notions. Pour **quantifier la séparation des différents classes** ou groupes, nous allons donc réutiliser encore une fois la bonne vieille séparation de la variance totale en variance inter-groupe et variance intra-groupe que nous avons déjà employée, par exemple, dans l'ANOVA. Sauf qu'ici, nous travaillons en multivarié avec des matrices ayant potentiellement un grand nombre de dimensions. Du point de vue purement mathématique, cela ne change rien, car la partition de la variable s'applique tout aussi bien à *N* > 2 dimensions. Ensuite, nous nous intéressons aux **distances inter-groupes**. Notez que, plus ces distances sont importantes, mieux nous séparons les groupes (ou si vous préférez, les classes de notre classifieur).
+
+Pour rappel, l'ACP est une technique qui effectue la **diagonalisation d'un matrice** (matrice variance-covariance, ou matrice de corrélation des données). D'un point de vue géométrique, nous avons vu que diagonaliser une matrice revient en fait à effectuer une **rotation du système d'axes** représenté par cette matrice, de sorte que les nouveaux axes ainsi obtenus correspondent à une **maximisation de la variance** sur les nouveaux axes. En ACP, on cherchait à "étaler" les données le plus possible sur les 2 ou 3 premiers axes afin de visualiser comment les points (les individus) se répartissent.
+
+En ADL, on réutilise le même principe, mais nous substituons la matrice inter-groupes à la matrice variance-covariance pour effectuer cette ACP. Le résultat est une *autre* rotation des axes qui va maximiser, cette fois-ci, les distances inter-groupes... et donc, étaler au mieux les différentes classes de notre classifieur selon des axes qui les *séparent* le mieux possible linéairement (entendez par là, par une division à l'aide d'hyperplans qui sont les équivalents à *N* dimension de droites de séparation dans un plan à deux dimensions, voir schéma ci-dessous). Les hyperplans de séparations sont déterminés par rapport aux barycentres des différentes classes. En d'autres termes, ils sont placés à égale distance des centres de gravité des différents nuages de points dans la représentation en composantes principales de l'ADL.
+
+À partir de là, l'espace est divisé en plusieurs régions dont les frontières son linéaires. Chaque région correspond à une classe. Il suffit alors de projeter des nouveaux individus dans cet espace (recalcul des coordonnées selon la rotation du système d'axes et représentation de ces coordonnées dans l'espace des individus de l'ADL). Nous regardons alors dans quelle sous-région nos points ont été se placer pour en déterminer la classe à laquelle ils appartiennent. Pour une autre explication, [voyez ici](https://od-datamining.com/knwbase/lanalyse-discriminante-expliquee-a-ma-fille/).
+
+![Schéma de principe de rotation du système d'axes de l'ADL afin de maximiser la variance inter-groupe, et donc, de séparer au mieux ces groupes dans le nouveau système d'axe. La séparation du plan à l'aide d'une droite à égale distance des barycentres des groupes définit des sous-régions qui correspondent à chacune des classes.](images/01-classification1/adl.png)
+
+### Manchots antarctiques
+
+Partons d'un exemple pratique sur trois populations de manchots adultes proches de la station de recherche PALMER en Antarctique. 
 
 ```{r}
 SciViews::R
@@ -243,31 +259,29 @@ n_learning
 On sépare nos observations en deux sets indépendants. On utilise cependant la fonction `set.seed()` afin de fixer le début du générateur de nombres pseudo-aléatoires, ce qui donne une série de nombres qui ont les mêmes propriétés que des nombres tirés au sort, mais ce tirage au sort est *reproductible* d'une fois à l'autre. 
 
 ```{r}
-set.seed(372)
+set.seed(96578)
 # Récupération de n_learning items parmi les numéros de lignes de 1 à n
 learning <- sample(1:n, n_learning)
 # Sous-tableau correspondant à ces lignes -> apprentissage
-penguins_learn <- as.data.frame(penguins[learning, ])
+penguins_learn <- penguins[learning, ]
 # Sous-tableau ne correspondant pas à ces lignes -> test
-penguins_test <- as.data.frame(penguins[-learning, ])
+penguins_test <- penguins[-learning, ]
 ```
 
-A noter que les tableaux issus de `penguins` sont des "tibbles". Ce sont des objets similaires à des data frames, mais avec un comportement légèrement différent. Or, les fonctions de {mlearning} demandent des data frames *senso stricto*. Donc, nous convertissons nos sets d'apprentissage et de test à l'aide de `as.data.frame()`.
-
-Le set d'apprentissage comprend `r nrow(penguins_learn)` et le set de test comprend `r nrow(penguins_test)`. Nous utilisons le package {mlearning} pour réaliser notre analyse ici. La fonction `mlLda()` propose une structure que nous avons déjà employée à de nombreuses reprises. Il faut fournir la formule et le set d'apprentissage (`data =`). Dans notre cas, nous souhaitons prédire l'espèce à l'aide de plusieurs attributs.
+Le set d'apprentissage comprend `r nrow(penguins_learn)` et le set de test comprend `r nrow(penguins_test)`. Nous utilisons le package {mlearning} pour réaliser notre analyse ici. La fonction `mlLda()` propose une structure que nous avons déjà employée à de nombreuses reprises. Il faut fournir le set d'apprentissage (`data =`) et la formule. Dans notre cas, nous souhaitons prédire l'espèce à l'aide de plusieurs attributs.
 
 ```{r}
 library(mlearning)
 
-penguins_lda <- mlLda(species ~ bill_length + bill_depth + flipper_length + body_mass,
-  data = penguins_learn)
+penguins_lda <- mlLda(data = penguins_learn,
+  species ~ bill_length + bill_depth + flipper_length + body_mass)
 ```
 
-Cependant dans le cas particulier où **toutes** les variables du tableau sont utilisées pour l'analyse, comme c'est le cas ici, la formule peut être abrégée en `class ~ .`, ce qui signifie que la variable dépendante qualitative `class` est étudiée en fonction de **toutes** les autres variables du tableau. En fait, ce n'est pas tout-à-fait synonyme car dans ce dernier cas, les fonction du package {mlearning} utilisent des astuces de programmation pour optimiser les calculs (autant en vitesse qu'en utilisation de la mémoire vive). Il est donc très fortement conseillé d'utiliser cette forme.
+Cependant dans le cas particulier où **toutes** les variables du tableau sont utilisées pour l'analyse, comme c'est le cas ici, la formule peut être abrégée en `class ~ .`, ce qui signifie que la variable dépendante qualitative `class` est étudiée en fonction de **toutes** les autres variables du tableau, considées toutes comme des attributs. En fait, ce n'est pas tout-à-fait synonyme car dans ce dernier cas, les fonction du package {mlearning} utilisent des astuces de programmation pour optimiser les calculs (autant en vitesse qu'en utilisation de la mémoire vive). Il est donc très fortement conseillé d'utiliser cette forme.
 
 ```{r}
 # on peut simplifier l'écriture de la formule condensée.
-penguins_lda <- mlLda(species ~ ., data = penguins_learn)
+penguins_lda <- mlLda(data = penguins_learn, species ~ .)
 penguins_lda
 ```
 
@@ -292,7 +306,7 @@ La fonction `plot()` appliquée à notre objet `penguins_conf` de classe `confus
 plot(penguins_conf)
 ```
 
-Notre classifieur a commis une erreur sur les données du set de test. On obtient tout le détail des métriques que nous avons vu précédemment en faisant appel à la fonction `summary()`.
+Notre classifieur a commis deux erreurs sur les données du set de test. Il semble que Gentoo puisse s'identifier sans erreurs par rapport aux deux autres espèces, alors qu'une erreur (faible) subsiste dans la discrimination entre Adelie et Chinstrap. On obtient tout le détail des métriques que nous avons vu précédemment en faisant appel à la fonction `summary()`.
 
 ```{r}
 summary(penguins_conf)
