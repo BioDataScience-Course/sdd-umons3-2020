@@ -1,3 +1,71 @@
 # Classification supervisée II {#classif2}
 
-...
+##### Objectifs {-}
+
+- Connaître la classification supervisée par la méthode des plus proches voisins
+
+- Connaître également sa variante optimisée\ : la quantification vectorielle
+
+- Maîtriser la validation croisée comme approche efficace de partitionnement entre set d'apprentissage et de test
+
+##### Prérequis {-}
+
+Ce module continue la matière vue dans le module précédent et s'appuie dessus. Assurez-vous d'avoir bien compris la logique de la classification supervisée et les trois étapes\ : apprentissage, test et déploiement. Vous devez être également capable de créer un classifieur avec R (en utilisant l'ADL). Enfin, la matrice de confusion et les métriques qui en sont dérivées ne doivent plus avoir de secrets pour vous pour évaluer les performances d'un classifieur dans la phase de test. S'il subsiste des doutes ou des incompréhensions pour ces aspects clés de la classification supervisée, vous feriez mieux d'approfondir le module 1 *avant* d'aborder celui-ci.
+
+## Différents algorithmes
+
+Les algorithmes de classification supervisée se subdivisent en trois grandes classes\ :
+
+- celles qui **utilisent un modèle** (linéaire ou non linéaire) sous-jacent pour mettre en relation les mesures et les groupes. Par exemple, l'analyse discriminante linéaire que nous connaissons déjà appartient à cette catégorie. Nous verrons également les machines à vecteurs supports et les réseaux de neurones dans cette catégorie.
+
+- celles qui font appel à un indice de similarité calculé entre les individus (attribution du groupe correspondant aux individus les plus ressemblants à celui qu'on teste). Ce sont les techniques dites du plus proche voisin et de la quantification vectorielle (voir ci-après dans ce module).
+
+- enfin, les techniques qui définissent une suite de règle de division dichotomique du jeu de données (qui se matérialisent par un ou plusieurs **arbres de décision**). Il s'agit du partitionnement récursif et de "random forest", par exemple. Nous verrons ces méthodes dans le module 3.
+
+Nous avons déjà abordé l"analyse discriminante linéaire dans le précédent module et nous allons étudier ici quelques autres algorithmes de chaque groupe ici, ainsi que dans le module suivant. Ensuite, nous découvrirons une méthode efficace de partitionnement entre set d'apprentissage et de test\ : la validation croisée. Enfin, nous mettrons tout cela en musique pour étudier différents algorithmes de classification en pratique, en vue de choisir celui qui nous semble le plus adéquat pour le cas étudié.
+
+## K plus proches voisins
+
+K plus proches voisins (*k-nearest neighbours* en anglais ou k-NN en abbrégé) est certainement la technique la plus intuitive en classification supervisée. Malgré sa simplicité inhérente, elle offre de bonnes prestations. La classification supervisée s’effectue par une analyse de la matrice de [distances de Mahalanobis](https://qastack.fr/stats/62092/bottom-to-top-explanation-of-the-mahalanobis-distance) (équivalente à la distance Euclidienne ou géométrique appliquée sur des données réduites de variance unitaire) entre un individu d’intérêt à reconnaître et les individus du set d'apprentissage.
+
+![La classification par les k plus proches voisins compare un individu inconnu (en gris) avec les individus de classe connue du set d'apprentissage (bleus et rouges matérialisant deux classes différentes) du point de vue de la distance de Mahalanobis. Ici k = 3, et l'individu inconnu est considéré comme bleu puisqu'il est plus proche de deux bleus contre un seul rouge.](images/02-classification2/knn.png)
+
+En d’autres termes, il s’agit tout simplement de calculer la distance géométrique qui sépare un individu d’intérêt de tous les individus du set d'apprentissage dans un espace réduit, c’est-à-dire, un espace où chaque variable est mise à l’échelle de telle manière que sa variance soit unitaire. La classe attribuée à l'individu d’intérêt sera la même que celle du, ou des *k* individus les plus proches (d'où le nom de la méthode). Des variantes utilisent naturellement d’autres calculs de distances\ : Euclidiennes, Manhattan, etc.
+
+Un seul paramètre doit donc être définit\ : *k*, représentant le nombre d'individus proches considérés. Un vote à la majorité permet de déterminer à quel groupe appartient l’objet testé. En cas d’ex-æquos, la classe de l'individu du set d'apprentissage le plus proche est utilisée. Pour minimiser le risque d’ex-aequos, *k* est généralement choisi impair. Dans notre schéma, nous utilisons *k* = 3, valeur qui s’est avérée optimale dans beaucoup de situations. La recherche de la valeur optimale de *k* dans le cadre de l’application finale sera évidemment possible ultérieurement.
+
+TODO: exemple...
+
+## Quantification vectorielle
+
+Un des désavantages de la méthode des k plus proches voisins est que l'on doit conserver *toutes* les données du set d'apprentissage et confronter systématiquement tout nouvel individu à l'ensemble des cas de ce set. L'idée sous-jacente à la quantification vectorielle (*learning vector quantization* en anglais, LVQ en abbrégé) est que les données initiales peuvent sans doute être synthétisées\ : des individus proches dans l'espace de Malahonobis peuvent être remplacés par des "individus moyens ou centroïdes" tout en apportant à peu près le même effet. Du coup, nous réduisons la quantité d'information à conserver et nous accélérons les calculs dans les phases de test et déploiement.
+
+Une étape supplémentaire dans le calcul du classifieur est introduite. Le set d'apprentissage initial est résumé en un "codebook" dans lequel les groupes initiaux sont remplacés par un ou plusieurs centroïdes. Ces centroïdes sont, en quelque sorte, des "portraits robots" des différents classes et ils résument les caractéristiques des individus appartenant à ces classes. La classification supervisée se fait par une méthode similaire aux k plus proches voisins mais en utilisant les centroïdes du "codebook" en lieu et place des individus du set d'apprentissage.
+
+En plus du paramètre *k*, il faut donc également définir *nc*, le nombre de centroïdes qui seront calculés dans le "codebook". Il est possible de calculer librement les différents centroïdes en fonction de la dispersion des données, ou bien d’imposer que le même nombre de centroïdes soit calculé pour chaque classe.
+
+![Un exemple fictif et visuel de classification par quantification vectorielle à deux classes (rouge et bleue) résumée via un "codebook" de *nc* = 6. Ce codebook est ensuite utilisé comme référence pour déterminer la classe de l'individu inconnu en gris par k plus proches voisins avec *k* = 3. On en déduit qu'il s'agit probablement d'un individu de la classe rouge ici puisque deux centroïdes rouges sont plus proches contre un seul bleu.](images/02-classification2/lvq.png)
+
+TODO: exemple d'application.
+
+## Validation croisée
+
+Rappelez-vous qu'une règle à laquelle il ne faut *jamais* déroger, c'est de ne pas utiliser les mêmes individus en apprentissage et en test.
+
+![Les sets d'apprentissage et de test ne peuvent pas utiliser *toutes* les données\ : il faut les partitionner.](images/02-classification2/split-set.png)
+
+Souvent, la grosse difficulté est d'obtenir suffisamment d'objets de chaque classe identifiés manuellement pour permettre à la fois l'apprentissage et le test. Un test sur les **mêmes** objets que ceux utilisés lors de l'apprentissage mène à une surestimation systématique des performances du classifieur. Nous sommes donc contraint d'utiliser des objets différents dans les deux cas. Naturellement, plus, nous avons d'objets dans le set d'apprentissage **et ** dans le set de test, et meilleur sera notre classifieur et notre évaluation de son efficacité.
+
+La **validation croisée** permet de résoudre ce dilemme en utilisant en fin de compte *tous* les objets, *à la fois* dans le set d'apprentissage et dans le set de test, mais *jamais simultanément*. L'astuce consiste à diviser aléatoirement l'échantillon en *n* sous-ensembles à peu près égaux en nombre. Ensuite, l'apprentissage suivi du test est effectué *n* fois indépendamment. A chaque fois, on sélectionne tous les sous-ensembles sauf un pour l'apprentissage, et le sous-ensemble laissé de côté est utilisé pour le test. L'opération est répétée de façon à ce que chaque sous-ensemble serve de set de test tour à tour. Au final, ou rassemble les résultats obtenus sur les *n* sets de tests, donc, sur tous les objets de notre échantillon. Cela se fait en additionnant les *n* matrices de confusion ainsi obtenues. L'animation suivante visualise le processus pour que cela soit plus clair dans vottre esprit.
+
+TODO: ajouter l'animation.
+
+Au final, nous aurons utilisé tous les individus à la fois en apprentissage et en test, mais jamais simultanément. L'addition des matrices de confusions obtenues à chaque étape nous donne une grosse matrice qui contient le même nombre d'individus que l'ensemble de notre jeu de données initial. Naturellement, nous n'avons pas le même classifieur à chaque étape, et celui-ci n'est pas aussi bien construit que s'il utilisait véritablement *toutes* les observations. Mais plus le découpage est fin et plus nous nous en approchons. À la limite, pour *N* observations, nous pourrions réaliser *n* = *N* sous-ensembles, c'est-à-dire que chaque sous-ensemble contient un et un seul individu. Nous avons alors à chaque fois le classifieur le plus proche possible de celui que l'on obtiendrait avec véritablement toutes les observations puisqu'à chaque étape nous ne perdons qu'un seul individu en phase d'apprentissage. La contrepartie est un temps de calcul potentiellement très, très long puisqu'il y a énormément d'étapes. **Cette technique porte le nom de validation par exclusion d'une donnée ou _leave-one-out cross-validation_ en anglais, LOOCV en abbrégé**. À l'autre extrême, nous pourrions utiliser *n* = 2. Mais dans ce cas, nous n'utilisons que le moitié des observation en phase d'apprentissage à chaque étape. C'est le plus rapide, mais le moins exact.
+
+En pratique, un compromis entre exactitude et temps de calcul nous mène à choisir souvent la **validation croisée dix fois** (*ten-fold cross-validation* en anglais). Nous divisons aléatoirement en dix sous-ensembles d'à peu près le même nombre d'individus et nous répétons donc l'opération apprentissage -> test seulement dix fois. Chacun des dix classifieurs a donc été élaboré avec 90% des données totales, ce qui représent souvent un compromis encore acceptable pour estimer les propriétés qu'aurait le classifieur réalisé avec 100% des données. Toutefois, si nous constatons que le temps de calcul est raisonnable, rien ne nous empêche d'augmenter le nombre de sous-ensemble, voire d'utiliser la version par exclusion d'une donnée, mais en pratique nous observons tout de même que cela n'est pas raisonnable sur des très gros jeux de données et avec les algorithmes les plus puissants, mais aussi les plus gourmands en calcul comme random forest ou les réseaux de neurones que nous aborderons au prochain chapitre.
+
+TODO: exemple d'application
+
+## Choix
+
+TODO: comparaison et choix...

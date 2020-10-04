@@ -1,3 +1,79 @@
 # Classification supervisée III {#classif3}
 
 ...
+
+
+##  Les méthodes par arbre de décision
+
+L’arbre de classification est un algorithme de classification supervisée qui créé un arbre dichotomique où, à chaque nœud, une variable permet de déterminer si le parcours de l’arbre doit être poursuivi vers la gauche du nœud (lorsque la valeur de la variable est inférieure à un seuil fixé), ou vers sa droite (si la valeur est supérieure ou égale à ce seuil, voir Venables & Ripley 2003). Le choix de la variable utilisée à chaque nœud, ainsi que la valeur du seuil, sont déterminés par l’algorithme de façon à maximiser la séparation entre les deux sous-entités ainsi obtenus, qui doivent discriminer au mieux entre les différentes groupes à identifier. Le traitement est poursuivi tout au long de l’arbre jusqu’à aboutir à une extrémité, nommée "feuille", et qui représente une classe donnée. Notez qu’il peut très bien y avoir plusieurs feuilles qui représentent un même groupe. Le groupe attribué à une particule est donc celui auquel elle abouti après avoir parcouru l’arbre de la base jusqu’aux feuilles.
+
+Schéma du principe d’un arbre de classification en 3 groupes, A, B et C. A chaque nœud une variable discriminante et un seuil sont choisis afin de séparer au mieux les objets. Lorsque l’arbre est construit, un objet peut être présenté à sa base. Le groupe auquel il appartient est déterminé en parcourant l’arbre jusqu’à aboutir à une feuille.
+
+##  Random forest
+
+"Random Forest" (RF) est un algorithme introduit par Breiman (2001) qui créé un ensemble d’arbres décisionnels individuels (forêt d’arbres), dont la variable discriminante à chaque nœud est choisie parmi un sous-ensemble aléatoire de toutes les *p* variables utilisées (afin d’introduire une variation aléatoire dans chaque arbre décisionnel). Lorsque l’ensemble des arbres est créé, un vote à la majorité est appliqué en utilisant la réponse donnée par chaque arbre pour déterminer à quel groupe appartient la particule d’intérêt. C’est actuellement un des algorithmes les plus performants de classification supervisée. Par contre, étant donné qu’il faut créer plusieurs centaines d’arbres décisionnels, le temps de calcul est généralement plus élevé qu’avec des méthodes simples comme ADL, k plus proches voisins, ou l’utilisation d’un arbre unique).
+
+Les paramètres à définir sont le nombre d’arbres et le nombre de *p *variables à choisir aléatoirement à chaque nœud. Les paramètres choisis ici sont de 500 arbres et de 2*p*/3 variables choisies aléatoirement. Ces valeurs se sont montrées efficaces dans des études antérieures, et l’algorithme est, par ailleurs, relativement robuste face aux variations de ces paramètres autour des valeurs optimales.
+
+Schéma du principe de "Random Forest" pour la reconnaissance de trois groupes A, B et C. Cet algorithme créé un ensemble d’arbres où à chaque nœud une variable discriminante et un seuil sont choisis parmi un sous-ensemble aléatoire de toutes les variables. Lorsque la forêt est construite, le même objet est présenté à la base de chaque arbre. Le groupe auquel il appartient est obtenu par un vote à la majorité de tous les arbres.
+
+## Réseaux de neurones artificiels
+
+L’idée de cet algorithme vient de l’étude du fonctionnement de notre cerveau, d’où son nom, par analogie. Le modèle est constitué de plusieurs couches *i* interconnectées. Les nœuds *j* de ces connections constituent les neurones artificiels. La première couche est constituée des paramètres mesurés sur les particules et la dernière couche renseigne les groupes à reconnaître (Venables & Ripley 2003). La ou les couches intermédiaires permettent de paramétrer le système d’apprentissage. Les connexions entre neurones sont caractérisées par les seuils ω<sub>ij</sub> variant de 0 à 1, et le transfert du "signal" est généralement modélisé par des fonctions logistiques variant entre ces deux extrêmes. Ces seuils permettent de moduler les relations entre neurones et ainsi de déterminer le groupe d’une particule à partir des valeurs de paramètres mesurées sur celle-ci, par la transmission des signaux de proche en proche, dont le passage est autorisé ou bloqué en fonction des seuils de déclenchement définis (Venables & Ripley 2003). Ce type de fonctionnement est, en effet, parfaitement comparable au transfert d’un influx nerveux le long d’un réseau de neurones tels qu’existant dans notre cerveau.
+
+Les réseaux de neurones artificiels sont des techniques très sophistiquées, et qui admettent un grand nombre de paramètres différents (nombres de couches cachées, nombre de neurones par couche, fonction utilisée pour modéliser le signal, règle de définition des seuils,…). Dans le cas de notre étude, nous utilisons un algorithme simple, dit à une seule couche cachée, et dont tous les autres paramètres sont conservés aux valeurs fournies par défaut dans le logiciel R. Ces valeurs par défaut se sont avérées acceptables dans la plupart des études utilisant cet algorithme.
+
+*Schéma du principe de fonctionnement d’un réseau de neurone simple, avec une seule couche cachée. Le groupe prédit dépend de la valeur des paramètres et des coefficients de pondérations ω~ij~. C’est durant la phase d’apprentissage que les coefficients de pondération sont paramétrés.*
+
+## Classification de plancton par analyse d'image
+
+Dans cet exemple, nous cherchons à classer du mésozooplancton sur base de mesures effectuées sur chaque individu par analyse d'image. Voici le genre d'image que nous analysons (petite zone d'une image entière)\ :
+
+Cette image est automatiquement détourées, les objets sont identifiés et mesurés:
+
+Les mesures effectuées, au nombre de 27, sont des paramètres de taille, de forme et de distribution des niveaux de gris dans l'image. Un ensemble de 1035 objets sont en outre identifiés en 8 groupes (reject correspond à des objets qui ne sont pas du zooplancton):
+
+Au final, nous travaillons donc avec un tableau de 28 colonnes (27 mesures effectuées sur les images et une colonne correspondant à l'identification manuelle des objets, et 1035 lignes. Ce tableau est étudié par validation croisée dix fois et plusieurs algorithmes de classification supervisée sont testés afin de déterminer celui qui donne les meilleurs résultats.
+
+Il faut noter que la plupart de ces algorithmes ont des paramètres qui doivent être ajustés, afin d'optimiser la reconnaissance. Ceci se fait également par validation croisée. Différentes valeurs de ces paramètres sont testés, et ensuite, la valeur qui donne le plus haut taux de reconnaissance globale est conservé.
+
+Étant donné le temps de calcul extrêmement long de certaines méthodes, nous ne présentons ici que quelques résultats obtenus, et sans effectuer de démonstration en "live" avec le logiciel.
+
+### Optimisation de l'arbre de partitionnement
+
+Pour la méthode de l'arbre de partitionnement, nous avons vu que l'arbre brut n'est pas optimisé. Il faut ensuite l'élaguer pour le simplifier, tout en conservant un taux de connaissance acceptable. Voici les résultats:
+
+- Détermination de la taille d'arbre optimal:
+
+- Illustration de l'élagage de l'arbre de décision:
+
+### Optimisation des k plus proches voisins
+
+Nous avons testé deux types de distances: euclidiennes et euclidiennes après standardisation des variables, ainsi qu'un nombre variable de plus proches voisins (1, 3, 5 ou 7). Voici le résultat:
+
+ Classification success (%)
+Distance k = 1 k = 3 k = 5 k = 7
+Euclidean 64.6 63.5
+Scaled Euclidean 75.7 74.5 74.2 72.2
+
+Comme one le voit, la standardisation des variables améliore le résultat, et il n'est pas utile de considérer un grand nombre de voisins. Une étude plus détaillée, par bootstrap, montre en fait que *k = 3* est légèrement meilleur que *k = 1*, contrairement à ce que la première étude semble montrer:
+
+### Optimisation de "learning vector quantization"
+
+Ici, nous pouvons choisir la taille du "codebook", c'est à dire, le nombre de centroïdes que nous désirons conserver pour représenter au mieux chaque classe. Voici les résultats de l'étude de ce paramètres (les questions de performance en terme de vitesse d'exécution sont étudiées en parallèle):
+
+Ici, nous déciderons de conserver 200 pour la taille du codebook, comme meilleurs compromis entre le taux de reconnaissance et la vitesse d'exécution.
+
+### Optimisation de "random forest"
+
+Dans la méthode "random forest", nous avons plusieurs paramètres à disposition. Le plus important est certainement le nombre d'arbres que nous créons. Ensuite, les paramètres influençant les aspects aléatoires dans chaque arbre sont également importants. Il s'agit principalement d u paramètre m~try~, le nombre de variables (choisies aléatoirement) à tester à chaque nœud des arbres. Voici l'optimisation successive de ces deux paramètres (nous conservons ici 200 arbres avec 5 variables testées à chaque nœud):
+
+### Comparaison des méthodes optimisées
+
+Une fois chaque méthode optimisée, nous effectuons le test par validation croisée sur chacun d'eux, et nous comparons les résultats globaux, aussi bien en terme de précision (taux de reconnaissance global) qu'en terme de vitesse d'exécution. Voici les résultats\ :
+
+lda = analyse discriminante linéaire, qda = analyse quadratique linéaire, mda = analyse discriminante mixte, fda = analyse discriminante flexible, knn = k plus proches voisins, lvq = "learning vector quantization", tree = méthode par arbre simple, rpart = méthode par arbre simple, mais retravaillé, bagg / db.l / db.k sont des méthodes dites de "(double) bagging" où l'algorithme de reconnaissance est entraîné plusieurs fois sur des échantillons au hasard et où la classe est déterminée par vote à la majorité, rfor = "random forest", svm = "support vector machine", nnet = réseau de neurones et dvf = "discriminant vector forest", une méthode composite spécialement mise au point pour ce type de données (voir Grosjean et al, 2004). Il y a donc ici bien plus de méthodes testées que celles que nous voyons au cours.
+
+En règle générale, nous constatons que les méthodes plus complexes ou composites, telles que random forest, double bagging ou DVF sont plus performantes que les méthodes simples (tree, knn, lda, par exemple). A noter également, la contre performance de "support vector machine", qui est habituellement une des méthodes les plus performantes. Ceci illustre donc bien qu'il ne faut pas se cantonner à une seule technique. Selon les spécificités d'un jeu de données, des méthodes différentes peuvent s'avérer plus efficaces et utiles dans un contexte particulier.
+
+Ce type d'étude (optimisation de différentes méthodes, et puis comparaison par validation croisée) est typiquement celle à mener pour obtenir le meilleur algorithme de reconnaissance automatique.

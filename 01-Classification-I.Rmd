@@ -20,13 +20,17 @@ SciViews::R
 
 Si ce n'est déjà fait, vous devez installer et vous familiariser avec la 'SciViews Box' nouvelle mouture. RStudio et (R) Markdown ne doivent plus avoir de secrets pour vous. Vous devez aussi maîtriser les bases de Git et de GitHub (avoir un compte GitHub, savoir cloner un dépôt localement, travailler avec GitHub Desktop pour faire ses "commits", "push" et "pull"). L'ensemble de ces outils a été abordé dans le cours de [science des données biologiques partie 1]( `r paste(learndown$baseurl, "sdd-umons2", sep = "/")` ).
 
-Nous avons déjà abordé dans le cours de [science des données biologiques partie 2]( `r paste(learndown$baseurl, "sdd-umons2", sep = "/")` ) la notion de **classification non supervisée**. De même, la modélisation (via les **régressions**) a aussi fait l'objet d'une attention particulière dans le cours précédent. Toutes ces connaissances vont servir de pilier de base pour ce que nous étudierons ensemble dans ce module, ainsi que dans les deux suivants cobncernant la classification supervisée.
+Nous avons déjà abordé dans le cours de [science des données biologiques partie 2]( `r paste(learndown$baseurl, "sdd-umons2", sep = "/")` ) la notion de **classification non supervisée**. De même, la modélisation (via les **régressions**) a aussi fait l'objet d'une attention particulière dans le cours précédent. Toutes ces connaissances vont servir de pilier de base pour ce que nous étudierons ensemble dans ce module, ainsi que dans les deux suivants concernant la classification supervisée.
 
 ## Principes de base
 
 Rappelez-vous, la **classification** sert à regrouper les individus d'un jeu de données en différents groupes ou **classes**. Lorsque vous avez utilisé la classification hiérarchique ou le dendrogramme, vous avez réalisé de la classification _non_ supervisée. La classification _non_ supervisée permet de choisir des classes librement sur base de l'information contenue dans le jeu de données. 
 
 Nous allons aborder maintenant la **classification supervisée**. La classification supervisée permet d'utiliser un ordinateur pour lui faire apprendre à classer des objets selon nos propres critères que nous spécifions par ailleurs (*"machine learning"* en anglais). Par exemple, en biologie, nous sommes amenés à classer le vivant (la fameuse classification taxonomique selon la [nomenclature binomiale de Linné](https://www.tela-botanica.org/2018/11/carl-von-linne-pere-de-la-classification-des-plantes-missionbotanique/)). Nous pourrions être amenés à nous faire seconder par un ordinateur pour classer nos plantes en herbier, nos insectes en collections, ... ou nos photos d'oiseaux ou de poissons. A partir du moment où nous pouvons collecter ou mesurer différents caractéristiques quantitatives ou qualitatives sur chaque individu, et que pour certains, nous en connaissons le nom scientifique, la classification supervisée pourrait être utilisée pour classer automatiquement d'autres individus, uniquement sur base des mêmes mesures.
+
+```{block2, type='note'}
+Les techniques de classification supervisée font l'objet d'une effervescence toute particulière ces derniers temps, en particulier dans leurs versions "deep learning". Ces méthodes sont, en général (mais pas obligatoirement pour les approches plus traditionnelles) appliquées sur de très gros jeux de données contenant des dizaines de milliers, des centaines de milliers, voire des millions, ou d'avantage d'observations. C'est précisément ce très grand nombre d'observations qui mérite que nous essayions d'automatiser leur classement.
+```
 
 Un jeu de données est composé d'observations (les lignes du tableau) et de variables (les colonnes du tableau) sur ces observations. En classification supervisée, les observations se nomment les **items** (nos différents spéciments de plantes, insectes, ...) et les variables se nomment les **attributs** (les variables quantitatives ou qualitatives mesurées sur chaque spécimen). 
 
@@ -43,8 +47,6 @@ La classification supervisée va se décomposer en réalité en trois phases.
 2. **Test**\ : les **performances** de l’outil de classification (on dit aussi, le **classifieur**) sont évaluées à l’aide du **set de test**.
 
 3. **Déploiement**\ : si le classifieur obtient des performances satisfaisantes, il est utilisé pour classer **automatiquement** tous les autres items du jeu de données.
-
-La classification supervisée s'utilise généralement sur des gros jeux de données contenant des dizaines de milliers, des centaines de milliers, voire des millions d'observations, voire même d'avantage.
 
 Il y a de très nombreux domaines d'applications de ces techniques de classification supervisée de type *"machine learning"*. Par exemple en médecine, ces techniques s'utilisent pour analyser les mesures effectuées par un scanner, un système de radiographie aux rayons X, un électrocardiogramme ou électroencéphalogramme, ... pour y détecter des anomalies. Votre moteur de recherche favori sur Internet utilise ces techniques pour classer les pages en "pertinentes" et "non pertinentes". La reconnaissance vocale ou de l'écriture manuscrite entrent dans cette catégorie également, de même que l'analyse de sentiment sur base de texte (quelle est l'état d'esprit de l'auteur du texte sur base des mots et expressions qu'il utilise). Il faut s'attendre à ce que dans quelques années, des algorithmes plus efficaces, et des ordinateurs plus puissants pourront effectuer des tâches aujourd'hui dévolues à des spécialistes, comme le médecin spécialisé en radiographie pour l'exemple cité plus haut. Nous sommes même à l'aube des véhicules capables de conduire tous seuls, sur base de l'analyse des images fournies par leurs caméras\ !
 
@@ -77,7 +79,7 @@ Avant de nous lancer dans la découverte de différents algorithmes, nous devons
 L'outil le plus important pour évaluer la qualité d'un algorithme de classification supervisée est la **matrice de confusion**.
 
 ```{block2, type='warning'}
-L’évaluation doit toujours se faire sur un échantillon indépendant du set d’apprentissage. C'est pour cela que nous devons avoir deux sets indépendants\ : le set d'apprentisage et le set de test.
+Le test (évaluation des performances d'un classifieur) doit toujours se faire sur un échantillon indépendant du set d’apprentissage. C'est pour cela que nous devons avoir deux sets indépendants\ : le set d'apprentisage et le set de test ne contenant pas les mêmes individus.
 ````
 
 La matrice de confusion est représentée sous la forme d'un *tableau de contingence à double entrée* qui croise les groupes prédits par l'ordinateur avec les groupes prédits manuellement pour ces mêmes items. En cas de concordance, les items sont dénombrés sur la diagonale de cette matrice carrée. Donc, tous les dénombrements hors diagonale représentent des erreurs faites par l'ordinateur (en vertu de l'hypothèse de base que le classement manuel est fait sans ambiguïté et sans erreurs). 
@@ -97,12 +99,12 @@ conf <- data.frame( "Orange" = c( 25, 0, 1), "Mandora" = c(0, 16, 9), "Mineola" 
 knitr::kable(conf, col.names = c("Orange", "Mandora", "Mandarine"),caption = "Matrice de confusion dont les colonnes représentent la classification par ordinateur et les lignes la classification manuelle.")
 ```
 
-Si nous nous intéressons à la qualité de notre algorithme pour classer les Mandora. Nous pouvons réduire notre matrice de confusion de la manière suivante.
+Quel que soit le nombre de classes, il est toujours possible de réduire la matrice de confusion dès lors qu'on se focalise sur *une* classe en particulier. Par exemple, si nous nous intéressons à la qualité de notre algorithme pour classer les mandoras, nous pouvons réduire notre matrice de confusion de la manière suivante (deux matrices simplifiées similaires peuvent naturellement être calculées pour les deux autres classes, orange et mandarine).
 
 ```{r, echo=FALSE, message=FALSE}
 mandora <- data.frame("Mandora" = c("16 = TP", "9 = FP"), "Pas mandora" = c("8 = FN", "44 = TN"),   row.names = c("Mandora", "Pas mandora"))
 
-knitr::kable(mandora,col.names = c("Mandora", "Pas Mandora"), caption = "Matrice de confusion dont les colonnes représentent la classification par ordinateur et les lignes la classification manuelle.")
+knitr::kable(mandora,col.names = c("Mandora", "Pas Mandora"), caption = "Matrice de confusion dont les colonnes représentent la classification par ordinateur et les lignes la classification manuelle pour les mandoras.")
 ```
 
 Les paramètres principaux sont
@@ -117,7 +119,7 @@ Les paramètres principaux sont
 
 `r h5p(21, height = 270, toc = "Répondez aux questions")`
 
-### Les métriques
+### Métriques de performance
 
 De très nombreuses métriques existent afin de quantifier l'ajustement d'un modèle sur base de la matrice de confusion. 
 
@@ -127,34 +129,116 @@ conf_mat <- data.frame("Positif" = c("TP", "FP"), "Négatif" = c("FN", "TN"), ro
 knitr::kable(conf_mat, caption = "Matrice de confusion théorique dont les colonnes représentent la classification par ordinateur et les lignes la classification manuelle.")
 ```
 
+Partons d'un exemple fictif afin d'illustrer les calculs\ :
+
+```{r}
+# Classification manuelle en 3 classes A, B, C (la "vérité")
+Manu <- c("A", "B", "C", "A", "A", "C", "B", "C", "B", "B")
+# Classification automatique (par l'ordinateur)
+Auto <- c("B", "B", "C", "C", "A", "C", "B", "C", "A", "B")
+
+# Matrice de confusion
+matconf <- table(Manuel = Manu, Automatique = Auto)
+knitr::kable(as.matrix(matconf), caption = "Données fictives de classification en trois classes A, B et C.")
+```
+
 - Taux de reconnaissance global (*Accuracy*)
 
-$$\frac{(TP+TN)}{(TP+TN+FP+FN)}$$
+$$acc(\%) = \frac{(TP+TN)}{(TP+TN+FP+FN)}\cdot 100$$
 
-Il s'agit d'une métrique qui quantifie globalement le modèle et qui se généralise facilement à plus de deux classes.
+Il s'agit d'une métrique qui quantifie globalement le modèle et qui se généralise facilement à plus de deux classes. Si vous observez bien les termes dans l'équation, vous constaterez que c'est en fait la somme des valeurs sur la diagonale divisée par la somme totale. Cela nous mène au calcul à la main suivant dans R, sachant que `diag()` extrait les éléments sur la diagonale d'une matrice carrée\ :
+
+```{r}
+# Taux global de reconnaissance (en %)
+acc <- (sum(diag(matconf)) / sum(matconf)) * 100
+acc
+```
+
 
 - Erreur globale (*Error*)
 
-$$1-\frac{(TP+TN)}{(TP+TN+FP+FN)}$$
+$$err = 100 - acc(\%) = (1-\frac{(TP+TN)}{(TP+TN+FP+FN)}) \cdot 100$$
 
 L'erreur globale est donc, le complément du taux de reconnaissance global et la somme des deux est toujours de 100%.
 
+```{r}
+# Taux d'erreur globale (en %)
+100 - acc
+```
+
 - Taux de vrai positif (*Recall*) 
 
-$$\frac{TP}{(TP+FN)}$$
+$$recall(\%) = \frac{TP}{(TP+FN)} \cdot 100$$
 
-Dans la littérature, vous pouvez également retrouver les noms suivants\ : *Sensitivity*, *True Positive Rate (TPR)*, *Power*, *Probability of detection*. Le "Recall" est une métrique centrale dans la mesure où elle se focalise, pour une classe donnée, sur la fractions d'items du set d'apprentissage que l'ordinateur a pu trouver. Cela répond donc à une question particulière du type\ : "est-ce que je suis capable d'aller trouver mes items d'intérêt dans l'ensemble".
+Dans la littérature, vous pouvez également retrouver les noms suivants\ : *Sensitivity*, *True Positive Rate (TPR)*, *Power*, *Probability of detection*. Le "Recall" est une métrique centrale dans la mesure où elle se focalise, pour une classe donnée, sur la fractions d'items du set d'apprentissage que l'ordinateur a pu trouver. Cela répond donc à une question particulière du type\ : "est-ce que je suis capable d'aller trouver mes items d'intérêt dans l'ensemble". Donc, pour les métriques qui s'intéressent à une classe en particulier (c'est valable pour les suivantes également), nous en avons autant que de classes. Voici comment calcule le recall pour les classes A, B et C à la main dans R sur notre exemple fictif\ :
+
+```{r}
+# Recall pour la classe A (%)
+recallA <- matconf[1, 1] / sum(matconf[1, ]) * 100
+recallA
+```
+
+```{r}
+# Recall pour la classe B (%)
+recallB <- matconf[2, 2] / sum(matconf[2, ]) * 100
+recallB
+```
+
+```{r}
+# Recall pour la classe C (%)
+recallB <- matconf[3, 3] / sum(matconf[3, ]) * 100
+recallB
+```
 
 - Spécificité (*specificity*)
 
-$$\frac{TN}{(TN+FP)}$$
-Dans la littérature, vous pouvez également retrouver les noms suivants\ : *True Negative Rate (TNR)*, *Selectivity*. La spécificity apparait complémentaire au "Recall", même si traditionnellement, on complète souvent "Recall" par précision (voir ci-dessous).
+$$specif(\%) = \frac{TN}{(TN+FP)} \cdot 100$$
+Dans la littérature, vous pouvez également retrouver les noms suivants\ : *True Negative Rate (TNR)*, *Selectivity*. La spécificité apparaît complémentaire au "Recall", même si traditionnellement, on complète souvent "Recall" par précision (voir ci-dessous). On peut aussi la calculer à partir du taux de faux positifs (FPR)\ :
+
+$$FPR(\%) = \frac{FP}{TN + FP} \cdot 100$$
+
+A partir du FPR, la spécificité se calcule alors comme son complément\ :
+
+$$specif(\%) = 100 - FPR = (1-\frac{FP}{TN + FP}) \cdot 100$$
+
+A noter aussi le taux de faux négatifs (FNR) qui est un point de vue complémentaire naturellement au taux de faux positifs \ :
+
+$$FNR(\%) = \frac{FN}{TP + FN} \cdot 100$$
+
+Pour calculer ces métriques à la main dans R sur notre exemple fictif, nous ferons\ :
+
+```{r}
+# Taux de faux négatifs (par ligne) pour A (en %)
+FNR <- ((sum(matconf[1, ]) - matconf[1, 1]) / sum(matconf[1, ])) * 100
+FNR
+```
+
+```{r}
+# Taux de faux positifs (par colonne) pour A (en %)
+# Notez que TN + FP est en fait tout sauf la première ligne
+FPR <- ((sum(matconf[, 1]) - matconf[1, 1]) / sum(matconf[-1, ])) * 100
+FPR
+```
+
+```{r}
+# Spécificité pour A (en %)
+specA <- 100 - FPR
+specA
+```
 
 - Précision (*Precision*)
 
-$$\frac{TP}{(TP+FP)}$$
+$$prec(\%) = \frac{TP}{(TP+FP)} \cdot 100$$
 
 Dans la littérature, vous pouvez également retrouver les noms suivants\ : *Positive Predicted Value (PPV)*, *Reproducibility*, *Repeatability*. La précision s'intéresse à une question très différente du "Recall", mais néanmoins complémentaire\ : "quelle est la fraction effectivement de classe X que l'ordinateur a classé comme X\ ?"
+
+Un calcul manuel dans R donne\ :
+
+```{r}
+# Precision pour A (en %)
+precA <- matconf[1, 1] / sum(matconf[, 1]) * 100
+precA
+```
 
 Si la classification ne peut se faire sans erreurs (cas le plus fréquent), nous pouvons améliorer la précision mais au détriment du "recall", ou vice-versa. Selon le contexte, nous avons plutôt intérêt à favoriser l'un ou l'autre. Par exemple, pour le dépistage du COVID-19, il vaut mieux un test avec un "recall" le plus élevé possible (pour ne pas déclarer des patients malades comme faussement sains), quitte à sacrifier un peu la précision (avoir une fraction un peu plus grande de faux positifs dans la fraction de la population considérée comme atteinte par le test... et qui ferait une quarantaine inutilement). 
 
@@ -164,26 +248,36 @@ Ces deux exemples sont plutôt extrêmes. Dans la majorité des cas, nous recher
 
 - Score F (*F-measure*)
 
-$$2 \cdot \frac{(precision \cdot recall)}{(precision + recall)}$$
+$$Fmeas = 2 \cdot \frac{(precision \cdot recall)}{(precision + recall)}$$
 
 Dans la littérature, vous pouvez également retrouver les noms suivants\ : *F1-score*, *harmonic mean of precision and recall*
 
-- *Balanced accuracy* 
+```{r}
+# Mesure F ou F1-score pour A (en %)
+2 * (recallA * precA) / (recallA + precA)
+```
 
-$$\frac{(specificity + recall)}{2}$$
+- Précision balancée (*Balanced accuracy*) 
+
+$$ball\ acc = \frac{(specificity + recall)}{2}$$
+
+```{r}
+# Précision balancée (balanced accuracy) pour A (en %)
+(specA + recallA) / 2
+```
+
 
 `r learnr("C01La_confusion", title = "La matrice de confusion", toc = "Tutoriel : matrice de confusion")`
 
 
-<details><summary>Pour en savoir plus</summary>
+##### Pour en savoir plus {-}
 
 Vous pouvez retrouver des indices supplémentaires via le lien suivant\ : [Statistics calculated on confusion matrix](https://github.com/BioDataScience-Course/sdd_lesson/blob/2019-2020/sdd3_01/more/confusion_matrix.pdf)
 
-</details>
 
 ## Analyse discriminante linéaire
 
-Il existe de très nombreux algorithmes de classification supervisée. Nous allons commencer la découverte des principaux algorithmes avec l'analyse discriminante linéaire. Cette analyse recherche la meilleure discrimination possible des groupes par rotation des axes, en diagonalisant la **matrice variance-covariance inter-groupes**, ce qui revient à calculer les combinaisons linéaires des variables initiales qui séparent le mieux ces groupes.
+Il existe de très nombreux algorithmes de classification supervisée. Nous allons commencer la découverte des principaux algorithmes avec l'**analyse discriminante linéaire**. Cette analyse recherche la meilleure discrimination possible des groupes par rotation des axes, en diagonalisant la **matrice variance-covariance inter-groupes**, ce qui revient à calculer les combinaisons linéaires des variables initiales qui séparent le mieux ces groupes.
 
 ```{block2, type = 'note'}
 Le principe de cet algorithme ne te rappelle rien\ ? Evidemment que oui, cet algorithme se base sur les mêmes principes que l'ACP. 
@@ -198,6 +292,8 @@ En ADL, on réutilise le même principe, mais nous substituons la matrice inter-
 À partir de là, l'espace est divisé en plusieurs régions dont les frontières son linéaires. Chaque région correspond à une classe. Il suffit alors de projeter des nouveaux individus dans cet espace (recalcul des coordonnées selon la rotation du système d'axes et représentation de ces coordonnées dans l'espace des individus de l'ADL). Nous regardons alors dans quelle sous-région nos points ont été se placer pour en déterminer la classe à laquelle ils appartiennent. Pour une autre explication, [voyez ici](https://od-datamining.com/knwbase/lanalyse-discriminante-expliquee-a-ma-fille/).
 
 ![Schéma de principe de rotation du système d'axes de l'ADL afin de maximiser la variance inter-groupe, et donc, de séparer au mieux ces groupes dans le nouveau système d'axe. La séparation du plan à l'aide d'une droite à égale distance des barycentres des groupes définit des sous-régions qui correspondent à chacune des classes.](images/01-classification1/adl.png)
+
+Cet algorithme présente l’avantage d’être simple et rapide à calculer. Par contre, l’ADL n’est généralement pas la méthode la plus performante en classification supervisée, et elle impose que les différents groupes soient décrits par des sous-espaces uniques et déliités par des hyperplans dans l’hyperespace des *p* variables initiales, soit, une hypothèse de départ très forte. Il est possible de restreindre l’outil de reconnaissance à *q* < *p* composantes discriminantes principales, afin de simplifier et d’accélérer le calcul, si cela s'avère nécessaire (les détails sortent du cadre de ce cours).
 
 ### Manchots antarctiques
 
@@ -239,7 +335,7 @@ penguins %>.%
   select(., -year, -island, -sex) -> penguins
 ```
 
-Le graphique ci-dessous propose un nuage de points pour différencier ces trois espèces. On observe une répartition assez bonne entre nos trois espèces pour les deux variables représentées. Ce graphique nous laisse penser que l'algorithme de classification a de grandes chances d'être efficace pour séparer ces trois espèces, car le jeu de donnée montre une tendance claire.
+Le graphique ci-dessous propose un nuage de points pour différencier ces trois espèces selon seulement deux variables. On observe une répartition assez bonne entre nos trois espèces pour les deux variables représentées. Ce graphique nous laisse penser que l'algorithme de classification a de grandes chances d'être efficace pour séparer ces trois espèces, car le jeu de donnée montre une tendance claire. N'oublions pas que nous avons au total quatre attributs à disposition.
 
 ```{r}
 chart(penguins, bill_length ~ flipper_length %color=% species) +
@@ -268,7 +364,11 @@ penguins_learn <- penguins[learning, ]
 penguins_test <- penguins[-learning, ]
 ```
 
-Le set d'apprentissage comprend `r nrow(penguins_learn)` et le set de test comprend `r nrow(penguins_test)`. Nous utilisons le package {mlearning} pour réaliser notre analyse ici. La fonction `mlLda()` propose une structure que nous avons déjà employée à de nombreuses reprises. Il faut fournir le set d'apprentissage (`data =`) et la formule. Dans notre cas, nous souhaitons prédire l'espèce à l'aide de plusieurs attributs.
+Le set d'apprentissage comprend `r nrow(penguins_learn)` et le set de test comprend `r nrow(penguins_test)`.
+
+#### Apprentissage avec ADL
+
+Nous utilisons le package {mlearning} pour réaliser notre analyse ici. La fonction `mlLda()` propose une structure que nous avons déjà employée à de nombreuses reprises. Il faut fournir le set d'apprentissage (`data =`) et la formule. Dans notre cas, nous souhaitons prédire l'espèce à l'aide de plusieurs attributs.
 
 ```{r}
 library(mlearning)
@@ -277,13 +377,69 @@ penguins_lda <- mlLda(data = penguins_learn,
   species ~ bill_length + bill_depth + flipper_length + body_mass)
 ```
 
-Cependant dans le cas particulier où **toutes** les variables du tableau sont utilisées pour l'analyse, comme c'est le cas ici, la formule peut être abrégée en `class ~ .`, ce qui signifie que la variable dépendante qualitative `class` est étudiée en fonction de **toutes** les autres variables du tableau, considées toutes comme des attributs. En fait, ce n'est pas tout-à-fait synonyme car dans ce dernier cas, les fonction du package {mlearning} utilisent des astuces de programmation pour optimiser les calculs (autant en vitesse qu'en utilisation de la mémoire vive). Il est donc très fortement conseillé d'utiliser cette forme.
+Cependant dans le cas particulier où **toutes** les variables du tableau sont utilisées pour l'analyse, comme c'est le cas ici, la formule peut être abrégée en `class ~ .`, ce qui signifie que la variable dépendante qualitative `class` est étudiée en fonction de **toutes** les autres variables du tableau, considérées toutes comme des attributs. En fait, ce n'est pas tout-à-fait synonyme car dans ce dernier cas, les fonction du package {mlearning} utilisent des astuces de programmation pour optimiser les calculs (autant en vitesse qu'en utilisation de la mémoire vive). Il est donc très fortement conseillé d'utiliser cette forme.
 
 ```{r}
 # on peut simplifier l'écriture de la formule condensée.
 penguins_lda <- mlLda(data = penguins_learn, species ~ .)
 penguins_lda
 ```
+
+Nous pouvons visualiser nos données selon les deux premiers axes discriminants (notés `LD1` et `LD2`) à l'aide du graphique suivant\ :
+
+```{r}
+plot(penguins_lda, col = as.numeric(response(penguins_lda)))
+```
+
+Nous voyons bien que la séparation est très bonne. Gentoo est très clairement séparé des deux autres, tandis que la frontière entre Chnistrap et Adelie est un peu moins nette, mais toutefois clairement visible.
+
+<details><summary>Visualisation des sous-régions correspondant aux trois espèces dans un plan.</summary>
+
+Bien que {mlearning} ne propose aucune fonction pour visualiser le découpage que réalise l'ADL pour décider à quelle classe un point appartient, nous pouvons la créer avec un peu de code en R (les détails de cette fonction vont au delà de ce cours, mais si vous êtes curieux, vous pouvez inspecter le code pour comprendre comment elle fonctionne).
+
+Pour visualiser ce qui se passe dans un plan à deux dimensions, nous allons refaire une prédiction à l'aide de deux variables seulement\ :
+
+```{r}
+penguins_learn %>.%
+  select(., flipper_length, bill_length, species) -> penguins_learn2
+
+penguins_lda2 <- mlLda(data = penguins_learn2, species ~ .)
+summary(penguins_lda2)
+```
+
+Nous voyons que 70% de la variance inter-classe est sur `LD1` et 30% sur `LD2`. Un partitionnement dans le plan des variables de départ est obtenu comme suit\ :
+
+
+```{r}
+# predplot() function inspired from MASS, chap. 12, p. 340
+predplot <- function(object, main = "", len = 100, ...) {
+  pen_data <- as.data.frame(penguins_learn2)
+  plot(pen_data[, 1], pen_data[, 2], type = "n", #log = "xy",
+    xlab = "longueur des nageoires [mm]", ylab = "longueur du bec [mm]", main = main)
+  for (il in 1:3) {
+    set <- pen_data$species == levels(pen_data$species)[il]
+    text(pen_data[set, 1], pen_data[set, 2],
+      labels = substr(as.character(pen_data$species[set]), 1, 3), col = 1 + il)
+  }
+  xp <- seq(170, 235, length = len)
+  yp <- seq(30, 60, length = len)
+  penT <- expand.grid(flipper_length = xp, bill_length = yp)
+  Z <- predict(object, penT, type = "both",...)
+  zp <- as.numeric(Z$class)
+  zp <- Z$membership[, 3] - pmax(Z$membership[, 2], Z$membership[, 1])
+  contour(xp, yp, matrix(zp, len), add = TRUE, levels = 0, labex = 0)
+  zp <- Z$membership[, 1] - pmax(Z$membership[, 2], Z$membership[, 3])
+  contour(xp, yp, matrix(zp, len), add = TRUE, levels = 0, labex = 0)
+  invisible()
+}
+predplot(penguins_lda2)
+```
+
+Effectivement, nous distinguons clairement que le plan a été divisé en 3 parties séparées par des segments de droites pour en délimiter les fromtières.
+
+</details>
+
+#### Phase de test
 
 Nous allons maintenant vérifier les performances de ce classifieur à l'aide de la matrice de confusion et des métriques que nous pouvons en dériver. Nous commençons par prédire les classes de notre set de test avec notre objet `penguins_lda` (fonction `predict()` tout simplement). Si elle est appliquée sur l'objet classifieur sans aucun autre argument, ce sont les items du set d'apprentissage qui sont classés, sinon, on rajoute comme second argument le nom du tableau (de test par exemple).
 
@@ -318,6 +474,10 @@ summary(penguins_conf)
 
 Tout comme cela avait déjà été expliqué lors de la présentation de l' [ACP]( `r paste(learndown$baseurl, "sdd-umons2/?iframe=wp.sciviews.org/sdd-umons2-2020/analyse-en-composantes-principales.html", sep = "/")` ), il est crucial de bien nettoyer son jeu de données avant de réaliser une ADL. Il est également très important de vérifier que les relations entre les variablers prédictives (les attributs) sont linéaires dans le cas de l'analyse disciminante *linéaire*. Sinon il faut transformer les données de manière appropriée. Rappelez-vous que l’ADL s’intéresse aux corrélations linéaires entre vos variables.
 
+#### Déploiement
+
+Notre ne reprenait que les données du set d'apprentissage et du set de test. Néanmoins, les scientifiques qui ont utilisé ces données pourraient légitimement considérer que le classifieur est suffisamment fiable pour pouvoir classer les trois espèces de manchots sur base des quatre mesures effectuées sur n'importe quel individu. Ainsi, s'ils possèdent par ailleurs des données biométriques sur les manchots de la région pour lesquelles il manque l'identification de l'espèce, ils pourraient utiliser leur classifieur pour les prédire. Si le jeu de donnée biométrique s'appelle par exemple `palmer2data`, ils feront tout simplement `predict(penguins_lda, palmer2data)` pour obtenir une prédiction des espèces de manchots poiur les individus repris dans `palmer2data`.
+
 ```{r, echo=FALSE, results='asis'}
 assignation("C01Ga_ml1", part = "I",
   url = "https://github.com/BioDataScience-Course/C01Ga_ml1",
@@ -325,6 +485,7 @@ assignation("C01Ga_ml1", part = "I",
     'S-BIOG-025' = "https://classroom.github.com/a/-5ulh9Fw"),
   toc = "Assignation : Utilisation de l'analyse discriminante linéaire.")
 ```
+
 
 ## Récapitulatif des exercices
 
