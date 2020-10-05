@@ -4,9 +4,9 @@
 
 - Maîtriser la validation croisée comme approche efficace de partitionnement entre set d'apprentissage et de test
 
-- Connaître la classification supervisée par la méthode des plus proches voisins
+- Connaître la classification supervisée par la méthode des plus proches voisins et par quantification vectorielle
 
-- Connaître également sa variante optimisée\ : la quantification vectorielle
+- Comprendre et être capable d'utiliser les méthodes par arbres décisionnels (partitionnement récursif et forêt aléatoire)
 
 ##### Prérequis {-}
 
