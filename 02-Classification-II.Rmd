@@ -324,7 +324,7 @@ plot(pima2_lvq_conf)
 summary(pima2_lvq_conf)
 ```
 
-##  Le partitionnement récursif
+##  Partitionnement récursif
 
 Le partitionnement récursif est un algorithme de classification supervisée qui créé un arbre dichotomique où, à chaque nœud, une variable permet de déterminer si le parcours de l’arbre doit être poursuivi vers la gauche du nœud (lorsque la valeur de la variable est inférieure à un seuil fixé), ou vers sa droite (si la valeur est supérieure ou égale à ce seuil). Le choix de la variable utilisée à chaque nœud, ainsi que la valeur du seuil, sont déterminés par l’algorithme de façon à maximiser la séparation entre les deux sous-entités ainsi obtenus, qui doivent discriminer au mieux entre les différentes groupes à identifier. Le traitement est poursuivi tout au long de l’arbre de manière récursive jusqu’à aboutir à une extrémité, nommée "feuille", et qui représente une classe donnée. Notez qu’il peut très bien y avoir plusieurs feuilles qui représentent une même classe. La classe attribuée à un individu est donc celle à laquelle on abouti après avoir parcouru l’arbre de la base jusqu’aux feuilles.
 
