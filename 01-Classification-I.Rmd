@@ -331,8 +331,12 @@ Nous nous intéressons uniquement pour l'instant aux variables explicatives num�
 
 ```{r}
 penguins %>.%
-  drop_na(penguins) %>.%
-  select(., -year, -island, -sex) -> penguins
+  select(., -year, -island, -sex) %>.%
+  drop_na(.) -> penguins
+```
+
+```{block2, type = 'warning'}
+La fonction `drop_na()` est bien pratique pour obtenir un tableau de données propre sans aucunes valeurs manquantes. Cependant, elle est assez impitoyable\ : toute ligne du tableau qui contient au moins une valeur manquante est éliminée. Toujours sélectionner les valeurs que l'on veut retenir dans le modèle *avant* de l'appliquer, sinon, on retirera aussi des lignes pour lesquelles les variables qui ne nous intéressent pas ont aussi des valeurs manquantes (ici, le sexe). 
 ```
 
 Le graphique ci-dessous propose un nuage de points pour différencier ces trois espèces selon seulement deux variables. On observe une répartition assez bonne entre nos trois espèces pour les deux variables représentées. Ce graphique nous laisse penser que l'algorithme de classification a de grandes chances d'être efficace pour séparer ces trois espèces, car le jeu de donnée montre une tendance claire. N'oublions pas que nous avons au total quatre attributs à disposition.
@@ -355,7 +359,7 @@ n_learning
 On sépare nos observations en deux sets indépendants. On utilise cependant la fonction `set.seed()` afin de fixer le début du générateur de nombres pseudo-aléatoires, ce qui donne une série de nombres qui ont les mêmes propriétés que des nombres tirés au sort, mais ce tirage au sort est *reproductible* d'une fois à l'autre. 
 
 ```{r}
-set.seed(96578)
+set.seed(324)
 # Récupération de n_learning items parmi les numéros de lignes de 1 à n
 learning <- sample(1:n, n_learning)
 # Sous-tableau correspondant à ces lignes -> apprentissage
@@ -476,7 +480,7 @@ Tout comme cela avait déjà été expliqué lors de la présentation de l' [ACP
 
 #### Déploiement
 
-Notre ne reprenait que les données du set d'apprentissage et du set de test. Néanmoins, les scientifiques qui ont utilisé ces données pourraient légitimement considérer que le classifieur est suffisamment fiable pour pouvoir classer les trois espèces de manchots sur base des quatre mesures effectuées sur n'importe quel individu. Ainsi, s'ils possèdent par ailleurs des données biométriques sur les manchots de la région pour lesquelles il manque l'identification de l'espèce, ils pourraient utiliser leur classifieur pour les prédire. Si le jeu de donnée biométrique s'appelle par exemple `palmer2data`, ils feront tout simplement `predict(penguins_lda, palmer2data)` pour obtenir une prédiction des espèces de manchots poiur les individus repris dans `palmer2data`.
+Notre jeu de données ne reprenait que les données du set d'apprentissage et du set de test. Néanmoins, les scientifiques qui ont utilisé ces données pourraient légitimement considérer que le classifieur est suffisamment fiable pour pouvoir classer les trois espèces de manchots sur base des quatre mesures effectuées sur n'importe quel individu. Ainsi, s'ils possèdent par ailleurs des données biométriques sur les manchots de la région pour lesquelles il manque l'identification de l'espèce, ils pourraient utiliser leur classifieur pour les prédire. Si le jeu de donnée biométrique s'appelle par exemple `palmer2data`, ils feront tout simplement `predict(penguins_lda, palmer2data)` pour obtenir une prédiction des espèces de manchots poiur les individus repris dans `palmer2data`.
 
 ```{r, echo=FALSE, results='asis'}
 assignation("C01Ga_ml1", part = "I",
