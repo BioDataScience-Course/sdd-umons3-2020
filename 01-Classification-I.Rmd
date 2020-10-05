@@ -166,26 +166,26 @@ L'erreur globale est donc, le complément du taux de reconnaissance global et la
 100 - acc
 ```
 
-- Taux de vrai positif (*Recall*) 
+- Rappel (*Recall*) 
 
 $$recall(\%) = \frac{TP}{(TP+FN)} \cdot 100$$
 
-Dans la littérature, vous pouvez également retrouver les noms suivants\ : *Sensitivity*, *True Positive Rate (TPR)*, *Power*, *Probability of detection*. Le "Recall" est une métrique centrale dans la mesure où elle se focalise, pour une classe donnée, sur la fractions d'items du set d'apprentissage que l'ordinateur a pu trouver. Cela répond donc à une question particulière du type\ : "est-ce que je suis capable d'aller trouver mes items d'intérêt dans l'ensemble". Donc, pour les métriques qui s'intéressent à une classe en particulier (c'est valable pour les suivantes également), nous en avons autant que de classes. Voici comment calcule le recall pour les classes A, B et C à la main dans R sur notre exemple fictif\ :
+Dans la littérature, vous pouvez également retrouver les noms suivants\ : taux de vrais positifs *True Positive Rate (TPR)*, sensitivité *Sensitivity*, *Power*, *Probability of detection*. Le rappel est une métrique centrale dans la mesure où elle se focalise, pour une classe donnée, sur la fractions d'items du set d'apprentissage que l'ordinateur a pu trouver. Cela répond donc à une question particulière du type\ : "est-ce que je suis capable d'aller trouver mes items d'intérêt dans l'ensemble". Donc, pour les métriques qui s'intéressent à une classe en particulier (c'est valable pour les suivantes également), nous en avons autant que de classes. Voici comment on calcule le rappel pour les classes A, B et C à la main dans R sur notre exemple fictif\ :
 
 ```{r}
-# Recall pour la classe A (%)
+# Rappel pour la classe A (%)
 recallA <- matconf[1, 1] / sum(matconf[1, ]) * 100
 recallA
 ```
 
 ```{r}
-# Recall pour la classe B (%)
+# Rappel pour la classe B (%)
 recallB <- matconf[2, 2] / sum(matconf[2, ]) * 100
 recallB
 ```
 
 ```{r}
-# Recall pour la classe C (%)
+# Rappel pour la classe C (%)
 recallB <- matconf[3, 3] / sum(matconf[3, ]) * 100
 recallB
 ```
@@ -193,7 +193,7 @@ recallB
 - Spécificité (*specificity*)
 
 $$specif(\%) = \frac{TN}{(TN+FP)} \cdot 100$$
-Dans la littérature, vous pouvez également retrouver les noms suivants\ : *True Negative Rate (TNR)*, *Selectivity*. La spécificité apparaît complémentaire au "Recall", même si traditionnellement, on complète souvent "Recall" par précision (voir ci-dessous). On peut aussi la calculer à partir du taux de faux positifs (FPR)\ :
+Dans la littérature, vous pouvez également retrouver les noms suivants\ : taux de vrais négatifs *True Negative Rate (TNR)*, sélectivité *Selectivity*. La spécificité apparaît complémentaire au rappel, même si traditionnellement, on complète souvent rappel par précision (voir ci-dessous). On peut aussi la calculer à partir du taux de faux positifs (FPR)\ :
 
 $$FPR(\%) = \frac{FP}{TN + FP} \cdot 100$$
 
@@ -230,7 +230,7 @@ specA
 
 $$prec(\%) = \frac{TP}{(TP+FP)} \cdot 100$$
 
-Dans la littérature, vous pouvez également retrouver les noms suivants\ : *Positive Predicted Value (PPV)*, *Reproducibility*, *Repeatability*. La précision s'intéresse à une question très différente du "Recall", mais néanmoins complémentaire\ : "quelle est la fraction effectivement de classe X que l'ordinateur a classé comme X\ ?"
+Dans la littérature, vous pouvez également retrouver les noms suivants\ : *Positive Predicted Value (PPV)*, *Reproducibility*, *Repeatability*. La précision s'intéresse à une question très différente du rappel, mais néanmoins complémentaire\ : "quelle est la fraction effectivement de classe X que l'ordinateur a classé comme X\ ?"
 
 Un calcul manuel dans R donne\ :
 
@@ -240,11 +240,11 @@ precA <- matconf[1, 1] / sum(matconf[, 1]) * 100
 precA
 ```
 
-Si la classification ne peut se faire sans erreurs (cas le plus fréquent), nous pouvons améliorer la précision mais au détriment du "recall", ou vice-versa. Selon le contexte, nous avons plutôt intérêt à favoriser l'un ou l'autre. Par exemple, pour le dépistage du COVID-19, il vaut mieux un test avec un "recall" le plus élevé possible (pour ne pas déclarer des patients malades comme faussement sains), quitte à sacrifier un peu la précision (avoir une fraction un peu plus grande de faux positifs dans la fraction de la population considérée comme atteinte par le test... et qui ferait une quarantaine inutilement). 
+Si la classification ne peut se faire sans erreurs (cas le plus fréquent), nous pouvons améliorer la précision mais au détriment du rappel, ou *vice-versa*. Selon le contexte, nous avons plutôt intérêt à favoriser l'un ou l'autre. Par exemple, pour le dépistage du COVID-19, il vaut mieux un test avec un rappel le plus élevé possible (pour ne pas déclarer des patients malades comme faussement sains), quitte à sacrifier un peu la précision (avoir une fraction un peu plus grande de faux positifs dans la fraction de la population considérée comme atteinte par le test... et qui ferait une quarantaine inutilement). 
 
-Dans d'autres situation, il vaut mieux, au contraire favoriser la précision. Si nous voulons inclure des sujets atteints d'une maladie rare dans une étude, nous n'aurons pas intérêt à échantillonner la population au hasard. En effet, notre échantillon contiendra trop d'individus sains par rapport aux rares malades. Nous pourrions alors utiliser la classification supervisée pour déterminer qui est malade ou sain, et ensuite effectuer un échantillonnage stratifié dans les deux classes (50% de chaque classe dans l'échantillon final pour notre étude). Évidemment dans ce cas, si la précision est très faible, nous aurons énormément de faux positifs dans la fraction détectée comme malade. Cela réduirait alors la représentativité des individus malades dans l'échantillon, par rapport à un classifieur qui montre une précision plus grande pour la classe des malades.
+Dans d'autres situations, il vaut mieux, au contraire favoriser la précision. Si nous voulons inclure des sujets atteints d'une maladie rare dans une étude, nous n'aurons pas intérêt à échantillonner la population au hasard. En effet, notre échantillon contiendra trop d'individus sains par rapport aux rares malades. Nous pourrions alors utiliser la classification supervisée pour déterminer qui est malade ou sain, et ensuite effectuer un échantillonnage stratifié dans les deux classes (50% de chaque classe dans l'échantillon final pour notre étude). Évidemment dans ce cas, si la précision est très faible, nous aurons énormément de faux positifs dans la fraction détectée comme malade. Cela réduirait alors la représentativité des individus malades dans l'échantillon, par rapport à un classifieur qui montre une précision plus grande pour la classe des malades.
 
-Ces deux exemples sont plutôt extrêmes. Dans la majorité des cas, nous recherchons plutôt un bon équilibre entre "recall" et précision, et ce, pour toutes les classes. Les mesures suivantes de score *F* ou "balanced accuracy" tentent de synthétiser "recall" et précision, ou "recall" et spécificité en un seule nombre pour une classe données, afin de représenter au mieux cette recherche d'un compromis entre les deux.
+Ces deux exemples sont plutôt extrêmes. Dans la majorité des cas, nous recherchons plutôt un bon équilibre entre rappel et précision, et ce, pour toutes les classes. Les mesures suivantes de score *F* ou précision balancée tentent de synthétiser rappel et précision, ou rappel et spécificité en un seule nombre pour une classe données, afin de représenter au mieux cette recherche d'un compromis entre les deux.
 
 - Score F (*F-measure*)
 
@@ -262,7 +262,7 @@ Dans la littérature, vous pouvez également retrouver les noms suivants\ : *F1-
 $$ball\ acc = \frac{(specificity + recall)}{2}$$
 
 ```{r}
-# Précision balancée (balanced accuracy) pour A (en %)
+# Précision balancée pour A (en %)
 (specA + recallA) / 2
 ```
 
@@ -310,7 +310,23 @@ La fonction `skim()` nous donne un aperçu du contenu de ce jeu de données. Si 
 skimr::skim(penguins)
 ```
 
-Ce jeu de données comprend `r ncol(penguins)` variables et `r nrow(penguins)` individus. On observe la présence de quelques données manquantes que nous supprimons avant de continuer. Nous allons également renommer et donner un labels à nos variables.
+Ce jeu de données comprend `r ncol(penguins)` variables et `r nrow(penguins)` individus. La variable que nous cherchons à prédire ici est `species` (variable réponse). Trois espèces de manchots sont étudiées\ :
+
+- Adelie (152 individus)
+- Gentoo (124 individus)
+- Chinstrap (68 individus)
+
+Bien que nous n'ayons pas un *plan balancé* (même nombre d'items pour chaque niveau de notre variable réponse), les différences restent encore acceptables, soit un peu plus du simple au double entre Chinstrap et Adelie. Nous pourrions sous-échantillonner les espèces les plus abondantes mais nous diminuons alors la taille de notre jeu de données. Des techniques existent pour balancer le nombre d'items, dont la plus en vogue\ : [SMOTE ("Synthetic Minority Over-sampling")](https://rikunert.com/SMOTE_explained). Elle peut s'avérer utile ici, mais nous poursuivrons sans modifier artificiellement le nombre d'items dans notre jeu de données.
+
+```{block2, type = 'info'}
+En quoi un nombre différent d'items dans chaque classe peut-il poser problème en classification supervisée\ ? En fait comme la plupart des critères sont basés sur la fraction correcte prédite pour **l'ensemble** des données, en cas de différences extrêmes nous pourrions arriver à des situations paradoxales. Imaginez par exemple une maladie très rare. Nous avons un échantillon important de patients sains, mais forcément très peu de cas positifs. Par exemple, 1,5% de notre set d'apprentissage est constitué de patients malades. Dans ce cas, un classifieur trivial qui classerait tout le monde comme sain ferait globalement 98,5% de prédictions correctes. C'est difficile à battre, et en même temps pas très utile. Donc, deux points à retenir de ce cas fictif\ :
+
+1. Toujours essayer de balancer les items dans les classes, mais sans exagaration (une différence du simple au double est encore gérable, pour fixer les idées),
+
+2. Le point de référence pour définir si un classifieur est efficace dépend de la classe la plus abondante. Avec un plan balancé à deux classes, un classiifieur qui classe correctement 70% des items fait 20% mieux que le classement au hasard. Par contre, si la classe la plus abondante représente 75% du set, il fera *moins bien* de 5% qu'un classement purement au hasard (sic\ !)
+```
+
+On observe la présence de quelques données manquantes que nous supprimerons plus loin avant de faire notre analyse. Nous allons également renommer et donner un labels à nos variables quantitatives (nos attributs).
 
 ```{r}
 penguins <- rename(
@@ -346,9 +362,9 @@ chart(penguins, bill_length ~ flipper_length %color=% species) +
   geom_point() 
 ```
 
-*N'hésitez pas à explorer par vous même ce jeu de données.*
+*N'hésitez pas à explorer par vous-même ce jeu de données\ : il y a en effet pas mal de graphiques intéressants à réaliser avant de se lancer dans une analyse plus approfondie... qui a dit "boites à moustaches"\ ? J'ai entendu "matrice de corrélation" là-bas au fond\ ? ...*
 
-Le jeu de données est découpé en un set d'apprentissage et un set de test. On décide de garder 2/3 des observations pour le set d'apprentissage.
+Le jeu de données est découpé en un **set d'apprentissage** et un **set de test**. On décide de garder 2/3 des observations pour le set d'apprentissage.
 
 ```{r}
 n <- nrow(penguins)
@@ -368,7 +384,7 @@ penguins_learn <- penguins[learning, ]
 penguins_test <- penguins[-learning, ]
 ```
 
-Le set d'apprentissage comprend `r nrow(penguins_learn)` et le set de test comprend `r nrow(penguins_test)`.
+Le set d'apprentissage comprend `r nrow(penguins_learn)` items et le set de test comprend `r nrow(penguins_test)` individus.
 
 #### Apprentissage avec ADL
 
@@ -476,7 +492,7 @@ summary(penguins_conf)
 
 ##### Pièges et astuces {-}
 
-Tout comme cela avait déjà été expliqué lors de la présentation de l' [ACP]( `r paste(learndown$baseurl, "sdd-umons2/?iframe=wp.sciviews.org/sdd-umons2-2020/analyse-en-composantes-principales.html", sep = "/")` ), il est crucial de bien nettoyer son jeu de données avant de réaliser une ADL. Il est également très important de vérifier que les relations entre les variablers prédictives (les attributs) sont linéaires dans le cas de l'analyse disciminante *linéaire*. Sinon il faut transformer les données de manière appropriée. Rappelez-vous que l’ADL s’intéresse aux corrélations linéaires entre vos variables.
+Tout comme cela avait déjà été expliqué lors de la présentation de l' [ACP]( `r paste(learndown$baseurl, "sdd-umons2/?iframe=wp.sciviews.org/sdd-umons2-2020/analyse-en-composantes-principales.html", sep = "/")` ), il est crucial de bien nettoyer son jeu de données avant de réaliser une ADL. Il est également très important de vérifier que les relations entre les variables prédictives (les attributs) sont linéaires dans le cas de l'analyse disciminante *linéaire*. Sinon il faut transformer les données de manière appropriée. Rappelez-vous que l’ADL s’intéresse aux corrélations linéaires entre vos variables.
 
 #### Déploiement
 

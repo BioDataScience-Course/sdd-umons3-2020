@@ -2,21 +2,6 @@
 
 ...
 
-
-##  Les méthodes par arbre de décision
-
-L’arbre de classification est un algorithme de classification supervisée qui créé un arbre dichotomique où, à chaque nœud, une variable permet de déterminer si le parcours de l’arbre doit être poursuivi vers la gauche du nœud (lorsque la valeur de la variable est inférieure à un seuil fixé), ou vers sa droite (si la valeur est supérieure ou égale à ce seuil, voir Venables & Ripley 2003). Le choix de la variable utilisée à chaque nœud, ainsi que la valeur du seuil, sont déterminés par l’algorithme de façon à maximiser la séparation entre les deux sous-entités ainsi obtenus, qui doivent discriminer au mieux entre les différentes groupes à identifier. Le traitement est poursuivi tout au long de l’arbre jusqu’à aboutir à une extrémité, nommée "feuille", et qui représente une classe donnée. Notez qu’il peut très bien y avoir plusieurs feuilles qui représentent un même groupe. Le groupe attribué à une particule est donc celui auquel elle abouti après avoir parcouru l’arbre de la base jusqu’aux feuilles.
-
-Schéma du principe d’un arbre de classification en 3 groupes, A, B et C. A chaque nœud une variable discriminante et un seuil sont choisis afin de séparer au mieux les objets. Lorsque l’arbre est construit, un objet peut être présenté à sa base. Le groupe auquel il appartient est déterminé en parcourant l’arbre jusqu’à aboutir à une feuille.
-
-##  Random forest
-
-"Random Forest" (RF) est un algorithme introduit par Breiman (2001) qui créé un ensemble d’arbres décisionnels individuels (forêt d’arbres), dont la variable discriminante à chaque nœud est choisie parmi un sous-ensemble aléatoire de toutes les *p* variables utilisées (afin d’introduire une variation aléatoire dans chaque arbre décisionnel). Lorsque l’ensemble des arbres est créé, un vote à la majorité est appliqué en utilisant la réponse donnée par chaque arbre pour déterminer à quel groupe appartient la particule d’intérêt. C’est actuellement un des algorithmes les plus performants de classification supervisée. Par contre, étant donné qu’il faut créer plusieurs centaines d’arbres décisionnels, le temps de calcul est généralement plus élevé qu’avec des méthodes simples comme ADL, k plus proches voisins, ou l’utilisation d’un arbre unique).
-
-Les paramètres à définir sont le nombre d’arbres et le nombre de *p *variables à choisir aléatoirement à chaque nœud. Les paramètres choisis ici sont de 500 arbres et de 2*p*/3 variables choisies aléatoirement. Ces valeurs se sont montrées efficaces dans des études antérieures, et l’algorithme est, par ailleurs, relativement robuste face aux variations de ces paramètres autour des valeurs optimales.
-
-Schéma du principe de "Random Forest" pour la reconnaissance de trois groupes A, B et C. Cet algorithme créé un ensemble d’arbres où à chaque nœud une variable discriminante et un seuil sont choisis parmi un sous-ensemble aléatoire de toutes les variables. Lorsque la forêt est construite, le même objet est présenté à la base de chaque arbre. Le groupe auquel il appartient est obtenu par un vote à la majorité de tous les arbres.
-
 ## Réseaux de neurones artificiels
 
 L’idée de cet algorithme vient de l’étude du fonctionnement de notre cerveau, d’où son nom, par analogie. Le modèle est constitué de plusieurs couches *i* interconnectées. Les nœuds *j* de ces connections constituent les neurones artificiels. La première couche est constituée des paramètres mesurés sur les particules et la dernière couche renseigne les groupes à reconnaître (Venables & Ripley 2003). La ou les couches intermédiaires permettent de paramétrer le système d’apprentissage. Les connexions entre neurones sont caractérisées par les seuils ω<sub>ij</sub> variant de 0 à 1, et le transfert du "signal" est généralement modélisé par des fonctions logistiques variant entre ces deux extrêmes. Ces seuils permettent de moduler les relations entre neurones et ainsi de déterminer le groupe d’une particule à partir des valeurs de paramètres mesurées sur celle-ci, par la transmission des signaux de proche en proche, dont le passage est autorisé ou bloqué en fonction des seuils de déclenchement définis (Venables & Ripley 2003). Ce type de fonctionnement est, en effet, parfaitement comparable au transfert d’un influx nerveux le long d’un réseau de neurones tels qu’existant dans notre cerveau.
