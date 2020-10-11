@@ -1,8 +1,187 @@
 # Classification supervisée III {#classif3}
+7
+```{r setup, results='hide', warning=FALSE, include=FALSE}
+SciViews::R
+```
 
-...
+##### Objectifs {-}
+
+- Prendre conscience de l'impact des proportions relatives par classes sur les métriques et maîtriser ce phénomène
+
+- Appréhender les courbes ROC et l'AUC comme mesure indépendante des proportions dans un cas à deux classes
+
+- Comprendre et être capable d'utiliser les algorithmes de machine à vecteurs supports et les réseaux neuronaux, découvrir l'apprentissage profond.
+
+- Mettre en œuvre toutes les notions apprises dans les trois modules consacrés à la classification supervisée dans le cadre d'un cas plus complexe, sous forme de challenge.
+
+##### Prérequis {-}
+
+Ce module constitue le troisième volet d'une trilogie consacrée à la classification supervisée. Le niveau de difficulté allant crescendo, assurez-vous d'avoir bien assimilé toutes les notions importantes et les subtilités étudiées dans les deux premiers volets avant d'aborder celui-ci.
+
+## Métriques et proportions
+
+A partir du moment où la classification ne se fait pas sans erreurs, nous avons présence de faux positifs et de faux négatifs. Le fait d'être un faux positif ou un faux négatif dépend essentiellement du point de vue, c'est-à-dire, de la classe d'intérêt. Cependant ces erreurs restent des erreurs quel que soit le point de vue (sauf si nous fusionnons les classes confondues, bien évidemment). Un élément important à considérer est que le taux d'erreur, qu'il soit global ou local tel que mesuré, par exemple, par le rappel ou la précision pour une classe cible **dépend énormément des proportions d'occurences observées dans les différentes classes**, et ce, aussi bien dans la phase d'apprentissage que de test ou de déploiement.
+
+Ce problème nous ramène, en réalité à des calculs basiques de probabilités et au théorème de Bayes que nous avons abordé dans le [module 7 du premier cours de science des données biologiques](https://wp.sciviews.org/sdd-umons/?iframe=wp.sciviews.org/sdd-umons-2020/probabilit%25C3%25A9s.html). **Rappelez-vous, nous avions traité le cas du dépistage d'une maladie, dont le résultat dépendait du fait que la maladie soit fréquente ou rare dans la population (sa prévalence)**. Si vous ne vous souvenez plus de quoi il s'agit, il peut être utile de relire maintenant les sections 7.1.1 à 7.1.3 de ce premier cours, car ce contenu s'applique parfaitement ici.
+
+Pour illustrer une nouvelle fois ce phénomène, prenons un cas extrême. Admettons que notre classifieur soit capable de discerner **sans aucune erreur** un classe parmi deux possibles, disons la classe A. Quel sera le rappel\ ? Ça c'est facile, comme tous les individus A seront classés comme A par notre classifieur nous n'aurons *aucun* faux négatif. Donc, le rappel qui est $TP / (TP + FN)$ vaudra toujours 1 ou 100%, et ce, quel que soit les proportions relatives de A et de B dans notre échantillon. **En absence d'erreur, il n'y a pas d'ambiguïté, ni de dépendance aux proportions relatives.**
+
+Par contre, calculons maintenant la précision pour A, si nous savons que notre même classifieur a tendance à classer 10% des individus B comme des A (faux positifs *FP*). La précision étant le rapport $TP / (TP + FP)$, interviennent ici ces faux positifs qui dépendent eux *de ce que notre classifieur est capable de faire par rapport à la classe B*. Dix pourcents de faux positifs, oui, mais sur combien d'items\ ? Prenons deux cas\ :
+
+1. La classe A est prédominante dans l'échantillon, disons qu'elle représente 80% de l'ensemble. Pour 100 individus, nous aurons donc 80 A, tous vrais positifs, et 20 B, dont 10%, soit deux sont faussement classés comme A. La précision est donc de $80 / (80 + 2)$, soit un peu moins de 98%. C'est un très bon résultat.
+
+2. Dans notre second cas, les proportions sont inversées. nous avons 20% de B et 80% de A. Donc, les vrais positifs pour 100 individus seront de 20 (tous les A) et les faux positifs seront 10% de 80, soit 8. La précision devient donc $20 / (20 + 8)$, soit un tout petit peu plus de 71%.
+
+**Dans le second cas, la précision pour la classe A a diminué de manière très nette, rien qu'en changeant les proportions relatives de A et de B dans notre échantillon, les performances de notre classifieur n'ayant absolument pas été modifiées entre les deux situations.** Nous venons de démontrer que les métriques, dès qu'il y a la moindre erreur de classification possible, sont très sensibles aux proportions relatives des individus dans les classes. Notons que la diminution de la précision dans le cas (2) est liée à la fois à la diminution des vrais positifs (puisqu'il y a moins de A dans notre set), et à l'augmentation des faux positifs, qui dépendent eux de la quantité de B en augmentation. Notons que le raisonnement est symétrique. Donc, le rappel sera également impacté dès que le taux de classification correcte pour A devient inférieur à 100%.
+
+A l'extrême, il devient très difficile de classer correctement des items appartenant à des classes rares à cause de ce phénomène. En effet, si A ne représente plus que 1% de l'échantillon, nous aurons un seul vrai positif, et 10% de 99, soit pratiquement 10 faux positifs pour un lot de 100 individus. Donc, la précision pour A devient $1 / (1 + 10)$, soit 9% seulement. Nous verrons alors notre classifieur comme *très mauvais* à l'examen des items qu'il prétend être des A, et pour lesquels la grosse majorité ne le sera pas. Pourtant, il classe A sans aucune erreur et ne fait que 10% d'erreur pour B, ce qui présenté de la sorte, passe pour un bon classifieur.
+
+```{block2, type = 'warning'}
+Les différentes métriques qui mesurent les performances de nos classifieurs sont très sensibles aux proportions relatives des différentes classes. Comme l'optimisation des classifieurs se fait sur base de ces métriques, elle est elle-même dépendante des proportions relatives des classes dans le set d'apprentissage.
+
+Enfin, si les proportions relatives des items dans les classes diffèrent entre le sert de test et les échantillons à classer lors du déploiement du classifieur, les valeurs calculées lors de la phase de test seront biaisées et ne reflèterons pas du tout les performances réelles du classifeur, une fois déployé.
+```
+
+### Proportions en apprentissage
+
+Une première conséquence intéressante de ce que nous venons d'observer est que les proportions relatives des items dans le *set d'apprentissage* vont conditionner le comportement de notre classifieur. Si nous voulons augmenter le rappel pour une classe, nous pouvons augmenter ses proportions de manière relative aux autres classes dans le set d'apprentissage. Mais si nous ne voulons pas perdre en précision, nous éviterons d'avoir des proportions trop déséquilibrées entre les classes. C'est pour cette raison qu'il est souvent conseillé de procéder à un ré-échantillonnage dans le but d'obtenir un effectif à peu près égal entre les différentes classes dans le set d'apprentissage. Par contre, changer les proportions de la sorte nous mène à une erreur globale plus grande en déploiement. Donc, à nous à définir au préalable quelle(s) métrique(s) --et quelle(s) classe(s)-- sont les plus importantes par rapport à nos objectifs. Dans le challenge, vous aurez à réfléchir sur cette question\ !
+
+Reprenons l'exemple de nos amérindiens de la tribu Pima confrontés au diabète (en n'utilisant que les cas complets).
+
+```{r}
+SciViews::R
+pima <- read("PimaIndiansDiabetes2", package = "mlbench")
+pima %>.%
+  drop_na(.) -> pima1
+table(pima1$diabetes)
+```
+
+Comme nous l'avions déjà signalé, nous avons deux fois plus de cas négatifs que positifs. Revenons sur notre classifieur à forêt aléatoire avec 500 arbres\ :
+
+```{r}
+library(mlearning)
+set.seed(3631)
+pima1_rf <- mlRforest(data = pima1, diabetes ~ ., ntree = 500)
+pima1_rf_conf <- confusion(cvpredict(pima1_rf, cv.k = 10), pima1$diabetes)
+summary(pima1_rf_conf)
+```
+
+Notez que le rappel (Recall) est plus faible pour les cas positifs (60%) que pour les cas négatifs (88%). C'est normal car notre classifieur est optimisé pour réduire l'erreur globale. Dans cette situation, ayant plus de cas négatif, il vaut mieux déclarer un cas douteux comme négatif puisque le risque de se tromper est plus faible que de le déclarer positif. La précision pour `pos` est de 71.5%. Admettons que nous souhaitons maintenant étudier un maximum de ces indiennes diabétiques. Le rappel pour la classe `pos` est notre métrique importante, or c'est la valeur la plus faible actuellement. Comme faire pour l'augmenter sans changer d'algorithme\ ? Et bien, une des façons de procéder consiste à changer délibérément les proportions des classes dans le set d'apprentissage. Si nous prenons le même nombre d'individus positifs que négatifs, cela donne ceci\ :
+
+```{r}
+# Rééchantillonnage du set
+pima1 %>.%
+  group_by(., diabetes) %>.%
+  sample_n(., 130, replace = FALSE) -> pima1b
+table(pima1b$diabetes)
+```
+
+```{r}
+set.seed(854)
+pima1b_rf <- mlRforest(data = pima1b, diabetes ~ ., ntree = 500)
+pima1b_rf_conf <- confusion(cvpredict(pima1b_rf, cv.k = 10), pima1b$diabetes)
+summary(pima1b_rf_conf)
+```
+
+Le rappel pour la classe `pos` est monté de 60% (`pima1`) à presque 75% (`pima1b`). En première approche, nous devrions nous réjouir de ce résultat, d'autant plus que la précision semble être monté en même temps à presque 78%. Notre nouveau classifieur semble nettement plus efficace pour trouver les indiennes diabétiques dans l'ensemble de la population. **Mais attention\ ! N'oublions jamais que les métriques sont sensibles aux proportions et que justement, nous venons de les trafiquer.** A titre d'exercice, vous pouvez examiner l'effet d'un changement encore plus radical, par exemple, si vous prenez deux ou trois fois plus de cas positifs que négatifs dans votre set d'apprentissage.
+
+### Probabilités *a priori*
+
+Nous avons la possibilité souvent d'estimer les proportions relatives des classes dans les données à classer. Il suffit de réaliser un échantillonnage aléatoire de taille raisonnable (par exemple, un minimum de 100 individus pour exprimer les résultats en pourcents), et de comptabiliser les proportions observées dans chaque classe. Ces proportions seront appelées les **probabilités _a priori_** (*prior probabilities* en anglais). Pour nos indiennes Pima, les probabilités _a priori_ (si l'échantillonnage de départ est bien aléatoire et réalisé dans les règles de l'art) sont déterminées en fonction de la table de contingence, mais plus loin, nous devrons fournir un vecteur numérique, donc nous convertissons directement ici à partir des proportions claculées sur l'ensemble des données\ :
+
+```{r}
+pima_prior <- table(pima$diabetes) / nrow(pima)
+pima_prior <- structure(as.numeric(pima_prior), names = names(pima_prior))
+pima_prior
+```
+
+Ensuite, de nombreux algorithmes de classification peuvent nous renvoyer des probabilités d'appartenir à une classe, telles que prédites par le classifieur indépendamment des proportions relatives par classe (la prédiction de la classe n'est que celle qui a la probabilité la plus élevée, en réalité). L'arbre de probabilités (résolution graphique), ou un calcul simple de probabilités faisant intervenir le théorème de Bayes (résolution numérique) permet de combiner les probabilités _a priori_ et les probabilités issues du classifieur pour calculer ce que nous appelons les **probabilités _a posteriori_**, c'est-à-dire les réelles probabilités d'être A ou B, par exemple. Ce calcul nous l'avions déjà fait dans le [module 7 du cours I](https://wp.sciviews.org/sdd-umons/?iframe=wp.sciviews.org/sdd-umons-2020/probabilit%25C3%25A9s.html). Nous ne re-développons pas ces calculs ici. Encore une fois, vous êtes invité à relire cette section si vous ne comprenez pas de quoi il s'agit.
+
+Dans {mlearning}, les probabilités _a priori_ peuvent être injectées dans l'objet `confusion` pour corriger nos métriques en faveur de valeurs plus réalistes relatives aux probabilités _a posteriori_. Donc, pour nos métriques obtenues à l'aide du set d'apprentissage `pima1b` aux proportions modifiées, nous rétablissons des valeurs plus plausibles par rapport à la population étudiée, et en même temps, plus comparables avec les métriques sur `pima1` en procédant comme suit\ :
+
+```{r}
+prior(pima1b_rf_conf) <- pima_prior
+summary(pima1b_rf_conf)
+```
+
+Nous voyons que les valeurs de rappels ne sont pas modifiées par cette correction. Nous avons toujours 75% pour la classe `pos`, par contre, la précision a diminué à 62%, et donc le score F a lui aussi diminué. Notre précision pour les cas `pos` est donc maintenant moins bonne qu'avec `pima1` de près de 10%. Ceci est normal. Tout classifieur doit faire un **compromis** entre rappel et précision. Si nous gagnons pour l'un, nous perdons inévitablement pour l'autre. Notre score F nous indique toutefois un léger gain global.
+
+##### A retenir {-}
+
+Si vous êtes amené à modifier les proportions des différentes classes dans votre set d'apprentissage (pratique conseillée si les proportions sont trop différentes d'une classe à l'autre), n'oubliez pas de repondérer les calculs des métriques via `prior()` afin d'avoir des valeurs plus représentatives des performances de votre classifieur en situation.
+
+## Courbes ROC
+
+La **courbe ROC (pour "Receiver Operating Characteristic")** est une courbe qui représente le comportement de notre classifieur à deux classes pour tous les seuils de détection possibles (*cutoff* en anglais). Si nous utilisons les probabilités d'appartenance à la classe cible renvoyées par notre classifieur au lieu des prédictions, nous pourrions choisir librement à partir de quelle probabilité nous considérons qu'un item est de cette classe, autrement dit, nous ne sommes plus obligés de considérer un seuil > 0.5 de probabilité d'appartenance à A pour déclarer l'item comme A (vote à la majorité classique pour la forêt aléatoire, la probabilité est ici la fraction des arbres qui ont voté pour la classe). Nous pourrions très bien descendre notre critère, par exemple, toute probabilité supérieure à 0.4 entraînerait un classement en A. Nous pouvons, au contraire rendre notre critère plus sévère, par exemple en adoptant un seuil de 0.75. En prenant des seuils de 0 à 1, nous balayons toutes les possibilités. A chaque fois, nous pouvons calculer le taux de vrais positifs et le taux de faux positifs. La courbe ROC représente ces résultats avec le taux de faux positifs sur l'axe x et le taux de vrais positifs sur l'axe y. Voici, par exemple, la courbe ROC pour notre classifieur ADL `pima1`.
+
+Tout d'abord, il nous faut obtenir les "probabilités". Selon les algorithmes ce sont réellement des probabilités, ou alors, des nombres entre 0 et 1 qui ont des propriétés similaires. Dans le cas de la forêt aléatoire, c'est la proportion des arbres qui ont voté pour la classe. On parlera alors plus justement d'un nombre qui quantifie l'appartenance à la classe (*membership* en anglais), plutôt que de probabilité. Voici comme nous plouvons obtenir ces appartenances\ :
+
+```{r}
+pima1_rf_mem <- cvpredict(pima1_rf, cv.k = 10, type = "membership")
+head(pima1_rf_mem)
+```
+
+Nous utilisons le package {ROCR} qui demande uniquement les appartenances à la classe cible (ici `pos`, donc la seconde colonne), ainsi qu'un vecteur indiquant par 0 ou 1 si l'individu appartient effectivement ou non à cette classe cible. C'est l'objet `prediction`. A partir de là, nous calculons un objet `performance` en indiquant les deux métriques que nous voulons utiliser (`tpr` et `fpr` pour la courbe ROC), et nous réalisons le graphique.
+
+```{r}
+library(ROCR)
+pima1_rf_predobj <- prediction(pima1_rf_mem[, 2], pima1$diabetes == "pos")
+pima1_rf_perf <- performance(pima1_rf_predobj, "tpr", "fpr")
+plot(pima1_rf_perf)
+abline(a = 0, b = 1, lty = 2)
+```
+
+Le trait pointillé représente ce que donnerait un classifieur de référence qui classe en `pos` ou `neg` au hasard., et donc, il obtient autant de faux positifs que de vrais positifs quel que soit le seuil choisi. En dessous, nous ferions moins bien que le hasard. Au dessus, notre classifieur est meilleur. Et plus nous nous rapprochons du coin supérieur gauche du graphique avec notre courbe, meilleur sera notre classifieur (plus haut taux de vrais positifs pour plus bas taux de faux positifs).
+
+Une façon de quantifier globalement les performances de notre classifieur quel que soit le seuil est de **calculer l'aire sous cette courbe**. Pour un classifieur au hasard de référence, elle sera de 0.5. Plus l'aire sous la courbe (**AUC** ou *Area Under the Curve* en anglais) se rapprochera de un, meilleur sera notre classifieur. Voci une des façons de calculer l'AUC dans R\ :
+
+```{r}
+pROC::auc(pima1$diabetes, pima1_rf_mem[, 2])
+```
+
+Si vous voulez, l'AUC est un peu comme le R^2^ de la régression linéaire\ : pour un même jeu de données nous pouvons superposer les courbes de deux ou plusieurs classifieurs sur le graphique, et calculer leurs AUC respectifs pour nous aider à choisir le meilleur. Comparons donc notre classifieur issu de `pima1b` avec les proportions réajustées à celui réalisé avec `pima1`. La difficulté ici est de réajuster les proportions pour que les deux soient comparables, voir [ici](https://jennybc.github.io/purrr-tutorial/ls12_different-sized-samples.html).
+
+```{r}
+pima1b_rf_mem <- cvpredict(pima1b_rf, cv.k = 10, type = "membership")
+# Tableau membership + vraies valeurs
+pima1b_rf_mem <- data.frame(membership = pima1b_rf_mem[, 2], diabetes = pima1b$diabetes)
+# Rééchantillonnage pour rétablir les bonnes proportions
+library(purrr)
+library(tidyr)
+set.seed(36433)
+pima1b_rf_mem %>.%
+  group_by(., diabetes) %>.% 
+  nest(.) %>.%
+  ungroup(.) %>.% 
+  mutate(., n = pima_prior * nrow(pima1)) %>.% 
+  mutate(., samp = map2(data, n, sample_n, replace = TRUE)) %>.% 
+  select(., -data) %>.%
+  unnest(., samp) -> pima1b_resampled
+table(pima1b_resampled$diabetes)
+```
+
+```{r}
+pima1b_rf_predobj <- prediction(pima1b_resampled$membership,
+  pima1b_resampled$diabetes == "pos")
+pima1b_rf_perf <- performance(pima1b_rf_predobj, "tpr", "fpr")
+# Graphique relatif à pima1
+plot(pima1_rf_perf, col = "darkgreen")
+# Ajout de celui relatif à pima1b sur le même graphique
+plot(pima1b_rf_perf, col = "darkred", add = TRUE)
+abline(a = 0, b = 1, lty = 2)
+legend("bottomright", inset = 0.1, legend = c("pima1", "pima1b"), lty = 1,
+  col = c("darkgreen", "darkred"))
+```
+
+```{r}
+pROC::auc(pima1b_resampled$diabetes, pima1b_resampled$membership)
+```
+
+Nous pouvons observer que notre second classifeur `pima1b` est effectivement légèrement plus performant que le premier avec `pima1`.
 
 ## Réseaux de neurones artificiels
+
+CECI DOIT ENCORE ETRE REMANIE !
 
 L’idée de cet algorithme vient de l’étude du fonctionnement de notre cerveau, d’où son nom, par analogie. Le modèle est constitué de plusieurs couches *i* interconnectées. Les nœuds *j* de ces connections constituent les neurones artificiels. La première couche est constituée des paramètres mesurés sur les particules et la dernière couche renseigne les groupes à reconnaître (Venables & Ripley 2003). La ou les couches intermédiaires permettent de paramétrer le système d’apprentissage. Les connexions entre neurones sont caractérisées par les seuils ω<sub>ij</sub> variant de 0 à 1, et le transfert du "signal" est généralement modélisé par des fonctions logistiques variant entre ces deux extrêmes. Ces seuils permettent de moduler les relations entre neurones et ainsi de déterminer le groupe d’une particule à partir des valeurs de paramètres mesurées sur celle-ci, par la transmission des signaux de proche en proche, dont le passage est autorisé ou bloqué en fonction des seuils de déclenchement définis (Venables & Ripley 2003). Ce type de fonctionnement est, en effet, parfaitement comparable au transfert d’un influx nerveux le long d’un réseau de neurones tels qu’existant dans notre cerveau.
 

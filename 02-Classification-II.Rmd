@@ -1,5 +1,9 @@
 # Classification supervisée II {#classif2}
 
+```{r setup, results='hide', warning=FALSE, include=FALSE}
+SciViews::R
+```
+
 ##### Objectifs {-}
 
 - Maîtriser la validation croisée comme approche efficace de partitionnement entre set d'apprentissage et de test

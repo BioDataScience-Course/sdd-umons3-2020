@@ -10,7 +10,7 @@ SciViews::R
 
 - Comprendre le principe général de la classification supervisée
 
-- Être capable d'utiliser l'algorithme et la fonction R `lda()` d'analyse discriminante linéaire
+- Être capable d'utiliser l'analyse discriminante linéaire pour faire de la classification supervisée
 
 - Maîtriser les matrices de confusion
 
