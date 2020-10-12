@@ -271,3 +271,9 @@ lda = analyse discriminante linéaire, qda = analyse quadratique linéaire, mda 
 En règle générale, nous constatons que les méthodes plus complexes ou composites, telles que random forest, double bagging ou DVF sont plus performantes que les méthodes simples (tree, knn, lda, par exemple). A noter également, la contre performance de "support vector machine", qui est habituellement une des méthodes les plus performantes. Ceci illustre donc bien qu'il ne faut pas se cantonner à une seule technique. Selon les spécificités d'un jeu de données, des méthodes différentes peuvent s'avérer plus efficaces et utiles dans un contexte particulier.
 
 Ce type d'étude (optimisation de différentes méthodes, et puis comparaison par validation croisée) est typiquement celle à mener pour obtenir le meilleur algorithme de reconnaissance automatique.
+
+## Récapitulatif des exercices
+
+Dans ce module 3, vous aviez à réaliser les exercices suivants\ :
+
+`r show_ex_toc()`
