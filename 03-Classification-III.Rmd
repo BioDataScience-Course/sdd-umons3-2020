@@ -1,5 +1,6 @@
 # Classification supervisée III {#classif3}
-7
+
+
 ```{r setup, results='hide', warning=FALSE, include=FALSE}
 SciViews::R
 ```
