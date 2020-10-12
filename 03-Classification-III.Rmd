@@ -110,6 +110,16 @@ Nous voyons que les valeurs de rappels ne sont pas modifiées par cette correcti
 
 Si vous êtes amené à modifier les proportions des différentes classes dans votre set d'apprentissage (pratique conseillée si les proportions sont trop différentes d'une classe à l'autre), n'oubliez pas de repondérer les calculs des métriques via `prior()` afin d'avoir des valeurs plus représentatives des performances de votre classifieur en situation.
 
+##### A vous de jouer ! {-}
+
+```{r, echo=FALSE, results='asis'}
+assignation("C03Ga_cardiovascular", part = "I",
+  url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
+  course.urls = c(
+    'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
+  toc = "Assignation : Réflexion sur les proportions.")
+```
+
 ## Courbes ROC
 
 La **courbe ROC (pour "Receiver Operating Characteristic")** est une courbe qui représente le comportement de notre classifieur à deux classes pour tous les seuils de détection possibles (*cutoff* en anglais). Si nous utilisons les probabilités d'appartenance à la classe cible renvoyées par notre classifieur au lieu des prédictions, nous pourrions choisir librement à partir de quelle probabilité nous considérons qu'un item est de cette classe, autrement dit, nous ne sommes plus obligés de considérer un seuil > 0.5 de probabilité d'appartenance à A pour déclarer l'item comme A (vote à la majorité classique pour la forêt aléatoire, la probabilité est ici la fraction des arbres qui ont voté pour la classe). Nous pourrions très bien descendre notre critère, par exemple, toute probabilité supérieure à 0.4 entraînerait un classement en A. Nous pouvons, au contraire rendre notre critère plus sévère, par exemple en adoptant un seuil de 0.75. En prenant des seuils de 0 à 1, nous balayons toutes les possibilités. A chaque fois, nous pouvons calculer le taux de vrais positifs et le taux de faux positifs. La courbe ROC représente ces résultats avec le taux de faux positifs sur l'axe x et le taux de vrais positifs sur l'axe y. Voici, par exemple, la courbe ROC pour notre classifieur ADL `pima1`.
@@ -179,6 +189,16 @@ pROC::auc(pima1b_resampled$diabetes, pima1b_resampled$membership)
 
 Nous pouvons observer que notre second classifeur `pima1b` est effectivement légèrement plus performant que le premier avec `pima1`.
 
+##### A vous de jouer ! {-}
+
+```{r, echo=FALSE, results='asis'}
+assignation("C03Ga_cardiovascular", part = "II",
+  url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
+  course.urls = c(
+    'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
+  toc = "Assignation : Les courbes ROC.")
+```
+
 ## Réseaux de neurones artificiels
 
 CECI DOIT ENCORE ETRE REMANIE !
@@ -188,6 +208,16 @@ L’idée de cet algorithme vient de l’étude du fonctionnement de notre cerve
 Les réseaux de neurones artificiels sont des techniques très sophistiquées, et qui admettent un grand nombre de paramètres différents (nombres de couches cachées, nombre de neurones par couche, fonction utilisée pour modéliser le signal, règle de définition des seuils,…). Dans le cas de notre étude, nous utilisons un algorithme simple, dit à une seule couche cachée, et dont tous les autres paramètres sont conservés aux valeurs fournies par défaut dans le logiciel R. Ces valeurs par défaut se sont avérées acceptables dans la plupart des études utilisant cet algorithme.
 
 *Schéma du principe de fonctionnement d’un réseau de neurone simple, avec une seule couche cachée. Le groupe prédit dépend de la valeur des paramètres et des coefficients de pondérations ω~ij~. C’est durant la phase d’apprentissage que les coefficients de pondération sont paramétrés.*
+
+##### A vous de jouer ! {-}
+
+```{r, echo=FALSE, results='asis'}
+assignation("C03Ga_cardiovascular", part = "III",
+  url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
+  course.urls = c(
+    'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
+  toc = "Assignation : Les courbes ROC.")
+```
 
 ## Classification de plancton par analyse d'image
 
