@@ -1,5 +1,5 @@
 # Classification supervisée III {#classif3}
-7
+
 ```{r setup, results='hide', warning=FALSE, include=FALSE}
 SciViews::R
 ```
@@ -20,7 +20,7 @@ Ce module constitue le troisième volet d'une trilogie consacrée à la classifi
 
 ## Métriques et proportions
 
-A partir du moment où la classification ne se fait pas sans erreurs, nous avons présence de faux positifs et de faux négatifs. Le fait d'être un faux positif ou un faux négatif dépend essentiellement du point de vue, c'est-à-dire, de la classe d'intérêt. Cependant ces erreurs restent des erreurs quel que soit le point de vue (sauf si nous fusionnons les classes confondues, bien évidemment). Un élément important à considérer est que le taux d'erreur, qu'il soit global ou local tel que mesuré, par exemple, par le rappel ou la précision pour une classe cible **dépend énormément des proportions d'occurences observées dans les différentes classes**, et ce, aussi bien dans la phase d'apprentissage que de test ou de déploiement.
+A partir du moment où la classification ne se fait pas sans erreurs, nous avons présence de faux positifs et de faux négatifs. Le fait d'être un faux positif ou un faux négatif dépend essentiellement du point de vue, c'est-à-dire, de la classe d'intérêt. Cependant ces erreurs restent des erreurs quel que soit le point de vue (sauf si nous fusionnons les classes confondues, bien évidemment). Un élément important à considérer est que le taux d'erreur, qu'il soit global ou local tel que mesuré, par exemple, par le rappel ou la précision pour une classe cible **dépend énormément des proportions d'occurrences observées dans les différentes classes**, et ce, aussi bien dans la phase d'apprentissage que de test ou de déploiement.
 
 Ce problème nous ramène, en réalité à des calculs basiques de probabilités et au théorème de Bayes que nous avons abordé dans le [module 7 du premier cours de science des données biologiques](https://wp.sciviews.org/sdd-umons/?iframe=wp.sciviews.org/sdd-umons-2020/probabilit%25C3%25A9s.html). **Rappelez-vous, nous avions traité le cas du dépistage d'une maladie, dont le résultat dépendait du fait que la maladie soit fréquente ou rare dans la population (sa prévalence)**. Si vous ne vous souvenez plus de quoi il s'agit, il peut être utile de relire maintenant les sections 7.1.1 à 7.1.3 de ce premier cours, car ce contenu s'applique parfaitement ici.
 
@@ -39,7 +39,7 @@ A l'extrême, il devient très difficile de classer correctement des items appar
 ```{block2, type = 'warning'}
 Les différentes métriques qui mesurent les performances de nos classifieurs sont très sensibles aux proportions relatives des différentes classes. Comme l'optimisation des classifieurs se fait sur base de ces métriques, elle est elle-même dépendante des proportions relatives des classes dans le set d'apprentissage.
 
-Enfin, si les proportions relatives des items dans les classes diffèrent entre le sert de test et les échantillons à classer lors du déploiement du classifieur, les valeurs calculées lors de la phase de test seront biaisées et ne reflèterons pas du tout les performances réelles du classifeur, une fois déployé.
+Enfin, si les proportions relatives des items dans les classes diffèrent entre le set de test et les échantillons à classer lors du déploiement du classifieur, les valeurs calculées lors de la phase de test seront biaisées et ne reflèterons pas du tout les performances réelles du classifeur, une fois déployé.
 ```
 
 ### Proportions en apprentissage
@@ -87,7 +87,7 @@ Le rappel pour la classe `pos` est monté de 60% (`pima1`) à presque 75% (`pima
 
 ### Probabilités *a priori*
 
-Nous avons la possibilité souvent d'estimer les proportions relatives des classes dans les données à classer. Il suffit de réaliser un échantillonnage aléatoire de taille raisonnable (par exemple, un minimum de 100 individus pour exprimer les résultats en pourcents), et de comptabiliser les proportions observées dans chaque classe. Ces proportions seront appelées les **probabilités _a priori_** (*prior probabilities* en anglais). Pour nos indiennes Pima, les probabilités _a priori_ (si l'échantillonnage de départ est bien aléatoire et réalisé dans les règles de l'art) sont déterminées en fonction de la table de contingence, mais plus loin, nous devrons fournir un vecteur numérique, donc nous convertissons directement ici à partir des proportions claculées sur l'ensemble des données\ :
+Nous avons la possibilité souvent d'estimer les proportions relatives des classes dans les données à classer. Il suffit de réaliser un échantillonnage aléatoire de taille raisonnable (par exemple, un minimum de 100 individus pour exprimer les résultats en pourcents), et de comptabiliser les proportions observées dans chaque classe. Ces proportions seront appelées les **probabilités _a priori_** (*prior probabilities* en anglais). Pour nos indiennes Pima, les probabilités _a priori_ (si l'échantillonnage de départ est bien aléatoire et réalisé dans les règles de l'art) sont déterminées en fonction de la table de contingence, mais plus loin, nous devrons fournir un vecteur numérique, donc nous convertissons directement ici à partir des proportions calculées sur l'ensemble des données\ :
 
 ```{r}
 pima_prior <- table(pima$diabetes) / nrow(pima)
@@ -112,9 +112,15 @@ Si vous êtes amené à modifier les proportions des différentes classes dans v
 
 ## Courbes ROC
 
-La **courbe ROC (pour "Receiver Operating Characteristic")** est une courbe qui représente le comportement de notre classifieur à deux classes pour tous les seuils de détection possibles (*cutoff* en anglais). Si nous utilisons les probabilités d'appartenance à la classe cible renvoyées par notre classifieur au lieu des prédictions, nous pourrions choisir librement à partir de quelle probabilité nous considérons qu'un item est de cette classe, autrement dit, nous ne sommes plus obligés de considérer un seuil > 0.5 de probabilité d'appartenance à A pour déclarer l'item comme A (vote à la majorité classique pour la forêt aléatoire, la probabilité est ici la fraction des arbres qui ont voté pour la classe). Nous pourrions très bien descendre notre critère, par exemple, toute probabilité supérieure à 0.4 entraînerait un classement en A. Nous pouvons, au contraire rendre notre critère plus sévère, par exemple en adoptant un seuil de 0.75. En prenant des seuils de 0 à 1, nous balayons toutes les possibilités. A chaque fois, nous pouvons calculer le taux de vrais positifs et le taux de faux positifs. La courbe ROC représente ces résultats avec le taux de faux positifs sur l'axe x et le taux de vrais positifs sur l'axe y. Voici, par exemple, la courbe ROC pour notre classifieur ADL `pima1`.
+Avant d'aborder les courbes ROC, nous devons nous concentrer sur le **seuil de détection** (*cutoff* en anglais). Dans un classifieur à deux classes avec la foret aléatoire, un vote à la majorité des arbres revient à dire que plus de la moitié des arbres a voté pour la classe retenue. Ceci correspond donc à un seuil de 50%. Mais qu'est-ce qui vous empêcherait d'utiliser un seuil différent\ ? Intuitivement, nous réalisons tout de suite que si nous **durcissons** le seuil pour la classe cible (par exemple, un individu ne sera déclaré de cette classe appelée *A* qu'à partir du moment où 70% ou plus des arbres ont voté en ce sens), nous aurons au final *moins* d'individus *A* dans notre prédiction. Cela aura probablement pour conséquence d'augmenter le rappel (car plus de cas flous auront été attribués à la classe *B*, or il est possible de montrer qu'une partie importante de l'erreur se situe justement dans ces cas moins nets). En revanche, nous devons aussi nous attendre à voir la précision (ou la sensibilité) diminuer (rappelez-vous du fameux compromis rappel - précision). Choisir un seuil moins sensible, par exemple 30%, aura l'effet inverse d'augmenter les prédictions *A*, ainsi que précision et sensibilité, mais en diminuant le rappel. Mais existe-t-il un seuil optimal\ ? La courbe ROC permet de le déterminer.
 
-Tout d'abord, il nous faut obtenir les "probabilités". Selon les algorithmes ce sont réellement des probabilités, ou alors, des nombres entre 0 et 1 qui ont des propriétés similaires. Dans le cas de la forêt aléatoire, c'est la proportion des arbres qui ont voté pour la classe. On parlera alors plus justement d'un nombre qui quantifie l'appartenance à la classe (*membership* en anglais), plutôt que de probabilité. Voici comme nous plouvons obtenir ces appartenances\ :
+```{block2, type = 'note'}
+Outre la variation des proportions relatives des individus dans le set d'apprentissage, nous pouvons aussi faire varier les performances de notre classifieur entre rappel et précision en modifiant le *seuil de détection**.
+```
+
+La **courbe ROC (pour "Receiver Operating Characteristic")** est une courbe qui représente le comportement de notre classifieur à deux classes pour tous les seuils de détection possibles. Si nous utilisons les probabilités d'appartenance à la classe cible renvoyées par notre classifieur au lieu des prédictions, nous pourrions choisir librement à partir de quelle probabilité nous considérons qu'un item est de cette classe. En prenant des seuils de 0 à 1 (ou 100%), nous balayons toutes les possibilités. A chaque seuil, nous pouvons calculer le taux de vrais positifs et le taux de faux positifs. La courbe ROC représente ces résultats avec le taux de faux positifs sur l'axe x et le taux de vrais positifs sur l'axe y. Voici, par exemple, la courbe ROC pour notre classifieur ADL `pima1`.
+
+Tout d'abord, il nous faut obtenir les "probabilités". Selon les algorithmes ce sont réellement des probabilités, ou alors, des nombres entre 0 et 1 qui ont des propriétés similaires. Dans le cas de la forêt aléatoire, c'est la proportion des arbres qui ont voté pour la classe. On parlera alors plus justement d'un nombre qui quantifie l'appartenance à la classe (*membership* en anglais), plutôt que de probabilité. Voici comment nous pouvons obtenir ces appartenances\ :
 
 ```{r}
 pima1_rf_mem <- cvpredict(pima1_rf, cv.k = 10, type = "membership")
@@ -131,9 +137,9 @@ plot(pima1_rf_perf)
 abline(a = 0, b = 1, lty = 2)
 ```
 
-Le trait pointillé représente ce que donnerait un classifieur de référence qui classe en `pos` ou `neg` au hasard., et donc, il obtient autant de faux positifs que de vrais positifs quel que soit le seuil choisi. En dessous, nous ferions moins bien que le hasard. Au dessus, notre classifieur est meilleur. Et plus nous nous rapprochons du coin supérieur gauche du graphique avec notre courbe, meilleur sera notre classifieur (plus haut taux de vrais positifs pour plus bas taux de faux positifs).
+Le trait pointillé représente ce que donnerait un classifieur de référence qui classe en `pos` ou `neg` au hasard., et donc, il obtient autant de faux positifs que de vrais positifs quel que soit le seuil choisi. En dessous, nous ferions moins bien que le hasard. Au dessus, notre classifieur est meilleur. Et plus nous nous rapprochons du coin supérieur gauche du graphique avec notre courbe, meilleur sera notre classifieur (plus haut taux de vrais positifs pour plus bas taux de faux positifs). Ainsi le choix du seuil peut se faire pour un point de la courbe qui s'approche le plus du coin supérieur gauche.
 
-Une façon de quantifier globalement les performances de notre classifieur quel que soit le seuil est de **calculer l'aire sous cette courbe**. Pour un classifieur au hasard de référence, elle sera de 0.5. Plus l'aire sous la courbe (**AUC** ou *Area Under the Curve* en anglais) se rapprochera de un, meilleur sera notre classifieur. Voci une des façons de calculer l'AUC dans R\ :
+Une façon de quantifier globalement les performances de notre classifieur quel que soit le seuil est de **calculer l'aire sous cette courbe**. Pour un classifieur au hasard de référence, elle sera de 0.5. Plus l'aire sous la courbe (**AUC** ou *Area Under the Curve* en anglais) se rapprochera de un, meilleur sera notre classifieur. Voici une des façons de calculer l'AUC dans R\ :
 
 ```{r}
 pROC::auc(pima1$diabetes, pima1_rf_mem[, 2])
@@ -181,13 +187,40 @@ Nous pouvons observer que notre second classifeur `pima1b` est effectivement lé
 
 ## Réseaux de neurones artificiels
 
-CECI DOIT ENCORE ETRE REMANIE !
-
-L’idée de cet algorithme vient de l’étude du fonctionnement de notre cerveau, d’où son nom, par analogie. Le modèle est constitué de plusieurs couches *i* interconnectées. Les nœuds *j* de ces connections constituent les neurones artificiels. La première couche est constituée des paramètres mesurés sur les particules et la dernière couche renseigne les groupes à reconnaître (Venables & Ripley 2003). La ou les couches intermédiaires permettent de paramétrer le système d’apprentissage. Les connexions entre neurones sont caractérisées par les seuils ω<sub>ij</sub> variant de 0 à 1, et le transfert du "signal" est généralement modélisé par des fonctions logistiques variant entre ces deux extrêmes. Ces seuils permettent de moduler les relations entre neurones et ainsi de déterminer le groupe d’une particule à partir des valeurs de paramètres mesurées sur celle-ci, par la transmission des signaux de proche en proche, dont le passage est autorisé ou bloqué en fonction des seuils de déclenchement définis (Venables & Ripley 2003). Ce type de fonctionnement est, en effet, parfaitement comparable au transfert d’un influx nerveux le long d’un réseau de neurones tels qu’existant dans notre cerveau.
+L’idée de cet algorithme vient de l’étude du fonctionnement de notre cerveau, d’où son nom, par analogie. Le modèle est constitué de plusieurs couches *i* interconnectées. Les nœuds *j* de ces connections constituent les neurones artificiels. La première couche est constituée des paramètres mesurés sur les particules et la dernière couche renseigne les classes à identifier (Venables & Ripley 2003). La ou les couches intermédiaires permettent de paramétrer le système d’apprentissage. Les connexions entre neurones sont caractérisées par les seuils ω~ij~ variant de 0 à 1, et le transfert du "signal" est généralement modélisé par des fonctions logistiques variant entre ces deux extrêmes. Ces seuils permettent de moduler les relations entre neurones et ainsi de déterminer le groupe d’une particule à partir des valeurs de paramètres mesurées sur celle-ci, par la transmission des signaux de proche en proche, dont le passage est autorisé ou bloqué en fonction des seuils de déclenchement définis (Venables & Ripley 2003). Ce type de fonctionnement est, en effet, parfaitement comparable au transfert d’un influx nerveux le long d’un réseau de neurones dans notre cerveau.
 
 Les réseaux de neurones artificiels sont des techniques très sophistiquées, et qui admettent un grand nombre de paramètres différents (nombres de couches cachées, nombre de neurones par couche, fonction utilisée pour modéliser le signal, règle de définition des seuils,…). Dans le cas de notre étude, nous utilisons un algorithme simple, dit à une seule couche cachée, et dont tous les autres paramètres sont conservés aux valeurs fournies par défaut dans le logiciel R. Ces valeurs par défaut se sont avérées acceptables dans la plupart des études utilisant cet algorithme.
 
 *Schéma du principe de fonctionnement d’un réseau de neurone simple, avec une seule couche cachée. Le groupe prédit dépend de la valeur des paramètres et des coefficients de pondérations ω~ij~. C’est durant la phase d’apprentissage que les coefficients de pondération sont paramétrés.*
+
+### Apprentissage profond
+
+L'apprentissage profond (*deep learning* en anglais) est un domaine fascinant et plein d'avenir qui représente une forme moderne de réseaux de neurones exploitant la puissance de calcul des ordinateurs actuels. C'erst un des piliers de l'intelligence artificielle. La vidéo suivante, bien qu'étant une publicité pour un acteur majeur du secteur (NVidia pour ne pas le nommer) est très bien faite pour comprendre les enjeux réels au delà du buzz autour de l'intelligence artificielle et est même surprenante (mais vous devez la visionner pour comprendre pourquoi\ !)
+
+```{r, echo=FALSE}
+vembedr::embed_youtube("e2_hsjpTi4w", width = 770, height = 433)
+```
+
+Un réseau d'apprentissage profond est un très gros réseau de neurones contenant des centaines, des milliers, voire encore plus de neurones artificiels interconnectés en plusieurs couches. Il offre une telle plasticité au niveau de l'apprentissage qu'il est capable de s'adapter aux situations les plus complexes.
+
+Cette animation montre bien les différentes étapes d'apprentissage d'une réseau profond par rapport à un problème simple en apparence seulement\ : la conduite autonome d'un véhicule.
+
+```{r, echo=FALSE}
+vembedr::embed_youtube("wL7tSgUpy8w", width = 770, height = 433)
+```
+
+Encore une autre vidéo qui montre comme un réseau profond a appris à marcher **tout seul**.
+
+```{r, echo=FALSE}
+vembedr::embed_youtube("gn4nRCC9TwQ", width = 770, height = 433)
+```
+
+Malheureusement, l'apprentissage profond nécessite une quantité importante de calculs et tous les ordinateurs ne sont pas capables d'entraîner un mtel modèle. Il faut généralement utiliser des processeurs GPU (dans des cartes graphiques puissantes) pour arriver à des vitesses d'apprentissage raisonnables. nous allons donc nous limiter à une petite démo simpliste juste pour vous illustrer la façon dont cela se passe.
+
+
+##### Pour en savoir plus {-}
+
+Cette [vidéo](https://www.youtube.com/watch?v=UOvPeC8WOt8&feature=youtu.be) explique dans le détail le principe de fonctionnement d'un réseau profond et l'illustre justement sur l'apprentissage de la classification de chiffres manuscrits.
 
 ## Classification de plancton par analyse d'image
 
