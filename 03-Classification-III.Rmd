@@ -1,9 +1,5 @@
 # Classification supervisée III {#classif3}
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 2c31e6afbd678a4a285665c953514c82750df8f7
 ```{r setup, results='hide', warning=FALSE, include=FALSE}
 SciViews::R
 ```
