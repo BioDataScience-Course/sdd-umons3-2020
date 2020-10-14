@@ -1,5 +1,9 @@
 # Classification supervisée III {#classif3}
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2c31e6afbd678a4a285665c953514c82750df8f7
 ```{r setup, results='hide', warning=FALSE, include=FALSE}
 SciViews::R
 ```
@@ -110,6 +114,16 @@ Nous voyons que les valeurs de rappels ne sont pas modifiées par cette correcti
 
 Si vous êtes amené à modifier les proportions des différentes classes dans votre set d'apprentissage (pratique conseillée si les proportions sont trop différentes d'une classe à l'autre), n'oubliez pas de repondérer les calculs des métriques via `prior()` afin d'avoir des valeurs plus représentatives des performances de votre classifieur en situation.
 
+##### A vous de jouer ! {-}
+
+```{r, echo=FALSE, results='asis'}
+assignation("C03Ga_cardiovascular", part = "I",
+  url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
+  course.urls = c(
+    'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
+  toc = "Assignation : Réflexion sur les proportions.")
+```
+
 ## Courbes ROC
 
 Avant d'aborder les courbes ROC, nous devons nous concentrer sur le **seuil de détection** (*cutoff* en anglais). Dans un classifieur à deux classes avec la foret aléatoire, un vote à la majorité des arbres revient à dire que plus de la moitié des arbres a voté pour la classe retenue. Ceci correspond donc à un seuil de 50%. Mais qu'est-ce qui vous empêcherait d'utiliser un seuil différent\ ? Intuitivement, nous réalisons tout de suite que si nous **durcissons** le seuil pour la classe cible (par exemple, un individu ne sera déclaré de cette classe appelée *A* qu'à partir du moment où 70% ou plus des arbres ont voté en ce sens), nous aurons au final *moins* d'individus *A* dans notre prédiction. Cela aura probablement pour conséquence d'augmenter le rappel (car plus de cas flous auront été attribués à la classe *B*, or il est possible de montrer qu'une partie importante de l'erreur se situe justement dans ces cas moins nets). En revanche, nous devons aussi nous attendre à voir la précision (ou la sensibilité) diminuer (rappelez-vous du fameux compromis rappel - précision). Choisir un seuil moins sensible, par exemple 30%, aura l'effet inverse d'augmenter les prédictions *A*, ainsi que précision et sensibilité, mais en diminuant le rappel. Mais existe-t-il un seuil optimal\ ? La courbe ROC permet de le déterminer.
@@ -185,6 +199,16 @@ pROC::auc(pima1b_resampled$diabetes, pima1b_resampled$membership)
 
 Nous pouvons observer que notre second classifeur `pima1b` est effectivement légèrement plus performant que le premier avec `pima1`.
 
+##### A vous de jouer ! {-}
+
+```{r, echo=FALSE, results='asis'}
+assignation("C03Ga_cardiovascular", part = "II",
+  url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
+  course.urls = c(
+    'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
+  toc = "Assignation : Les courbes ROC.")
+```
+
 ## Réseaux de neurones artificiels
 
 L’idée de cet algorithme vient de l’étude du fonctionnement de notre cerveau, d’où son nom, par analogie. Le modèle est constitué de plusieurs couches *i* interconnectées. Les nœuds *j* de ces connections constituent les neurones artificiels. La première couche est constituée des paramètres mesurés sur les particules et la dernière couche renseigne les classes à identifier (Venables & Ripley 2003). La ou les couches intermédiaires permettent de paramétrer le système d’apprentissage. Les connexions entre neurones sont caractérisées par les seuils ω~ij~ variant de 0 à 1, et le transfert du "signal" est généralement modélisé par des fonctions logistiques variant entre ces deux extrêmes. Ces seuils permettent de moduler les relations entre neurones et ainsi de déterminer le groupe d’une particule à partir des valeurs de paramètres mesurées sur celle-ci, par la transmission des signaux de proche en proche, dont le passage est autorisé ou bloqué en fonction des seuils de déclenchement définis (Venables & Ripley 2003). Ce type de fonctionnement est, en effet, parfaitement comparable au transfert d’un influx nerveux le long d’un réseau de neurones dans notre cerveau.
@@ -193,6 +217,7 @@ Les réseaux de neurones artificiels sont des techniques très sophistiquées, e
 
 *Schéma du principe de fonctionnement d’un réseau de neurone simple, avec une seule couche cachée. Le groupe prédit dépend de la valeur des paramètres et des coefficients de pondérations ω~ij~. C’est durant la phase d’apprentissage que les coefficients de pondération sont paramétrés.*
 
+<<<<<<< HEAD
 ### Apprentissage profond
 
 L'apprentissage profond (*deep learning* en anglais) est un domaine fascinant et plein d'avenir qui représente une forme moderne de réseaux de neurones exploitant la puissance de calcul des ordinateurs actuels. C'erst un des piliers de l'intelligence artificielle. La vidéo suivante, bien qu'étant une publicité pour un acteur majeur du secteur (NVidia pour ne pas le nommer) est très bien faite pour comprendre les enjeux réels au delà du buzz autour de l'intelligence artificielle et est même surprenante (mais vous devez la visionner pour comprendre pourquoi\ !)
@@ -222,6 +247,18 @@ Malheureusement, l'apprentissage profond nécessite une quantité importante de 
 
 Cette [vidéo](https://www.youtube.com/watch?v=UOvPeC8WOt8&feature=youtu.be) explique dans le détail le principe de fonctionnement d'un réseau profond et l'illustre justement sur l'apprentissage de la classification de chiffres manuscrits.
 
+=======
+##### A vous de jouer ! {-}
+
+```{r, echo=FALSE, results='asis'}
+assignation("C03Ga_cardiovascular", part = "III",
+  url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
+  course.urls = c(
+    'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
+  toc = "Assignation : Les courbes ROC.")
+```
+
+>>>>>>> 2c31e6afbd678a4a285665c953514c82750df8f7
 ## Classification de plancton par analyse d'image
 
 Dans cet exemple, nous cherchons à classer du mésozooplancton sur base de mesures effectuées sur chaque individu par analyse d'image. Voici le genre d'image que nous analysons (petite zone d'une image entière)\ :
@@ -274,3 +311,9 @@ lda = analyse discriminante linéaire, qda = analyse quadratique linéaire, mda 
 En règle générale, nous constatons que les méthodes plus complexes ou composites, telles que random forest, double bagging ou DVF sont plus performantes que les méthodes simples (tree, knn, lda, par exemple). A noter également, la contre performance de "support vector machine", qui est habituellement une des méthodes les plus performantes. Ceci illustre donc bien qu'il ne faut pas se cantonner à une seule technique. Selon les spécificités d'un jeu de données, des méthodes différentes peuvent s'avérer plus efficaces et utiles dans un contexte particulier.
 
 Ce type d'étude (optimisation de différentes méthodes, et puis comparaison par validation croisée) est typiquement celle à mener pour obtenir le meilleur algorithme de reconnaissance automatique.
+
+## Récapitulatif des exercices
+
+Dans ce module 3, vous aviez à réaliser les exercices suivants\ :
+
+`r show_ex_toc()`
