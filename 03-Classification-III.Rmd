@@ -392,16 +392,20 @@ assignation("C03Gb_challenge", part = NULL,
   toc = "Challenge pour trouver les meilleurs vins")
 ```
 
-Vous pourrez soumettre vos résultats via le formulaire ci-dessous\ :
+Vous pourrez soumettre vos résultats via le formulaire ci-dessous. Utilisez le bouton `Submit` pour tester votre soumission et le bouton `Quit & Save` pour envoyer votre solution au challenge et le faire apparaître dans le tableau de classement. Pour soumettre un autre modèle, relancez l'app de soumission avec `Reload`\ :
 
-```{r, echo=FALSE}
+<!-- launch_shiny("https://sdd.umons.ac.be/B01Sa_reglin/", height = 600, delay = 20, toc = "Ajuster la meilleure droite")`-->
+
+<iframe width="780" height="500" frameborder="0" scrolling="auto" class="shiny-app" id=\"C03Sa_ml_challenge\" src="https://sdd.umons.ac.be/C03Sa_ml_challenge/?login=Challenge"></iframe>
+
+```{r, echo=FALSE, eval=FALSE}
 knitr::include_app('https://sdd.umons.ac.be/C03Sa_ml_challenge/', height = '600px')
 ```
 
-Le classement apparaît ici\ :
+Le classement apparaît ici. Ce classement est mis à jour toutes les 5min. soyez patient si vous ne voyez pas tout de suite votre soumission.
 
 ```{r, echo=FALSE}
-knitr::include_app('https://sdd.umons.ac.be/C03Sb_ml_result', height = '600px')
+knitr::include_app('https://sdd.umons.ac.be/C03Sb_ml_result', height = '700px')
 ```
 
 ##### Pour en savoir plus {-}
