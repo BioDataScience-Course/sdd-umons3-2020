@@ -354,7 +354,7 @@ Le partitionnement récursif est un algorithme de classification supervisée qui
 
 ![Schéma du principe d’un arbre de classification en 4 classes, A, B, C et D en utilisant les attributs x, y et z. A chaque nœud un attribut et un seuil sont choisis afin d'établir une règle de décision (en rouge). Pour un individu dont il faut prédire la classe, nous parcourons l'arbre de branche en branche depuis tout en haut et bifurquons à gauche ou à droite selon la comparaison à la règle à chaque nœud\ : vers la gauche si la variable est inférieure au seuil, vers la droite si elle est supérieure ou égale. Les feuilles représentent chacune une classe (en bleu, duplications possibles). Arrivé à une feuille, nous obtenons donc la classe prédite pour cet individu.](images/02-classification2/rpart.png)
 
-Vosu pouvez aussi visionner une [magnifique présentation animée de ce qu'est un arbre de partitionnement ou décisionnel](http://www.r2d3.us/lapprentissage-automatique-en-images-chapitre-1/) (pensez bien à sélectionner le français en tout début de document et faites défiller jusqu'à la fin de l'histoire). Dans cette présentation, la notion de **suréchantillonnage** (*oversampling* en englais) est abordé. C'est un problème qui se rencontre souvent en classification supervisée, tout comme en régression. Dans le cas de l'arbre de partitionnement, la solustion consiste à élaguer les branches de moindre importance de l'arbre. [Cette page explique de manière très claire de quoi il s'agit](http://www.r2d3.us/visual-intro-to-machine-learning-part-2/). 
+Vous pouvez aussi visionner une [magnifique présentation animée de ce qu'est un arbre de partitionnement ou décisionnel](http://www.r2d3.us/lapprentissage-automatique-en-images-chapitre-1/) (pensez bien à sélectionner le français en tout début de document et faites défiler jusqu'à la fin de l'histoire). Dans cette présentation, la notion de **suréchantillonnage** (*oversampling* en anglais) est abordé. C'est un problème qui se rencontre souvent en classification supervisée, tout comme en régression. Dans le cas de l'arbre de partitionnement, la solution consiste à élaguer les branches de moindre importance de l'arbre. [Cette page explique de manière très claire de quoi il s'agit](http://www.r2d3.us/visual-intro-to-machine-learning-part-2/). 
 
 ### Pima avec rpart
 
@@ -437,6 +437,16 @@ Ah\ ? Ici, nous nous approchons de 27%, notre variable `insulin` de `pima1` semb
 
 La forêt aléatoire, ou *random forest* en anglais (RF) est un algorithme introduit par Breiman (2001) qui créé un ensemble d’arbres décisionnels individuels, dont la variable discriminante à chaque nœud est choisie parmi un sous-ensemble aléatoire de toutes les *p* variables utilisées (afin d’introduire une variation aléatoire dans chaque arbre de partitionnement qui sont donc tous différents). Lorsque l’ensemble des arbres est créé, un vote à la majorité est appliqué en utilisant la réponse donnée par chaque arbre pour déterminer à quelle classe appartient l'individu étudié. **C’est actuellement un des algorithmes les plus performants de classification supervisée.** Par contre, étant donné qu’il faut créer plusieurs centaines d’arbres, le temps de calcul est généralement plus élevé qu’avec des méthodes simples comme ADL, k plus proches voisins, ou l’utilisation d’un arbre unique.
 
+```{block2, type='note'}
+La combinaison de plusieurs classifieurs donne quasi-systématiquement des meilleurs résultats qu'un classifieur seul. On parle alors d'**ensemble** de classifieurs. La forêt aléatoire en est un excellent exemple. Plusieurs autres techniques existent pour combiner des classifieurs et améliorer les résultats, mais leur développement sort du cadre de ce cours\ :
+
+- **stacking\ :** Les résultats d'un ou plusieurs classifieurs sont utilisés comme variables d'entrée pour un autre classifieur. En d'autre terme, les classifieurs sont reliés en série les uns derrière les autres.
+
+- **bagging\ : ** pour **b**ootstrap **agg**regating améliore la stabilité et la précision de la classification. Quelques méthodes sont implémentées notamment dans le package R {ipred}. Le principe consiste à générer plusieurs sets d'apprentissage artificiellement par échantillonnage avec remplacement (technique de bootstrap), à entraîner des classifieurs sur chaque set, et à ensuite résumer les résultat via un vote à la majorité.
+
+- **boosting\ :** entraîne successivement des classifieurs en se focalisant sur les erreurs du précédent. L'un des algorithmes les plus performants actuellement, **XGBoost** fait partie de cette catégorie (voir le package {xgboost} dans R).
+```
+
 Les paramètres à définir sont le nombre d’arbres et le nombre de *p* attributs à choisir aléatoirement parmi tous les attributs à chaque nœud pour établir la règle de décision. C'est par cette présélection aléatoire de candidats de départ pour les règles que la variation est créée d'un arbre à l'autre. Cette présélection aléatoire est réitérée, naturellement, à chaque nœeud de chaque arbre. Les paramètres choisis ici sont de 500 arbres et de 2*p*/3 attributs conservés aléatoirement à chaque nœud. Ces valeurs se sont montrées efficaces dans des études antérieures, et l’algorithme est, par ailleurs, relativement robuste face aux variations de ces paramètres autour des valeurs par défaut.
 
 ![Schéma du principe de la forêt aléatoire pour la classification. Cet algorithme créé un ensemble d’arbres de partitionnement différents où, à chaque nœud, une variable discriminante et un seuil sont choisis comme les meilleures règles, mais seulement parmi un sous-ensemble aléatoire de tous les attributs. Lorsque la forêt est construite, le même individu est présenté à la base de chaque arbre. Le groupe auquel il appartient est obtenu par un vote à la majorité de tous les arbres.](images/02-classification2/rforest.png)
@@ -503,6 +513,9 @@ assignation("C02Ga_ml2", part = "III",
   toc = "Assignation : Utilisation de la forêt aléatoire.")
 ```
 
+##### Trucs et astuces {-}
+
+Pour l'instant {mlearning} utilise les fonctions du package {randomForest} qui reprend le code original de Breiman. Cependant, d'autres implémentations plus performantes ont été développées depuis. En particulier, le package R {ranger} implémente une version parallélisée (utilisation de plusieurs cœurs du processeur pour effectuer le calcul en parallèle) bien plus rapide sur les ordinateur actuels. Si la vitesse est un frein à l'utilisation de la forêt aléatoire dans votre application, allez voir du côté de cette implémentation.
 
 ## Récapitulatif des exercices
 

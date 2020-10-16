@@ -8,7 +8,7 @@ SciViews::R
 
 - Prendre conscience de l'impact des proportions relatives par classes sur les métriques et maîtriser ce phénomène
 
-- Appréhender les courbes ROC et l'AUC comme mesure indépendante des proportions dans un cas à deux classes
+- Appréhender le seuil de détection, les courbes ROC et l'AUC comme mesure indépendante du seuil de détection dans un cas à deux classes
 
 - Comprendre et être capable d'utiliser les algorithmes de machine à vecteurs supports et les réseaux neuronaux, découvrir l'apprentissage profond.
 
@@ -117,7 +117,7 @@ assignation("C03Ga_cardiovascular", part = "I",
   url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
   course.urls = c(
     'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
-  toc = "Assignation : Réflexion sur les proportions.")
+  toc = "Réflexion sur les proportions")
 ```
 
 ## Courbes ROC
@@ -137,31 +137,39 @@ pima1_rf_mem <- cvpredict(pima1_rf, cv.k = 10, type = "membership")
 head(pima1_rf_mem)
 ```
 
-Nous utilisons le package {ROCR} qui demande uniquement les appartenances à la classe cible (ici `pos`, donc la seconde colonne), ainsi qu'un vecteur indiquant par 0 ou 1 si l'individu appartient effectivement ou non à cette classe cible. C'est l'objet `prediction`. A partir de là, nous calculons un objet `performance` en indiquant les deux métriques que nous voulons utiliser (`tpr` et `fpr` pour la courbe ROC), et nous réalisons le graphique.
+Nous utilisons le package {ROCR} qui demande uniquement les appartenances à la classe cible (ici `pos`, donc la seconde colonne), ainsi qu'un vecteur indiquant par 0 ou 1 si l'individu appartient effectivement ou non à cette classe cible. C'est l'objet `prediction`. A partir de là, nous calculons un objet `performance` en indiquant les deux métriques que nous voulons utiliser ("true positive rate" `tpr` et "fasle positive rate" `fpr` pour la courbe ROC), et nous réalisons ensuite le graphique.
+
+```{r, message=FALSE, warning=FALSE}
+library(ROCR)
+```
 
 ```{r}
-library(ROCR)
+# 1) Formatter les prédictions pour ROCR
 pima1_rf_predobj <- prediction(pima1_rf_mem[, 2], pima1$diabetes == "pos")
+# 2) Calculer les performances avec les 2 métriques tpr et fpr
 pima1_rf_perf <- performance(pima1_rf_predobj, "tpr", "fpr")
+# 3) Tracer notre graphique ROC
 plot(pima1_rf_perf)
 abline(a = 0, b = 1, lty = 2)
 ```
 
-Le trait pointillé représente ce que donnerait un classifieur de référence qui classe en `pos` ou `neg` au hasard., et donc, il obtient autant de faux positifs que de vrais positifs quel que soit le seuil choisi. En dessous, nous ferions moins bien que le hasard. Au dessus, notre classifieur est meilleur. Et plus nous nous rapprochons du coin supérieur gauche du graphique avec notre courbe, meilleur sera notre classifieur (plus haut taux de vrais positifs pour plus bas taux de faux positifs). Ainsi le choix du seuil peut se faire pour un point de la courbe qui s'approche le plus du coin supérieur gauche.
+Le trait pointillé représente ce que donnerait un classifieur de référence qui classe en `pos` ou `neg` au hasard, et donc, il obtient autant de faux positifs que de vrais positifs quel que soit le seuil choisi. En dessous, nous ferions moins bien que le hasard. Au dessus, notre classifieur est meilleur. Et plus nous nous rapprochons du coin supérieur gauche du graphique avec notre courbe, meilleur sera notre classifieur (plus haut taux de vrais positifs pour plus bas taux de faux positifs). Ainsi le choix du seuil peut se faire pour un point de la courbe qui s'approche le plus du coin supérieur gauche.
 
-Une façon de quantifier globalement les performances de notre classifieur quel que soit le seuil est de **calculer l'aire sous cette courbe**. Pour un classifieur au hasard de référence, elle sera de 0.5. Plus l'aire sous la courbe (**AUC** ou *Area Under the Curve* en anglais) se rapprochera de un, meilleur sera notre classifieur. Voici une des façons de calculer l'AUC dans R\ :
+Une façon de quantifier globalement les performances de notre classifieur quel que soit le seuil est de **calculer l'aire sous cette courbe**. Pour un classifieur au hasard de référence, elle sera de 0.5 puisque le triangle inférieur délimité par le trait pointillé représente la moitié de l'aire totale du graphique. Plus l'aire sous la courbe (**AUC** ou *Area Under the Curve* en anglais) se rapprochera de un, meilleur sera notre classifieur. Voici une des façons de calculer l'AUC dans R\ :
 
 ```{r}
 pROC::auc(pima1$diabetes, pima1_rf_mem[, 2])
 ```
 
-Si vous voulez, l'AUC est un peu comme le R^2^ de la régression linéaire\ : pour un même jeu de données nous pouvons superposer les courbes de deux ou plusieurs classifieurs sur le graphique, et calculer leurs AUC respectifs pour nous aider à choisir le meilleur. Comparons donc notre classifieur issu de `pima1b` avec les proportions réajustées à celui réalisé avec `pima1`. La difficulté ici est de réajuster les proportions pour que les deux soient comparables, voir [ici](https://jennybc.github.io/purrr-tutorial/ls12_different-sized-samples.html).
+Si vous voulez, l'AUC est un peu comme le *R^2^* de la régression linéaire\ : pour un même jeu de données nous pouvons superposer les courbes de deux ou plusieurs classifieurs sur le graphique, et calculer leurs AUC respectifs pour nous aider à choisir le meilleur. Par contre, avec deux jeux de données différents (proportions par classes différentes), les valeurs ne sont plus comparables. Ainsi, si nous voulons comparer notre classifieur issu de `pima1b` avec celui de `pima1`, nous devons d'abord réajuster les proportions pour que les deux soient comparables, voir [ici](https://jennybc.github.io/purrr-tutorial/ls12_different-sized-samples.html).
 
 ```{r}
 pima1b_rf_mem <- cvpredict(pima1b_rf, cv.k = 10, type = "membership")
 # Tableau membership + vraies valeurs
 pima1b_rf_mem <- data.frame(membership = pima1b_rf_mem[, 2], diabetes = pima1b$diabetes)
 # Rééchantillonnage pour rétablir les bonnes proportions
+# (calcul un peu compliqué, mais pas besoin de comprendre les détails ici
+# pour comprendre la logique générale du calcul effectué)
 library(purrr)
 library(tidyr)
 set.seed(36433)
@@ -175,6 +183,8 @@ pima1b_rf_mem %>.%
   unnest(., samp) -> pima1b_resampled
 table(pima1b_resampled$diabetes)
 ```
+
+Une fois le réajustement des proportions réalisé dans `pima1b`, nous pouvons superposer les deux courbes ROC `pima1` et `pima1b`. Pour superposer un graphique sur l'autre, utiliser l'argument `add = TRUE` pour le second.
 
 ```{r}
 pima1b_rf_predobj <- prediction(pima1b_resampled$membership,
@@ -193,7 +203,7 @@ legend("bottomright", inset = 0.1, legend = c("pima1", "pima1b"), lty = 1,
 pROC::auc(pima1b_resampled$diabetes, pima1b_resampled$membership)
 ```
 
-Nous pouvons observer que notre second classifeur `pima1b` est effectivement légèrement plus performant que le premier avec `pima1`.
+Nous pouvons observer que notre second classifeur `pima1b` est effectivement globalement légèrement plus performant que le premier avec `pima1`, avec toutefois des précautions d'usage puisque les données utilisées ne sont pas *strictement* identiques. Seulement les proportions relatives dans les deux classes ont été alignées entre les deux courbes. Par cobntre, selon le seuil de détection choisi, le modèle établi avec `pima1` peut localement égaler, ou même dépasser légèrement les performances de celui établi à l'aide de `pima1b`. De manière générale, les courbes ROC seront parfaitement utilisables *sans ajustement nécessaire par contre,* pour comparer deux modèles différents obtenus à partir d'exactement les *mêmes* données.
 
 ##### A vous de jouer ! {-}
 
@@ -202,18 +212,134 @@ assignation("C03Ga_cardiovascular", part = "II",
   url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
   course.urls = c(
     'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
-  toc = "Assignation : Les courbes ROC.")
+  toc = "Courbes ROC")
 ```
+
+## Machine à vecteurs supports
+
+Les **machines à vecteurs supports** (*Support Vector Machine* en anglais, ou SVM en abrégé) forment une autre famille d'algorithmes utilisables en classification supervisée. Au départ, l'idée est simple\ : il s'agit de déterminer le meilleur hyperplan qui divise l'hyperespace représenté par les attributs décrivant un cas à deux classes. Avec deux attributs seulement (cas le plus simple, disons *x~1~* et *x~2~*), cela signifie que nous recherchons une **droite** qui divise notre plan *x~1~-x~2~* en deux, chaque région représentant le domaine de l'une des deux classes.
+
+Jusqu'ici, l'idée nous semble assez similaire à l'ADL. La grosse différence, c'est que dans l'ADL nous utilisons toutes les données pour définir la position de la frontière, alors que dans SVM, nous n'utilisons que les individus au niveau de la frontière qui forment les fameux "vecteurs supports" à l'origine du nom de la technique. Ces vecteurs supports définissent une **marge** autour de la frontière. Cette dernière est positionnée de telle façon que la marge en question soit la plus large possible. En d'autres termes, nous cherchons à définir un "no-man's land", un fossé le plus large possible autour de la frontière tracée entre les deux classes. Cette approche s'avère judicieuse et performante en pratique.
+
+![Logique de SVM pour positionner la frontière entre les deux classes à l'aide de vecteurs supports définissant une marge (en jaune) de part et d'autre de la frontière (en rouge). La frontière est tracée de telle façon que cette marge soit la plus large possible (schéma issu de Wikipédia, une fois n'est pas coutume).](images/03-classification3/svm-margin.png)
+
+Bon, il nous reste à contourner deux limitations pour que la méthode soit utilisable dans des situations plus générales\ :
+
+1. La frontière entre les deux classes n'est pas forcément linéaire, et en pratique, la plupart du temps elle ne le sera pas
+2. Comment généraliser à une situation à plus de deux classes\ ?
+
+Abordons ces deux points successivement ci-dessous.
+
+### Approche par noyau
+
+Le problème de frontière non linéaire se résout par une transformation de l'hyperespace initial vers une version **déformée** habilement par projection. Si la fonction qui effectue la déformation est correctement choisie, une frontière non linéaire peut être linéarisée, un peu comme une transformation bien choisie des données pour un nuage de points peut éventuellement le linéariser (nous avons abondamment utilisé cette astuce en modélisation).
+
+![Un noyau $\phi$ judiceusement choisi (qui n'est rien d'autre qu'une fonction réalisant la transformation) va déformer l'hyperespace de telle façon qu'une frontière non linéaire est linéarisée. (schéma issu de Wikipédia)](images/03-classification3/svm-kernel.png)
+
+La transformation appliquée est une fonction mathématique appelée **noyau** (*kernel* en anglais). Un certain nombre de noyaux ont été définis pour transformer des frontières de forme précise. Par exemple, si la frontière initiale est circulaire, un noyau existe pour linéariser cette frontière en transformant notre plan en hyperbole tridimensionnelle en calculant une troisième dimension telle que *x~3~ = x~1~^2^ + x~2~^2^*. Découper notre hyperbole 3D par une frontière plane revient alors à découper notre plan initial à l'aide d'une frontière circulaire. Ceci est illustré dans la vidéo suivante.
+
+```{r, echo=FALSE}
+vembedr::embed_youtube("3liCbRZPrZA", width = 770, height = 433)
+```
+
+##### A retenir {-}
+
+Avec SVM, le choix du noyau et de ses paramètres est une étape cruciale pour obtenir de bons résultats. Il se peut que vous ayez à essayer différents noyaux et différents paramètres de manière itérative avant d'arriver à un résultat satisfaisant. Par contre, une fois le noyau correctement définit, la technique s'avère très puissante.
+
+### SVM multiclasses
+
+Bien qu'il ne semble pas évident au premier abord que SVM ne soit définie que pour un cas à deux classes seulement, c'est ainsi que les mathématiciens l'ont développée. Par contre, cette limitation peut être dépasser par une astuce simple\ : ramener les situations multiclasses à des cas à deux classes. Nous avons déjà observé, en effet, pour la matrice de confusion que nous pouvons toujours réduire un problème multiclasses à deux classes seulement dès lors que nous choisissons une classe cible. Nous calculons ensuite cette classe cible *versus* tout ce qui n'est pas de cette classe-là. Cette approche est dite "macro", par contraste avec l'approche "micro" ou les classes sont confrontées individuellement deux à deux.
+
+Par exemple pour trois classes A, B, et C, dans l'approche "macro" nous comparerons A avec B + C en un classifieur unique pour décider si l'item appartient à A ou non. Dans l'approche "micro", nous comparerons A avec B d'un côté, puis A avec C d'un autre côté (deux classifieurs différents). Nous établirons ensuite un consensus entre ces deux classifieurs pour décider si l'items appartient à la classe A ou non. Ensuite dans les deux approches, nous faisons de même en ciblant cette fois-ci la classe B, et puis finalement la classe C. En rassemblant tous les résultats et en comparant les probabilités d'appartenance aux différentes classes renvoyées par les classifieurs individuels bi-classes, nous obtenons finalement un classifieur global multiclasses. C'est ainsi que SVM multiclasses fonctionne.
+
+```{block2, type = 'info'}
+La décomposition d'un classifieur multiclasses en une série de classifieurs bi-classes par approche "macro" ou "micro" est utile en SVM. Elle l'est aussi pour établir des métriques de performance globales sur base de métriques qui ne se calculent normalement qu'en mode bi-classe.
+
+C'est le cas du score *F*. Ainsi nous pouvons calculer un score *F* global pour l'ensemble d'un classifieur multiclasses en moyennant les scores *F* bi-classes individuels. Par contre, comme deux approches co-existent, nous avons donc deux versions\ : le score *F* "micro" et le score *F* "macro". Le premier déterminera une balance entre les comparaisons deux à deux (un comparé à un) de toutes les classes, tandis que le second envisagera le problème de manière plus globale (un comparé à tous). Les deux points de vue se complètent plus qu'ils ne s'opposent.
+
+**Les scores *F* "micro" et "macro" sont des métriques globales plus utiles que le taux global de reconnaissance (TGR) car ils tiennent compte des performances pour toutes les classes là ou le TGR ne quantifie la situation que de manière générale, délaissant ainsi la classification réalisée pour les classes les plus rares au bénéfice des classes abondantes.** Pour faire un parallèle avec la régression, le *R^2^* est un critère utile pour définir l'ajustement d'une droite, mais le critère d'Akaiké sera plus efficace pour définir le meilleur modèle. En classification, c'est pareil\ : le TGR quantifie les performances globales, mais les scores *F* micro et macro sont des biens meilleurs critères pour choisir son classifieur optimal.
+
+Les scores *F* micro et macro sont calculés sur nos objets `confusion` et renvoyés par `summary()`. Prenez donc la bonne habitude de les utiliser comme critères globaux de performance de vos classifieurs multiclasses de préférence au TGR ou au taux d'erreur globale.
+```
+
+##### A retenir {-}
+
+Les approches "micro" et "macro" permettent toutes deux de transformer un problème multiclasses en plusieurs problèmes bi-classes. C'est autant utile pour certains algorithmes comme SVM que pour certaines métriques comme le score *F*.
+
+### SVM et Pima
+
+Voyons maintenant ce que donne une SVM sur notre jeu de données `pima1`. Une version de SVM étant disponible dans {mlearning}, nous pouvons appliquer cet algorithme facilement avec un code R qui nous est à présent familier (nous choisissons ici la validation croisée dix fois pour en quantifier les performances).
+
+```{r}
+library(mlearning)
+set.seed(3674)
+pima1_svm <- mlSvm(data = pima1, diabetes ~ .)
+pima1_svm_conf <- confusion(cvpredict(pima1_svm, cv.k = 10), pima1$diabetes)
+plot(pima1_svm_conf)
+summary(pima1_svm_conf)
+```
+Ici, avec tous les arguments par défaut de `mlSvm()` nous avons un taux d'erreur de 24%, mais plus important, des *F* micro et macro d'environ 0.71. Si nous comparons à notre classifieur foret aléatoire sur les mêmes données, nous avions 21% d'erreur et *F* micro ou macro de 0.75. Donc, notre SVM non optimisé fait moins bien que la forêt aléatoire... mais le travail n'est pas terminé. Le noyau par défaut (`kernel = `) est `radial`. Les autres options (voir `?e1071::svm`) sont `linear` pour aucune transformation, `polynomial` (dans ce cas, préciser aussi `degree` et `coef0`, 3 et 0 respectivement par défaut) pour une frontière plus générale et `sigmoid` (préciser `coef0`, 0 par défaut).
+
+Un noyau linéaire fait mieux que le noyau radial\ :
+
+```{r}
+set.seed(857)
+pima1_svm2 <- mlSvm(data = pima1, diabetes ~ ., kernel = "linear")
+pima1_svm2_conf <- confusion(cvpredict(pima1_svm2, cv.k = 10), pima1$diabetes)
+plot(pima1_svm2_conf)
+summary(pima1_svm2_conf)
+```
+On se rapproche des scores de la foret aléatoire cici avec un *F* micro de 0.74 et un *F* macro de 0.736. Le noyau sigmoïde est ici désastreux, mais le noyau polynomial de degré 2 et avec un `coef0 = 1` donne ceci\ :
+
+```{r}
+set.seed(150)
+pima1_svm3 <- mlSvm(data = pima1, diabetes ~ ., kernel = "polynomial",
+  degree = 2, coef0 = 1)
+pima1_svm3_conf <- confusion(cvpredict(pima1_svm3, cv.k = 10), pima1$diabetes)
+plot(pima1_svm3_conf)
+summary(pima1_svm3_conf)
+```
+
+Avec un *F* micro de 0.747 et un *F* macro de 0.739, nous nous rapprochons très fortement des performances de la forêt aléatoire.
+
+##### A retenir {-}
+
+L'algorithme SVM est potentiellement très performant, mais il est délicat parce que de nombreux paramètres doivent être optimisés. Nous n'avons discuté que le noyau, mais il y a aussi la mise à l'échelle des variables ou non, la pondération des observations, etc. comme paramètres optimisables.
+
+##### Pour en savoir plus {-}
+
+- [Une explication des SVM plus en détails](https://zestedesavoir.com/tutoriels/1760/un-peu-de-machine-learning-avec-les-svm/) (en français)
+
+- Une présentation de SVM en français [détaillant un peu plus l'aspect mathématique sous-jacents](https://www.math.univ-toulouse.fr/~besse/Wikistat/pdf/st-m-app-svm.pdf).
 
 ## Réseaux de neurones artificiels
 
-L’idée de cet algorithme vient de l’étude du fonctionnement de notre cerveau, d’où son nom, par analogie. Le modèle est constitué de plusieurs couches *i* interconnectées. Les nœuds *j* de ces connections constituent les neurones artificiels. La première couche est constituée des paramètres mesurés sur les particules et la dernière couche renseigne les classes à identifier (Venables & Ripley 2003). La ou les couches intermédiaires permettent de paramétrer le système d’apprentissage. Les connexions entre neurones sont caractérisées par les seuils ω~ij~ variant de 0 à 1, et le transfert du "signal" est généralement modélisé par des fonctions logistiques variant entre ces deux extrêmes. Ces seuils permettent de moduler les relations entre neurones et ainsi de déterminer le groupe d’une particule à partir des valeurs de paramètres mesurées sur celle-ci, par la transmission des signaux de proche en proche, dont le passage est autorisé ou bloqué en fonction des seuils de déclenchement définis (Venables & Ripley 2003). Ce type de fonctionnement est, en effet, parfaitement comparable au transfert d’un influx nerveux le long d’un réseau de neurones dans notre cerveau.
+L’idée de cet algorithme vient de l’étude du fonctionnement de notre cerveau, d’où son nom, par analogie. Le modèle est constitué de plusieurs couches *i* interconnectées. Les nœuds *j* de ces connections constituent les neurones artificiels. La première couche est constituée des attributs mesurés sur les individus et la dernière couche renseigne les classes à identifier (Venables & Ripley 2003). Là où les couches intermédiaires permettent de paramétrer le système d’apprentissage. Les connexions entre neurones sont caractérisées par les seuils ω~ij~ variant de 0 à 1, et le transfert du "signal" est généralement modélisé par des fonctions logistiques variant entre ces deux extrêmes. Ces seuils permettent de moduler les relations entre neurones et ainsi de déterminer la classe à laquelle un individu appartient à partir des valeurs des attributs mesurés sur celui-ci, par la transmission des signaux de proche en proche, dont le passage est autorisé ou bloqué en fonction des seuils de déclenchement définis (Venables & Ripley 2003). Ce type de fonctionnement est, en effet, parfaitement comparable au transfert d’un influx nerveux le long d’un réseau de neurones dans notre cerveau.
 
 Les réseaux de neurones artificiels sont des techniques très sophistiquées, et qui admettent un grand nombre de paramètres différents (nombres de couches cachées, nombre de neurones par couche, fonction utilisée pour modéliser le signal, règle de définition des seuils,…). Dans le cas de notre étude, nous utilisons un algorithme simple, dit à une seule couche cachée, et dont tous les autres paramètres sont conservés aux valeurs fournies par défaut dans le logiciel R. Ces valeurs par défaut se sont avérées acceptables dans la plupart des études utilisant cet algorithme.
 
-*Schéma du principe de fonctionnement d’un réseau de neurone simple, avec une seule couche cachée. Le groupe prédit dépend de la valeur des paramètres et des coefficients de pondérations ω~ij~. C’est durant la phase d’apprentissage que les coefficients de pondération sont paramétrés.*
+![Représentation simplifiée d'une partie d'un réseau de neurones à une seule couche cachée (en bleu) et complètement connecté. En vert, la couche sensorielle qui reçoit les valeurs des attributs. En jaune, le neurone qui prédit une classe (source Wikipedia).](images/03-classification3/reseau-neurones.png)
 
-<<<<<<< HEAD
+### Pima avec réseau de neurones
+
+Un réseau de neurones simple à une seule couche cachée est disponible avec la fonction `mlNnet()` dans {mlearning}. L'utilisation est similaire aux autres fonctions du package\ :
+
+```{r}
+set.seed(85460)
+pima1_nnet <- mlNnet(data = pima1, diabetes ~ .)
+pima1_nnet_conf <- confusion(cvpredict(pima1_nnet, cv.k = 10), pima1$diabetes)
+plot(pima1_nnet_conf)
+summary(pima1_nnet_conf)
+```
+
+Avec les valeurs par défaut, notre réseau de neurones obtient des résultats décevants, avec un *F* micro de seulement 0.59 et un *F* macro de 0.50. Par contre, la fonction a beaucoup d'arguments qui représentent autant de paramètres à optimiser. Tout comme SVM, les réseaux de neurones nécessitent beaucoup de travail pour être optimisés correctement. De plus, il leur faut en général énormément de données en apprentissage avant d'avoir des bons résultats. Notre jeu de données `pima1` avec ses `r nrow(pima1)` est un peu juste pour cet algorithme.
+
+Une version plus évoluée du réseau de neurones, avec de très nombreuses couches et de neurones a des propriétés nettement plus intéressantes qui en font l'un des outils les plus efficaces actuellement en apprentissage machine. Mais nous entrons ici dans le domaine de l'apprentissage profond...
+
+#### Pour en savoir plus {-}
+
+- [Cette page](https://www.lebigdata.fr/reseau-de-neurones-artificiels-definition) présente les réseaux de neurones avec beaucoup de détails. En particuliers, la vidéo "qu'est-ce qu'un réseau de neurones artificiels\ ?" est très claire, mais un peu longue malheureusement (près de 24min). En français. 
+
 ### Apprentissage profond
 
 L'apprentissage profond (*deep learning* en anglais) est un domaine fascinant et plein d'avenir qui représente une forme moderne de réseaux de neurones exploitant la puissance de calcul des ordinateurs actuels. C'erst un des piliers de l'intelligence artificielle. La vidéo suivante, bien qu'étant une publicité pour un acteur majeur du secteur (NVidia pour ne pas le nommer) est très bien faite pour comprendre les enjeux réels au delà du buzz autour de l'intelligence artificielle et est même surprenante (mais vous devez la visionner pour comprendre pourquoi\ !)
@@ -236,14 +362,14 @@ Encore une autre vidéo qui montre comme un réseau profond a appris à marcher 
 vembedr::embed_youtube("gn4nRCC9TwQ", width = 770, height = 433)
 ```
 
-Malheureusement, l'apprentissage profond nécessite une quantité importante de calculs et tous les ordinateurs ne sont pas capables d'entraîner un mtel modèle. Il faut généralement utiliser des processeurs GPU (dans des cartes graphiques puissantes) pour arriver à des vitesses d'apprentissage raisonnables. nous allons donc nous limiter à une petite démo simpliste juste pour vous illustrer la façon dont cela se passe.
+Malheureusement, l'apprentissage profond nécessite une quantité importante de calculs et tous les ordinateurs ne sont pas capables d'entraîner un tel modèle. Il faut généralement utiliser des processeurs GPU (dans des cartes graphiques puissantes) pour arriver à des vitesses d'apprentissage raisonnables. Nous allons donc nous limiter à un renvoi vers une petite démonstration simpliste juste pour vous illustrer la façon dont cela se passe.
 
+Le jeu de données [MNIST](http://yann.lecun.com/exdb/mnist/) est un jeu de données ultra-classique et historique dans le développement de l'apprentissage profond. Il s'agit de plusieurs dizaines de milliers de chiffres manuscrits qui ont été numérisés. Le but est de créer un classifieur capable de reconnaître l'écriture manuscrite de nombres en reconnaissance donc les chiffres de 0 à 9. La résolution de ce problème dans R est présentée [ici](https://tensorflow.rstudio.com/tutorials/beginners/). C'est un excellent point d'entrée si vous voulez vous lancer dans l'apprentissage profond. Dans le cadre de ce cours nous n'irons cependant pas plus loin. Sachez toutefois que les meilleurs classifieurs en apprentissage profond sont actuellement capable de faire aussi bien, *voire mieux* dans la lecture de nombres en écriture manuscrite qu'un opérateur humain.
 
 ##### Pour en savoir plus {-}
 
 Cette [vidéo](https://www.youtube.com/watch?v=UOvPeC8WOt8&feature=youtu.be) explique dans le détail le principe de fonctionnement d'un réseau profond et l'illustre justement sur l'apprentissage de la classification de chiffres manuscrits.
 
-=======
 ##### A vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
@@ -251,62 +377,44 @@ assignation("C03Ga_cardiovascular", part = "III",
   url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
   course.urls = c(
     'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
-  toc = "Assignation : Les courbes ROC.")
+  toc = "SVM et réseaux de neurones")
 ```
 
->>>>>>> 2c31e6afbd678a4a285665c953514c82750df8f7
-## Classification de plancton par analyse d'image
+## Challenge
 
-Dans cet exemple, nous cherchons à classer du mésozooplancton sur base de mesures effectuées sur chaque individu par analyse d'image. Voici le genre d'image que nous analysons (petite zone d'une image entière)\ :
+Vous avez dû apprendre beaucoup de techniques complémentaires pour arriver à entraîner correctement votre classifieur (différents algorithmes, validation croisée, matrice de confusion, métriques, courbes ROC, ...). Nous vous proposons maintenant de mettre tout cela en application sous la forme d'un challenge. Vous allez travailler par équipes en binomes et vous tenterez de créer le meilleur classifieur pour détecter les vins excellents parmi un ensemble de vins de toutes catégories. Mais attention, l'exercice n'est pas facile. Vous allez devoir ruser pour gagner des places dans le classement, et mettre en œuvre toutes les techniques étudiées dans les modules 1 à 3 pour arriver aux meilleurs résultats\ !
 
-Cette image est automatiquement détourées, les objets sont identifiés et mesurés:
+```{r, echo=FALSE, results='asis'}
+assignation("C03Gb_challenge", part = NULL,
+  url = "https://github.com/BioDataScience-Course/C03Gb_Challenge",
+  course.urls = c(
+    'S-BIOG-025' = "https://classroom.github.com/a/XXXXXX"),
+  toc = "Challenge pour trouver les meilleurs vins")
+```
 
-Les mesures effectuées, au nombre de 27, sont des paramètres de taille, de forme et de distribution des niveaux de gris dans l'image. Un ensemble de 1035 objets sont en outre identifiés en 8 groupes (reject correspond à des objets qui ne sont pas du zooplancton):
+Vous pourrez soumettre vos résultats via le formulaire ci-dessous\ :
 
-Au final, nous travaillons donc avec un tableau de 28 colonnes (27 mesures effectuées sur les images et une colonne correspondant à l'identification manuelle des objets, et 1035 lignes. Ce tableau est étudié par validation croisée dix fois et plusieurs algorithmes de classification supervisée sont testés afin de déterminer celui qui donne les meilleurs résultats.
+```{r, echo=FALSE}
+knitr::include_app('https://sdd.umons.ac.be/C03Sa_ml_challenge/', height = '600px')
+```
 
-Il faut noter que la plupart de ces algorithmes ont des paramètres qui doivent être ajustés, afin d'optimiser la reconnaissance. Ceci se fait également par validation croisée. Différentes valeurs de ces paramètres sont testés, et ensuite, la valeur qui donne le plus haut taux de reconnaissance globale est conservé.
+Le classement apparaît ici\ :
 
-Étant donné le temps de calcul extrêmement long de certaines méthodes, nous ne présentons ici que quelques résultats obtenus, et sans effectuer de démonstration en "live" avec le logiciel.
+```{r, echo=FALSE}
+knitr::include_app('https://sdd.umons.ac.be/C03Sb_ml_result', height = '600px')
+```
 
-### Optimisation de l'arbre de partitionnement
+##### Pour en savoir plus {-}
 
-Pour la méthode de l'arbre de partitionnement, nous avons vu que l'arbre brut n'est pas optimisé. Il faut ensuite l'élaguer pour le simplifier, tout en conservant un taux de connaissance acceptable. Voici les résultats:
+- Un [résumé de la classification supervisée](https://vas3k.com/blog/machine_learning/) sur un ton un peu humoristique (en anglais).
 
-- Détermination de la taille d'arbre optimal:
+- Un [ouvrage complet consacré au "machine learning" dans R](https://bradleyboehmke.github.io/HOML/), en anglais. Cet ouvrage est excellent pour progresser en classification supervisée avec R.
 
-- Illustration de l'élagage de l'arbre de décision:
+- [Tidymodels](https://www.tidymodels.org/), un écosystème complet de packages R pour modéliser des données, dont la classification supervisée.
 
-### Optimisation des k plus proches voisins
+- [mlr3](https://mlr3.mlr-org.com/), un autre écosystème logiciel pour le "machine learning avec R"
 
-Nous avons testé deux types de distances: euclidiennes et euclidiennes après standardisation des variables, ainsi qu'un nombre variable de plus proches voisins (1, 3, 5 ou 7). Voici le résultat:
-
- Classification success (%)
-Distance k = 1 k = 3 k = 5 k = 7
-Euclidean 64.6 63.5
-Scaled Euclidean 75.7 74.5 74.2 72.2
-
-Comme one le voit, la standardisation des variables améliore le résultat, et il n'est pas utile de considérer un grand nombre de voisins. Une étude plus détaillée, par bootstrap, montre en fait que *k = 3* est légèrement meilleur que *k = 1*, contrairement à ce que la première étude semble montrer:
-
-### Optimisation de "learning vector quantization"
-
-Ici, nous pouvons choisir la taille du "codebook", c'est à dire, le nombre de centroïdes que nous désirons conserver pour représenter au mieux chaque classe. Voici les résultats de l'étude de ce paramètres (les questions de performance en terme de vitesse d'exécution sont étudiées en parallèle):
-
-Ici, nous déciderons de conserver 200 pour la taille du codebook, comme meilleurs compromis entre le taux de reconnaissance et la vitesse d'exécution.
-
-### Optimisation de "random forest"
-
-Dans la méthode "random forest", nous avons plusieurs paramètres à disposition. Le plus important est certainement le nombre d'arbres que nous créons. Ensuite, les paramètres influençant les aspects aléatoires dans chaque arbre sont également importants. Il s'agit principalement d u paramètre m~try~, le nombre de variables (choisies aléatoirement) à tester à chaque nœud des arbres. Voici l'optimisation successive de ces deux paramètres (nous conservons ici 200 arbres avec 5 variables testées à chaque nœud):
-
-### Comparaison des méthodes optimisées
-
-Une fois chaque méthode optimisée, nous effectuons le test par validation croisée sur chacun d'eux, et nous comparons les résultats globaux, aussi bien en terme de précision (taux de reconnaissance global) qu'en terme de vitesse d'exécution. Voici les résultats\ :
-
-lda = analyse discriminante linéaire, qda = analyse quadratique linéaire, mda = analyse discriminante mixte, fda = analyse discriminante flexible, knn = k plus proches voisins, lvq = "learning vector quantization", tree = méthode par arbre simple, rpart = méthode par arbre simple, mais retravaillé, bagg / db.l / db.k sont des méthodes dites de "(double) bagging" où l'algorithme de reconnaissance est entraîné plusieurs fois sur des échantillons au hasard et où la classe est déterminée par vote à la majorité, rfor = "random forest", svm = "support vector machine", nnet = réseau de neurones et dvf = "discriminant vector forest", une méthode composite spécialement mise au point pour ce type de données (voir Grosjean et al, 2004). Il y a donc ici bien plus de méthodes testées que celles que nous voyons au cours.
-
-En règle générale, nous constatons que les méthodes plus complexes ou composites, telles que random forest, double bagging ou DVF sont plus performantes que les méthodes simples (tree, knn, lda, par exemple). A noter également, la contre performance de "support vector machine", qui est habituellement une des méthodes les plus performantes. Ceci illustre donc bien qu'il ne faut pas se cantonner à une seule technique. Selon les spécificités d'un jeu de données, des méthodes différentes peuvent s'avérer plus efficaces et utiles dans un contexte particulier.
-
-Ce type d'étude (optimisation de différentes méthodes, et puis comparaison par validation croisée) est typiquement celle à mener pour obtenir le meilleur algorithme de reconnaissance automatique.
+- [Tutoriels pour l'apprentissage profond avec R](https://tensorflow.rstudio.com/tutorials/) en utilisant tensorflow, une librairie de fonctions dédiée au "deep learning".
 
 ## Récapitulatif des exercices
 
