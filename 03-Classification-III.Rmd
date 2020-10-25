@@ -388,7 +388,7 @@ Vous avez dû apprendre beaucoup de techniques complémentaires pour arriver à 
 assignation("C03Gb_challenge", part = NULL,
   url = "https://github.com/BioDataScience-Course/C03Gb_Challenge",
   course.urls = c(
-    'S-BIOG-025' = "https://classroom.github.com/a/XXXXXX"),
+    'S-BIOG-025' = "https://classroom.github.com/g/zFsIcGjF"),
   toc = "Challenge pour trouver les meilleurs vins")
 ```
 
