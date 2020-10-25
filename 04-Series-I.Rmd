@@ -20,7 +20,7 @@ Ce module nécessite d'être à l'aise avec R, RStudio et R Markdown. Les six pr
 
 ## Observations dépendantes du temps
 
-Démarrons tout de suite notre étude des séries chronologiques par une série d'exemples concrets qui vont nous emmener dans les plaines enneigées du grand Nord Canadien, au sommet d'un volcan à Hawaï, ou encore, dans le cerveau d'un patient épileptique.
+Démarrons tout de suite notre étude des séries chronologiques par plusieurs exemples concrets qui vont nous emmener dans les plaines enneigées du grand Nord Canadien, au sommet d'un volcan à Hawaï, ou encore, dans le cerveau d'un patient épileptique.
 
 ### Lynx
 
@@ -85,7 +85,102 @@ Au cours de notre exploration des séries temporelles, nous aborderons les fonct
 
 ### Séries régulières
 
-...
+Une série régulière est un ensemble de données mesurées sur la même entité (même individu, même unité statistique) avec un **espacement constant dans le temps**. La série n'a pas de valeurs manquantes. Ce type de série a des avantages énormes car nous pouvons décaler la série d'un ou plusieurs pas de temps, et les observations après décalage correspondent aux **mêmes dates** que les observations originales, à part aux extrémités, bien entendu.
+
+![Le décalage d'une série régulière d'un pas de temps résulte en des observations aux mêmes dates, mais décalées d'une unité\ : *x*~1~ est maintenant à la même date que *x*~2~ avant le décalage, *x*~2~ à la même date que *x*~3~ avant, et ainsi de suite...](images/04-series1/lag1.png)
+
+Après avoir effectué un décalage (*lag* en anglais) de un pas de temps, et moyennant l'élimination de la première observation *x*~1~ de la série d'origine et la dernière observation *x*~n~ de la série décalée, nous obtenons un tableau de 2 lignes et *n* - 1 colonnes. Nous noterons l'opérateur de décalage ou **opérateur retard** *L*, un opérateur qui effectue exactement ce traitement, c'est-à-dire qu'il associe à tout élément de la série régulière, l'observation précédente.
+
+$$L X_t = X_{t-1}$$
+
+Naturellement, nous pouvons décaler de plus de un pas de temps. Par exemple, si nous décalons de deux pas de temps, l'opérateur correspondant s'appelle alors *L*^2^, et le calcul correspond au schéma suivant\ :
+
+$$L^2 X_t = X_{t-2}$$
+
+![Décalage de deux pas de temps (*L*^2^)\ : *x*~1~ est maintenant à la même date que *x*~3~ avant le décalage, *x*~2~ à la même date que *x*~4~, etc.](images/04-series1/lag2.png)
+
+Si nous voulons rassembler la série de départ *X* et la série décalée *L*^2^ *X*, nous sommes maintenant obligés de laisser tomber les *deux* premières observations de *X* et les deux dernières de *L*^2^ *X*. De manière générale, nous définissons *L*^k^, avec *k* pouvant prendre des valeurs entières positives **ou négatives** (la série est décalée dans l'autre sens). *L*^0^ est un cas particulier où la série est simplement recopiée aux mêmes dates.
+
+$$L^k X_t = X_{t-k}$$
+
+R propose un type d'objet particulier pour représenter des séries régulières univariées (une seule variable mesurée à chaque fois)\ : les objets **ts**. Nos trois séries d'exemples de la section précédent sont des objets de ce type. Prenons `lynx` et examinons comment cet objet est représenté.
+
+```{r}
+data("lynx", package = "datasets")
+lynx
+```
+
+Visiblement, à l'impression de `lynx`, on voit que c'est un objet particulier "Time Series".
+
+```{r}
+class(lynx) # Objet ts
+```
+
+Pour inspecter (aux rayons X) un objet dans R, on peu le "déclasser" avec `unclass()`, ce qui a pour effet d'imprimer son contenu.
+
+```{r}
+unclass(lynx)
+```
+
+Ici, nous voyons qu'il s'agit d'un vecteur de données numériques auquel est ajouté un **attribut** (`attr`) nommé **tsp** pour **t**ime **s**eries **p**arameters et qui contient trois valeurs\ : 1821, 1934 et 1. Où sont les données de temps\ ? Et que veulent dire ces valeurs de **tsp**\ ? En fait, pour économiser de la place en mémoire, R n'enregistre pas toutes les dates, mais seulement la première, la dernière et le pas de temps de la série dans **tsp**. a l'aide de ces trois valeurs il est en fait possible de reconstituer toutes les dates. La fonction `time()` s'en charge\ :
+
+```{r}
+time(lynx)
+```
+
+Nous obtenons un autre objet **ts** qui contient cette fois-ci les dates de chaque observation. Le troisième nombre de **tsp** est la fréquence des observations (ici, 1) par rapport à l'unité de temps choisie (ici l'année). A partir de ces trois nombres, nous pouvons donc reconstituer la séquence des années depuis 1821 jusqu'à 1934 auxquelles les observations ont été réalisées.
+
+Comment connaître l'unité de temps utilisée dans la série\ ? En fait, cette unité n'est **pas** stockée dans l'objet **ts**. Vous la choisissez librement, vous définissez la date de départ, la date de fin exprimés dans cette unité choisie, ainsi que la fréquence des observations, et votre attribut **tsp** est complètement défini. La fonction `ts()` permet de générer une série temporelle, ou de transformer un vecteur d'observations en une série temporelle. Par exemple, si nous générons des données artificielles à partir d'une distribution Normale avec `rnorm()`, et que nous considérons ces données comme une série chronologique mesurée mensuellement entre janvier 2010 et décembre 2014, nous ferions ceci\ :
+
+```{r}
+fake_ser <- ts(rnorm(5 * 12), start = 2010, frequency = 12)
+fake_ser
+```
+
+Notez comme R formate notre sortie (il assume qu'une série à fréquence de 12 correspond à des données mensuelles). Nous ne devons indiquer que deux des trois paramètres de **tsp**, car le nombre d'observations dans le vecteur forunit l'information manquante à `ts()`. Quelles sont les dates de ces observations\ ?
+
+```{r}
+time(fake_ser)
+```
+
+R mesure ici le temps sous forme décimale. C'est pratique, mais nous n'y sommes pas habitués. Ainsi, il divise l'année en 12 douzièmes, peu importe que certains mois contiennent 31, 30 ou même 28/29 jours. Ainsi, le 1^er^ janvier 2010 est 2010.000. Le 1^er^ février 2010 est 2010 + 1/12 = 2010.083. Et le 1^er^ décembre 2014 est 2014 + 11/12 = 2014.917. La petite erreur de décalage du début de chaque mois est minime et sans impacts pratiques pour nos séries chronologiques biologiques car le vivant se soucie peu de notre calendrier grégorien. Par contre, pour des données comme le cours de la bourse, par exemple, ce genre d'approximation n'est pas utilisable et il faut alors employer des objets qui manipulent les dates de manière plus précise (mais aussi plus fastidieuse), que ceux du package {xts} (voir plus loin, les séries irrégulières).
+
+Dans notre série `fake_ser` de fréquence 12, le pas de temps est donc de un mois, soit 1/12 d'année. **Notez que le pas de temps est en fait l'_inverse_ de la fréquence des observations**. Si vous êtes plus à l'aise avec ce pas de temps, vous pouvez le substituer à la fréquence dans la fonction `ts()`via l'argument `deltat=`. Ainsi, indiquer `ts(...., frequency = 12)` ou `ts(...., deltat = 1/12)` est strictement équivalent.
+
+Plus tard, nous rencontrerons également les objets **mts** pour *multivariate time series*. Ces objets contiennent plusieurs variables mesurées sur le même individu au cours du temps. Le vecteur est alors remplacé par une matrice à *n* lignes (le nombre d'observations dans le temps) et *m* colonnes (le nombre de variables mesurées à chaque fois). L'attribut **tsp** est le même que pour **ts**.
+
+### Séries à trous
+
+Une série à trous est une série régulière, mais avec des valeurs manquantes. Comme R représente des valeurs manquantes dans un vecteur par `NA`, il est possible de créer et manipuler des séries à trous à l'aide des objets **ts** et **mts**. Par contre, certaines méthodes statistiques ne gèrerons pas ces valeurs manquantes et refuseront de renvoyer un résultat.
+
+En profitant des propriétés de dépendance partielle de la série, il est possible d'estimer des valeurs raisonnables pour remplacer les données manquantes, si elles sont peu nombreuses. Par exemple, il est possible de faire une interpolation linéaire entre les deux observations qui encadrent la valeur manquante. Cette technique, et d'autres, seront abordées dans le module suivant dans la section relative à la **régularisation**. Retenez juste, à ce stade, que notre objectif sera de régulariser autant que possible une série à trous avant de l'analyser.
+
+### Séries irrégulières
+
+Dès que le pas de temps entre les observations n'est pas constant, nous parlons de série irrégulière. Les séries irrégulières ne peuvent pas être représentées par des objets **ts** ou **mts** de R qui imposent un pas de temps régulier. Par contre, les packages {zoo} et {xts} permettent de manipuler ce genre de données.
+
+**TODO: introduction rapide à {xts} et conversion entre objets.**
+
+De manière générale, nous avons toujours intérêt à réaliser une séries régulière, ou la plus régulière possible. Ensuite, il faut penser aux techniques de régularisation si c'est faisable pour obtenir une série régulière qui approxime suffisamment bien les données de départ. En effet, la plupart des techniques d'analyse des séries temporelles se basent sur des séries régulières.
+
+##### A retenir {-}
+
+- Nous devons nous arranger pour obtenir autant que possible des **séries régulières**. Sinon, les séries à trous, voire légèrement irrégulières, pourront être **régularisées** avant analyses (voir module suivant).
+
+- R représente des séries régulières à l'aides d'objets **ts** (univariées) ou **mts** (multivariées).
+
+- Dans ces objets, le temps est encodé grâce à l'attribut **tsp** qui contient trois valeurs\ : la date de départ, celle de fin et la fréquence des observations.
+
+- L'unité de temps n'est pas définie par R\ : vous la choisissez librement. Si la fréquence est 12, R considérera toutefois à l'impression du contenu de l'objet que c'est des mesures mensuelles et que l'unité est l'année. De même si la fréquence est de 4, il considérera des mesures trimestrielles sur une année. Sinon, le temps est manipulé et imprimé par R de manière décimale.
+
+- Nous pouvons créer un objet **ts** ou **mts** à l'aide de la fonction `ts()`. Nous devons donner le vecteur ou la matrice des observations, ainsi que deux des trois paramètres de **tsp**. Nous pouvons substituer le **pas de temps** à la **fréquence** des observations via l'argument `deltat=`. En fait, `deltat == 1/frequence`, le pas de temps est l'inverse de la fréquence.
+
+- Les séries régulières doivent être représentées par des objets **xts** et le package {xts} propose une large palette de fonction pour manipuler de tels objets.
+
+
+##### Pour en savoir plus {-}
+
+- ...
 
 ## Description de séries
 
