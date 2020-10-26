@@ -565,3 +565,20 @@ $k
 ```
 
 Les tendances moyennes entre ces points sont renvoyées dans `$trends`. La valeur moyenne sur l'ensemble de la série (par défaut, ou la valeur de référence rentrée dans `local.trend(series, k = …)`) est reprise dans `$k`. Remarquons que les points 25 et 57 ont pratiquement même ordonnée (on pourrait les relier avec un segment de droite horizontal), et donc, la moyenne locale entre ces deux points est proche de la valeur de référence `$k`. Par contre, entre les points 1 et 25, la courbe cusum est décroissante, ce qui exprime une valeur moyenne inférieure à la valeur de référence (40.0 < 71.3). A l'opposé, la courbe cusum est croissante entre les points 57 et 75, ce qui indique une valeur moyenne entre ces points supérieure à la valeur de référence (166.3 > 71.3).
+
+##### A vous de jouer ! {-}
+
+```{r, echo=FALSE, results='asis'}
+assignation("C04Ga_ts", part = "I",
+  url = "https://github.com/BioDataScience-Course/C04Ga_ts",
+  course.urls = c(
+    'S-BIOG-025' = "https://classroom.github.com/a/BEIb7Y8B"),
+  toc = "Analyse de séries spatio-teporelles")
+```
+
+
+## Récapitulatif des exercices
+
+Dans ce module 4, vous aviez à réaliser les exercices suivants\ :
+
+`r show_ex_toc()`
