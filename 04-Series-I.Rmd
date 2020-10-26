@@ -67,6 +67,8 @@ plot(eeg)
 
 Ici, la série chronologique est comptabilisée sur l'axe du temps simplement avec le numéro de la mesure commençant par 2001, mais en réalité, 256 mesures sont réalisées par seconde ici. Dans cette série, les fluctuations sont importantes, mais apparaissent difficiles à interpréter sur le graphique brut.
 
+`r h5p(26, height = 270, toc = "Répondez à la question")`
+
 ```{block2, type = 'note'}
 Au travers de ces trois exemples concrets, nous constatons que les séries chronologiques sont utilisées dans de nombreux domaines en biologie. Le dernier exemple en particulier nous laisse un peu démuni. Nous réalisons à ce stade que nous avons besoin d'une toute nouvelle panoplie d'outil pour analyser ce type de données car étant des mesures successives dans le temps d'un *même* individu, nous n'avons **pas d'indépendance des observations les unes par rapport aux autres**, qui est pourtant une hypothèse de départ de pratiquement toutes les techniques statistiques que nous avons étudiées jusqu'ici.
 ```
@@ -156,6 +158,8 @@ R mesure ici le temps sous forme décimale. C'est pratique, mais nous n'y sommes
 Dans notre série `fake_ser` de fréquence 12, le pas de temps est donc de un mois, soit 1/12 d'année. **Notez que le pas de temps est en fait l'_inverse_ de la fréquence des observations**. Si vous êtes plus à l'aise avec ce pas de temps, vous pouvez le substituer à la fréquence dans la fonction `ts()`via l'argument `deltat=`. Ainsi, indiquer `ts(...., frequency = 12)` ou `ts(...., deltat = 1/12)` est strictement équivalent.
 
 Plus tard, nous rencontrerons également les objets **mts** pour *multivariate time series*. Ces objets contiennent plusieurs variables mesurées sur le même individu au cours du temps. Le vecteur est alors remplacé par une matrice à *n* lignes (le nombre d'observations dans le temps) et *m* colonnes (le nombre de variables mesurées à chaque fois). L'attribut **tsp** est le même que pour **ts**.
+
+`r h5p(27, height = 270, toc = "Sélectionnez la bonne réponse")`
 
 ### Séries à trous
 
