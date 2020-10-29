@@ -67,11 +67,15 @@ plot(eeg)
 
 Ici, la série chronologique est comptabilisée sur l'axe du temps simplement avec le numéro de la mesure commençant par 2001, mais en réalité, 256 mesures sont réalisées par seconde ici. Dans cette série, les fluctuations sont importantes, mais apparaissent difficiles à interpréter sur le graphique brut.
 
-`r h5p(26, height = 270, toc = "Répondez à la question")`
 
 ```{block2, type = 'note'}
 Au travers de ces trois exemples concrets, nous constatons que les séries chronologiques sont utilisées dans de nombreux domaines en biologie. Le dernier exemple en particulier nous laisse un peu démuni. Nous réalisons à ce stade que nous avons besoin d'une toute nouvelle panoplie d'outil pour analyser ce type de données car étant des mesures successives dans le temps d'un *même* individu, nous n'avons **pas d'indépendance des observations les unes par rapport aux autres**, qui est pourtant une hypothèse de départ de pratiquement toutes les techniques statistiques que nous avons étudiées jusqu'ici.
 ```
+
+##### A vous de jouer ! {-}
+
+`r h5p(26, height = 270, toc = "Représentation des séries chronologiques")`
+
 
 ## Qu'est-ce qu'une série chronologique ?
 
@@ -159,7 +163,9 @@ Dans notre série `fake_ser` de fréquence 12, le pas de temps est donc de un mo
 
 Plus tard, nous rencontrerons également les objets **mts** pour *multivariate time series*. Ces objets contiennent plusieurs variables mesurées sur le même individu au cours du temps. Le vecteur est alors remplacé par une matrice à *n* lignes (le nombre d'observations dans le temps) et *m* colonnes (le nombre de variables mesurées à chaque fois). L'attribut **tsp** est le même que pour **ts**.
 
-`r h5p(27, height = 270, toc = "Sélectionnez la bonne réponse")`
+##### A vous de jouer ! {-}
+
+`r h5p(27, height = 270, toc = "Création d'un objet ts")`
 
 ### Séries à trous
 
@@ -174,6 +180,10 @@ Dès que le pas de temps entre les observations n'est pas constant, nous parlons
 **TODO: introduction rapide à {xts} et conversion entre objets.**
 
 De manière générale, nous avons toujours intérêt à réaliser une séries régulière, ou la plus régulière possible. Ensuite, il faut penser aux techniques de régularisation si c'est faisable pour obtenir une série régulière qui approxime suffisamment bien les données de départ. En effet, la plupart des techniques d'analyse des séries temporelles se basent sur des séries régulières.
+
+##### A vous de jouer ! {-}
+
+`r h5p(28, height = 270, toc = "Type de série chronologiques")`
 
 ##### A retenir {-}
 
@@ -260,6 +270,11 @@ statsl2$x
 statsl2$xcut
 ```
 
+
+##### A vous de jouer ! {-}
+
+`r learnr("C04La_stat_slide", title = "Les Statistiques glissantes", toc = "Tutoriel : Statistiques glissantes")`
+
 ### Manipulations de ts
 
 Les jeux de données bricolés artificiellement sont parfois bien utiles pour explorer de nouvelles techniques. En effet, puisque nous les construisons nous-même nous savons dès le départ de quoi ils sont faits. Et donc, nous pouvons vérifier que le résultat obtenu est bien conforme. Par exemple, nous pouvons construre une série de données mensuelles commençant en avril 1998 (`start = c(1998, 4)`), contenant 100 valeurs et comportant une composante sinusoïdale d’une période annuelle ainsi qu’une composante aléatoire ayant une distribution normale de moyenne nulle et d’écart type 0.5\ :
@@ -270,12 +285,17 @@ tser <- ts(sin((1:100) / 6 * pi) + rnorm(100, sd = 0.5), start = c(1998, 4),
 tser
 ```
 
+##### A vous de jouer ! {-}
+
+`r learnr("C04Lb_ts_create", title = "Création d'objet ts", toc = "Tutoriel : Objet ts")`
+
 Créons maintenant une série multiple en prenant notre série de départ, ainsi qu'une version décalée de cinq mois à l'aide de la fonction `stats::lag()` et représentons cela graphiquement\ :
 
 ```{r}
 mtser <- ts.intersect(tser, stats::lag(tser, 5))
 plot(mtser)
 ```
+
 
 #### Manipulation du temps
 
@@ -311,6 +331,10 @@ window(tser, start = c(1999, 1), end = c(2001, 12))
 ```
 
 La fonction `stats::lag()` permet de décaler la série en arrière dans le temps (ou en avant si on fournit une valeur de décalage négative)\ ; nous l'avons déjà utilisée plus haut. La fonction `diff()` calcule la différence entre une série et elle-même décalée dans le temps de *k* observations. Les fonction `ts.intersect()` et `ts.union()` permettent de réunir deux ou plusieurs séries au sein d’une même matrice multivariée, avec une échelle de temps commune. Les fréquences respectives des séries à assembler doivent être identiques. Là où `ts.intersect()` retient uniquement l’intervalle de temps commun à toutes les séries, `ts.union()` conservera l’ensemble de l’intervalle temporel, toutes séries confondues.
+
+##### A vous de jouer ! {-}
+
+`r learnr("C04Lc_ts_manip", title = "Manipulation des séries chronologiques", toc = "Tutoriel : Manipulation des objets ts")`
 
 ## Analyse de séries spatio-temporelles
 

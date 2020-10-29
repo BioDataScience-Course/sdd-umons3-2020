@@ -87,6 +87,7 @@ summary(penguins_conf_loo)
 
 Le résultat est le même. Donc, nous venons de montrer que, dans le cas de ce jeu de données et de l'ADL, une validation croisée dix fois permet d'estimer les performances du classifieur aussi bien que l'approche bien plus coûteuse en calculs (342 classifieurs sont calculés et testés) du "leave-one-out".
 
+##### A vous de jouer ! {-}
 
 `r learnr("C02La_cv", title = "Validation croisée", toc = "Tutoriel : validation croisée")`
 
