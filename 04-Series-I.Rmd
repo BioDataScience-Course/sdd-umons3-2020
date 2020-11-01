@@ -287,7 +287,7 @@ Les descripteurs statistiques tels que la moyenne, la médiane, l'écart type, e
 
 ##### Exemple {-}
 
-On peut calculer des statistiques glissantes pour la série `ClausocalanusA` de `marbio` par groupe de 10 stations, les imprimer et faire un graphique de la "moyenne glissante" à l’aide des instructions suivantes\ :
+Nous reprenons ici l'exemple du manuel de {pastecs}. On peut calculer des statistiques glissantes pour la série `ClausocalanusA` de `marbio` par groupe de 10 stations, les imprimer et faire un graphique de la "moyenne glissante" à l’aide des instructions suivantes\ :
 
 ```{r}
 library(pastecs)
@@ -408,7 +408,7 @@ Manipulez et décrivez les différentes séries d'exemples. Notez par exemple qu
 
 ## Analyse de séries
 
-Les différentes techniques présentées dans cette section permettent de caractériser des séries spatio-temporelles, que ce soit en analysant l’autocorrélation ou la cross-corrélation, la quantité d’information (points de retournement, tournogramme), en effectuant une analyse spectrale, ou en déterminant l’existence d’une tendance générale ou locale. Le module suivant traitera plus particulièrement de la décomposition de séries en plusieurs composantes (tendance, cycle saisonnier, résidus par exemple). Bien que la décomposition et l’analyse soient des phases du traitement des séries spatio-temporelles qui ne se font pas l’une sans l’autre, nous les traitons dans des chapitres différents parce qu’elles renvoient des résultats différents. Alors que les techniques d’analyse ne modifient pas la série de départ et renvoient seulement les résultats statistiques de l’analyse, les décompositions renvoient des objets plus complexes qui contiennent aussi les composantes issues du traitement, composantes qui peuvent être transformées à nouveau en objets **ts** ou **mts**  pour être traitées ou analysées en cascade éventuellement.
+Les différentes techniques présentées dans cette section permettent de caractériser des séries spatio-temporelles, que ce soit en analysant l’autocorrélation ou la cross-corrélation, en effectuant une analyse spectrale, ou en déterminant l’existence d’une tendance générale ou locale. Le module suivant traitera plus particulièrement de la décomposition de séries en plusieurs composantes (tendance, cycle saisonnier, résidus par exemple). Bien que la décomposition et l’analyse soient des phases du traitement des séries spatio-temporelles qui ne se font pas l’une sans l’autre, nous les traitons dans des chapitres différents parce qu’elles renvoient des résultats différents. Alors que les techniques d’analyse ne modifient pas la série de départ et renvoient seulement les résultats statistiques de l’analyse, les décompositions renvoient des objets plus complexes qui contiennent aussi les composantes issues du traitement, composantes qui peuvent être transformées à nouveau en objets **ts** ou **mts**  pour être traitées ou analysées en cascade éventuellement.
 
 ### Autocorrélation, autocovariance, cross-corrélation et cross-covariance
 
@@ -422,110 +422,111 @@ acf(tser)
 
 Pour un décalage nul, la première barre verticale monte jusqu'à un toujours. Les barrés suivantes montrent jusqu'où l'**effet mémoire** de la série se marque. Les traits bleus horizontaux représentent une enveloppe de confiance à 95%. Donc, les barres qui dépassent (largement) de l'intervalle entre ces deux traits bleus sont significatives. Nous voyons ici que l'effet mémoire se marque sur les deux mois qui suivent (2 barres au dessus du trait bleu). Ensuite, le graphique est caractéristique d'une série périodique. En effet, l'autocorrélation passe par un minimum lorsque la série est décalée d'une demi-période. Ici, le cycle a une période d'un an. Nous voyons que nous passons par une autocorrélation négative et minimale après un décalage de 6, puis de 18 mois. L'axe des abscisses *Lag* est exprimé dans l'unité de la série qui est l'année ici. Cela correspond donc à respectivement 0.5 et 1.5 unités. Par contre, l'autocorrélation redevient positive et maximale pour un décalage d'une période exactement ou d'un multiple de cette période. ainsi, nous avons un mode pour un décalage de 1 année. Nous étudierons juste en dessous une technique plus puissante pour détecter les cycles dans une séries (analyse spectrale), mais lorsqu'ils sont flagrants comme ici, ils sont également clairement visisbles sur le graphique de l'autocorrélation.
 
-De même, on peut tracer l’autocovariance (la covariance est calculée entre la série de départ et la série décalée à la place de la corrélation) en précisant l’argument `type = "covariance"` à l’appel de `acf()`. On a aussi la possibilité de calculer une autocorrélation partielle avec `type = "partial"`. En outre, R fournit aussi `ccf()`, fonction qui calcule la cross-corrélation ou la cross-covariance entre deux séries\ :
+Pour un bruit blanc (une série constituée d'observations indépendantes les unes des autres), l'autocorrélation doit être nulle. Générons artificiellement une telle série afin de visualiser le graphique de l'autocorrélation correspondant\ :
+
+```{r}
+set.seed(1358) # Initie le générateur de nombre pseudo-aléatoires
+white_noise <- ts(rnorm(100))
+plot(white_noise)
+acf(white_noise)
+```
+
+Effectivement, pratiquement toutes les barres sont comprises à l'intérieur de l'enveloppe de confiance à 95%. Il est normal que 5% des barres sortent de cette enveloppe. A part la première pour un décalage nul qui ne doit pas être comptabilisée, nous avons une barre qui sort très légèrement sur 20, soit 5% (il pourrait aussi y en avoir deux ou trois, ou bien zéro au contraire par le biais du hasard, sans que cela ne change nos conclusions). Ce type de graphique doit nous diriger immédiatement vers la conclusion que l'autocorrélaition est nulle ou négligeable dans la série.
+
+Bien que nettement moins utilisé en pratique, on peut également tracer le graphique de l’autocovariance (la covariance est calculée entre la série de départ et la série décalée à la place de la corrélation) en précisant l’argument `type = "covariance"` à l’appel de `acf()`. On a aussi la possibilité de calculer une autocorrélation partielle avec `type = "partial"`. En outre, R fournit également `ccf()`, fonction qui calcule la **cross-corrélation** (ou corrélation croisée) ou la cross-covariance entre deux séries. Ceci peut s'avérer utile pour déterminer s'il y a une dépendance entre les deux séries, et éventuellement estimer également un décalage éventuel dans le temps pour cette dépendance. A titre d'illustration, prenons notre série artificielle `tser` et décalons-là de cinq mois. Traçons ensuite le graphique de cross-corrélation entre ces deux séries\ :
 
 ```{r}
 mtser <- ts.intersect(tser, stats::lag(tser, 5))
 ccf(mtser[, 1], mtser[, 2])
 ```
 
-On retrouve bien une cross-corrélation maximale pour un décalage de 5 entre la série de départ (`mtser[, 1]`) et la série décalée de 5 observations vers la gauche (`mtser[, 2]`).
+On retrouve bien une cross-corrélation maximale pour un décalage de cinq entre la série de départ (`mtser[, 1]`) et la série décalée (`mtser[, 2]`)\ : à partir du zéro, c'est la cinquième barre vers la droite qui est la plus élévée. Nous retrouvons également l'alternance entre corrélation positive et négative caractéristique de signaux cycliques sur ce graphique.
 
 ##### Exercez-vous {-}
 
 Si vous voulez affiner votre compréhension du graphique de l'autocorrélation, générez et examinez ces graphiques pour nos différentes séries d'exemple. Les séries `lynx` et `co2` doivent certainement présenter une variation périodique claire, mais pour `co2`, une tendance générale forte se superpose. Les autres séries sont moins claires sur le graphique obtenu avec `plot()`... que pouvez-vous observer sur le graphique de l'autocorrélation\ ?
 
+
 ### Analyse spectrale
 
-L’analyse harmonique ou analyse en série de Fourier consiste à évaluer les composantes sinusoïdales d’un signal dont les fréquences sont des multiples de la fréquence fondamentale, si on appelle fréquence fondamentale la plus grande fréquence pouvant exister dans une chronique (ou série). Comment varient la période et la fréquence dans un développement en série de Fourier?
+Afin d'identifier de manière plus fines les composantes cycliques d'une séries chronologique que via le graphique de l'autocorrélation, nous pouvons considérer que cette série est la combinaison d'un ensemble de signaux (co)sinusoïdaux de fréquence croissante. Pour rappel, la **période** d'un signal cyclique est le temps nécessaire pour accomplir exactement un cycle. Par contre, la **fréquence**, notée oméga ($\omega$) est l'inverse de de cette période ($\omega = 1/période$) et cela correspond au nombre de cycles qui rentrent dans une unité de mesure du temps. Un signal périodique élémentaire peut s'écrire alors à l'aide d'une fonction cosinus à trois paramètres\ : outre la fréquence $\omega$, il y a l'**amplitude** du signal notée $A$ et la **phase** phi ($\phi$) qui définit où le cycle commence sur l'axe du temps. Cette phase est un peu l'équivalent de l'ordonnée à l'origine pour une droite, soit un décalage du signal sur l'axe.
 
-Étant donné la longueur totale de la série, soit *n*, par quel entier *t* faut-il multiplier la fréquence angulaire pour obtenir la plus grande fréquence? On a les égalités:
+$$x_t = A \cdot \cos(2 \pi \omega t + \phi)$$
 
-La valeur de l’entier *t* tel que la fréquence soit la plus petite se déduit de la même façon:
-
-Le maximum en fréquence (associé au minimum en période), est égal à . La représentation en série de Fourier s’écrira:
-
-où est la moyenne du processus *x*~t~, *C*~i~ est l’**amplitude** de l’harmonique *i*, correspond à la **vitesse angulaire**, $/phi_i$ est la **phase à l’origine**, *n* est le nombre d’observations. Cette équation peut aussi s’écrire:
-
-Et si la série est préalablement centrée:
-
-Si on prend *i* = 0, le premier élément sera constant et égal à . En reprenant la dernière équation et en résolvant par les moindres carrés (cf. régression sinusoïdale), on a les formules:
-
-On a d’autre part: et
-
-Les estimations de *A*~i~ et *B~i~ sont indépendantes d’une harmonique à l’autre, et on peut estimer la variance de chacune par:
-
-Leurs pourcentages de variance respectifs par rapport à la variance totale du processus est:
-
-Ces valeurs permettent de reconnaître et de sélectionner les *m* harmoniques les plus remarquables. Par soustraction vis-à-vis de la série originale, on obtiendra une série résiduelle où les oscillations dominantes sont absentes:
-
-La grandeur *C*~i~^2^ = *A*~i~^2^ + *B*~i~^2^ définit une fonction discrète dite **périodogramme**. Par construction, on sait que:
-
-Le périodogramme définit pour chaque valeur de *i*, la contribution qu’apporte la composante sinusoïdale ayant la période *n* / *i* à la somme des carrés des *x*~t~. On peut tester la signification de chaque harmonique en fonction du pourcentage de variance expliquée (Anderson, 1971). Avec *n* observations, *q* la plus grande période harmonique calculée (normalement *q* = *n* / 2), et à un seuil de probabilité $\alpha$ (5% ou 1%), on a le pourcentage:
-
-Si le pourcentage de variance associé à une harmonique est supérieur à cette valeur, sa période est significativement différente de zéro au seuil $\alpha$.
-
-```{block2, type = 'note'}
-L’estimation fournie par le périodogramme donne un diagramme très irrégulier. Pour y remédier, on divise l’intervalle des fréquences en bandes centrées autour de p fréquences équidistantes. Ensuite, on calcule une moyenne mobile pondérée associée à chaque bande de fréquence. Les poids les plus élevés correspondent aux fréquences voisines de celles autour de laquelle est centrée la bande (fenêtre spectrale). Le lissage du périodogramme correspond à une estimation du pouvoir spectral du processus. Cependant, en pratique, on calculera le pouvoir spectral directement à partir de la fonction d’autocovariance présentée plus haut.
+```{r, fig.cap="Fonction cosinus avec une fréquence de 3. En gris, amplitude = 1, phase = 0. En noir, amplitude = 2, phase = 0. En rouge, amplitude = 2, phase = 1.6."}
+A <- 2
+omega <- 3
+phi <- 1.6
+t <- seq(from = -0.5, to = 1, by = 0.01)
+x1 <- cos(2 * pi * omega * t)
+x2 <- A * cos(2 * pi * omega * t)
+x3 <- A * cos(2 * pi * omega * t + phi)
+plot(t, x2, type = "l", col = "black")
+lines(t, x1, col = "darkgray")
+lines(t, x3, col = "red")
+grid()
+abline(h = 0, col = "gray")
+abline(v = 0, col = "gray")
 ```
 
-La **convolution** se définit comme suit: soit deux fonctions *f* et *g* de deux variables, on appelle la convolée de *f* et *g* (*f* o *g*) la fonction *h*(*x*), d’une seule variable définie par:
+Sur le graphique précédent, nous avons représenté trois cosinusoïdes pour vous illustrer l'effet des trois paramètres.
 
-Dans le cas discret, si on considère des séries et non des fonctions, on définit la convolée par:
+- Avec $\omega$ = 3, nous avons exactement trois cycles dans une unité de *t*, donc, trois cycles entre 0 et 1 pour toutes les courbes. En faisant varier $\omega$ on resserre ou étale les cycles sur l'axe des abscisses.
 
-1.  si *y*~j~ est positif ou nul lorsque *j* varie de –*J* à +*J* et si la somme des *y*~j~ vaut 1, la convolution des *x*~i-j~ par les *y*~j~ équivaut à une moyenne mobile.
-2.  si une série *y*~j~ est nulle pour les indices positifs, on a:
+- La courbe grise ayant une amplitude *A* de un, est comprise entre +1 et -1. Les deux autres ont une amplitude *A* doublée de deux. Par conséquent, le signal monte et descend deux fois plus entre +2 et -2.
 
-Une fonction qui subit une convolution passe à travers un filtre linéaire. Le signal de sortie est donné par la convolution du signal d’entrée avec une fonction qui caractérise le filtre.
+- Enfin, la phase $\phi$ des courbes grise et noire étant nulle, nous passons par un maximum en zéro sur l'axe des abscisses, car cos(0) = 1 = valeur maximale. Par contre, la courbe rouge est la même que la noire, mais déphasée de 1.6, ce qui la translate sur l'axe *t*.
 
-Soit *x*(*t*) une fonction (et non une série) qui n’est pas forcément périodique, on appelle **transformée de Fourier**:
+Les mathématiciens nous apprennent que l'on peut s'affranchir de $\phi$ à condition de considérer une somme de sinus et cosinus. Quel que soient $A$, $\omega$ et $\phi$, il existe toujours une paire $\beta_1$, $\beta_2$ telle que\ :
 
-Si *x*(*t*) est réelle, *tx*(*j*) est paire et on ne considère que des fréquences *f* > 0.
+$$A \cdot \cos(2 \pi \omega t + \phi) = \beta_1 \cdot \cos(2 \pi \omega t) + \beta_2 \cdot \sin(2 \pi \omega t)$$
 
-La convolution et la transformée de Fourier ont les propriétés suivantes. Soient *x*(*t*) et *g*(*t*) et *tx*(*f*) et *tg*(*f*). La transformée de Fourier fait correspondre à la convolution des deux fonctions la multiplication de leurs transformées. Réciproquement, la transformée de la fonction *h*(*t*) obtenue en multipliant *g*(*t*) par *x*(*t*) sera donnée par la convolution d’une fonction *tg*(*f*), appelée **fonction de transfert**, par *tx*(*f*): *th*(*f*) = *tx*(*f*) . *tg*(*f*).
+En fait, $\beta_1 = A \cdot \cos(\phi)$ et $\beta_2 = -A \cdot \sin(\phi)$. Cette reparamétrisation nous ouvre les portes de la **transformation de Fourier** qui consiste à considérer un signal de forme quelconque comme une somme de sinus et cosinus de fréquences différentes. Pour $n$ observations de $x_t$, nous pourrons écrire\ :
 
-Utiliser un filtre linéaire *g*(*t*), c’est opérer une convolution. La transformée du filtre est sa fonction de transfert *tg*(*f*). C’est en général une fonction complexe pouvant être décomposée en module et phase. Le module |*tg*(*f*)| = *G*(*f*) est appelé **gain du filtre**. On a l’**amplitude du spectre **(filtre linéaire):
+$$x_t = \sum^{n/2}_{i = 1} \left[ \beta_1 (\frac{i}{n}) \cos(2 \pi \omega_i t) + \beta_2 (\frac{i}{n}) \sin(2 \pi \omega_i t) \right]$$
 
-Par exemple, dans le cas d’une moyenne mobile sur un intervalle *t* - *T*, *t* + *T*, la fonction de transfert du filtre correspondant est:
+Si nous considérons $n/2$ fréquences différentes, nous avons $n$ paramètres à estimer, puisque pour chaque fréquence, nous avons deux paramètres ($\beta_1$ et $\beta_2$) à estimer à chaque fois. Or, avec un même nombre de paramètres que d'observations, nous ajustons **exactement** le modèle constitué de sommes de sinusoïdes et cosinusoïdes à travers toutes les valeurs observées. Ce problème est, en outre, facile à résoudre sur ordinateur à l'aide d'un algorithme appelé FFT (pour *Fast Fourier Transform* en anglais) qui permet de calculer très rapidement tous ces paramètres.
 
-La formule de la transformée de Fourier rappelle la décomposition de Fourier avec *T* tendant vers l’infini. Le coefficient de la composante e~2ift~ est *tx*(*f*); ainsi, plus la transformée décroît en module et plus les composantes de hautes fréquences diminuent.
+Nous arrivons à ce qui nous intéresse. L'amplitude de chaque signal de fréquence différente constituant notre série peut s'exprimer au travers de ce qu'on appelle un **périodogramme** qui se calcule comme suit\ :
 
-Le **spectre** d’un processus correspond à une décomposition de la variance sur l’ensemble des fréquences. Il est obtenu en effectuant la transformée de Fourier de la fonction d’autocovariance ou d’autocorrélation (dans ce cas, la variance du processus est normée à un). Le **pouvoir spectral** est donné par:
+$$P (\frac{i}{n}) = \hat \beta_1^2 (\frac{i}{n}) + \hat \beta_2^2 (\frac{i}{n})$$
 
-où $/phi$ est le décalage choisi (*lag*, en anglais). La variance totale est définie par:
+avec $\hat \beta_1 (\frac{i}{n})$ et $\hat \beta_2 (\frac{i}{n})$, les estimateurs des paramètres $\beta_1$ et $\beta_2$ pour les différentes fréquences $\omega_i$ considérées sur base de l'échantillon dont nous disposons (nos observations). Bien que la démonstration de ceci sorte du cadre de ce cours (elle fait intervenir la théorie de l'information et la probabilité d'observer un pic ou un creux dans une série à un instant *t* donné, ce qu'on appelle un point de retournement) il est possible d'estimer la probabilité qu'une valeur de $P (\frac{i}{n})$ se produise. Nous pouvons dès lors en dériver un test d'hypothèse\ : si la valeur de $P (\frac{i}{n})$ est supérieure à un seuil défini pa rapport à $\alpha$, nous pourrons considérer qu'il existe un signal significatif à la fréquence correspondante dans notre série.
 
-Représentation du spectre d’une série stationnaire: analyse de variance selon les fréquences f.
-
-La courbe obtenue ressemblera à celle d’un périodogramme car on dispose de peu de valeurs de $phi$. Pour obtenir une courbe lissée, on calculera une moyenne mobile pondérée associée à une bande de fréquences. Les poids les plus élevés correspondront aux fréquences voisines de celle autour de laquelle est centrée la bande. On effectuera une pondération de la fonction d’autocovariance initiale (fenêtre spectrale):
-
-où *k*~i~ est la fonction de pondération choisie. Plus simplement, on peut lisser directement le périodogramme, par exemple:
-
-L’estimation lissée à la fréquence *f*~j~ d’un spectre, notée s’obtient par:
-
-Mais convoler *S*~xx~(*f*) qui est égal à la transformée de Fourier de *C*~xx~(*l*) avec la fonction $\phi$~f~, correspond à la multiplication de *C*~xx~ par $\phi$~t~ dont $\phi$~fN est la transformée. Par conséquent, correspond à la transformée de Fourier directe du produit de convolution de *C*~xx~ par $\phi$~t~. Les fonctions $\phi$~f~ et $\phi$~t~ sont appelées respectivement, **fenêtre spectrale** ("spectral window") et **fenêtre des décalages** ("lag window").
-
-Multiplier *C*~xx~ par $\phi$~t~ a pour effet d’accélérer la décroissance en valeur absolue de la fonction d’autocovariance. Ceci implique que $\phi~tN soit une fonction du décalage *l* nulle assez vite au-delà d’un décalage limite *M*. *M* est l’**ouverture de la fenêtre**. Plus *M* est faible, plus le lissage est grand. La plus simple des fonctions (rectangulaire) correspond à . L’inconvénient est que sa transformée n’est pas toujours positive. De nombreux auteurs ont proposé des lissages divers (Daniell, Bartlett, Tuckey, Parzen,…). Le choix de l’intervalle de lissage *M* est aussi prépondérant que le choix de la fenêtre. R propose de telles méthodes via des fonctions de lissage très souples, telles que le "kernel smoothing" (voir la documentation des logiciels respectifs pour plus d'information).
+```{block2, type = 'note'}
+L’estimation fournie par le périodogramme donne un diagramme très irrégulier. Pour y remédier, on divise l’intervalle des fréquences en bandes centrées autour de *j* fréquences équidistantes. Ensuite, on lisse le signal à l'aide d'une moyenne mobile pondérée associée à chaque bande de fréquence (nous verrons au module suivant ce qu'est une moyenne mobile, retenez simplement que c'est un moyen efficace de lisser une courbe). Le périodogramme lissé est ainsi beaucoup plus facile à interpréter (voir exemple plus bas).
+```
 
 ##### Exemple {-}
 
-Sous R, la fonction `spectrum()` trace à la fois le périodogramme brut et le périodogramme lissé. Ainsi, les spectres (périodogrammes) bruts et lissés de `tser` sont obtenus côte à côte par\ :
+Sous R, la fonction `spectrum()` trace à la fois le périodogramme brut et le périodogramme lissé. Ainsi, les spectresbruts et lissés de `tser` sont obtenus côte à côte par\ :
 
 ```{r}
-par(mfrow = c(1, 2))            # Place 2 graphes côte à côte
+par(mfrow = c(1, 2))            # Place deux graphes côte à côte
 spectrum(tser)                  # Périodogramme brut
 spectrum(tser, spans = c(3, 5)) # Périodogramme lissé
 par(mfrow = c(1, 1))            # Valeur par défaut pour mfrow
 ```
 
-R offre aussi la possibilité de représenter le **périodogramme cumulé** qui permet souvent d’identifier plus clairement les fréquences significatives (ici, 1).
+Le lissage du périodogramme fait intervenir un argument `spans =` qui prend un vecteur de deux entiers impairs. Plus ces valeurs seront élevées, plus le lissage sera important, mais attention à ne pas tomber dans l'excès non plus. En pratique, nous pouvons tester différentes combinaisons et retenir celle qui donne le meilleur périodogramme. Notez comme le lissage a changé la largeur de bande (*bandwidth* en anglais) entre les deux graphiques, qui représente la *résolution* du périodogramme en fréquences différentes.
+
+Pour l'interprétation, nous nous référons à la barre bleue à droite du graphique qui matérialise la zone sur l'axe des ordonnées pour laquelle une fréquence peut être considérée comme significative. Alors que sur le périodogramme brut il peut sembler que la courbe traverse cette zone sensible un grand nombre de fois, c'est le périodogramme lissé qui nous indique de manière correcte que ces données artificielles ne comportent qu'une seule fréquence significative au seuil $\alpha$ de 5%\ : la fréquence de un.
+
+R offre aussi la possibilité de représenter le **périodogramme cumulé** qui permet souvent d’identifier plus clairement les fréquences significatives sous forme d'un saut vertical brutal dans la courbe qui sort de l'enveloppe de confiance à 95% matérialisée par deux traits pointillés bleus (ici, à une fréquence de un).
 
 ```{r}
 cpgram(tser)
 ```
 
+```{block2, type = 'warning'}
+L'analyse spectrale ne peut se faire que sur une série qui ne présente *pas* de tendance à long terme. On parle alors de **série stationnarisée**. Si ce n'est pas le cas, nous devons éliminer cette tendance générale *avant* de faire l'analyse spectrale. Les techniques pour éliminer cette tendance générale seront vues au prochain module.
+
+Parmi nos séries d'exemple, `co2` présente une tendance générale croissante très marquée. Cette série ne peut donc pas être analysées à l'aide de `spectrum()` telle quelle. Nous devons d'abord la stationnariser, donc éliminer sa tendance générale.
+```
+
 ### Analyse spectrale croisée
 
-L’analyse spectrale peut être étendue au cas des signaux bivariés. On pourra détecter les oscillations qui sont importantes simultanément dans deux séries, tester la corrélation entre les mouvements de même période, et estimer le déphasage éventuel entre ces oscillations.
+L’analyse spectrale peut être étendue au cas des signaux bivariés, tout comme le fait la corrélation croisée. On pourra détecter les oscillations qui sont importantes *simultanément* dans deux séries, tester la corrélation entre les mouvements de même période, et estimer le déphasage éventuel entre ces oscillations.
 
 On définit la corrélation avec retard entre deux signaux: *C*~xy~($\phi$) et *C*~yx~($\phi$). Les formules sont comparables à celles de l’autocorrélation, mais au lieu de considérer au numérateur le produit de valeurs réduites sans décalage et après décalage, on considère leur produit décalé pour deux descripteurs (cross-corrélation). Il y a donc deux fonctions de corrélation avec retard selon que l’on choisit tel ou tel descripteur en avance ou en retard sur l’autre.
 
@@ -543,13 +544,13 @@ En mode multivarié, R propose aussi des outils pour mener à bien une analyse s
 
 ```{r}
 mtser_spc <- spectrum(mtser, spans = c(3, 3))
-plot(mtser_spc, plot.type = "c")
-plot(mtser_spc, plot.type = "p")
+plot(mtser_spc, plot.type = "coherency")
+plot(mtser_spc, plot.type = "phase")
 ```
 
 ### Tendance générale
 
-La **tendance** générale (*general trend*, en anglais) représente une variation lente dans un sens déterminé. Cependant, si le plus souvent la tendance correspond à une fonction plus ou moins monotone croissante ou décroissante, dans d’autres cas la tendance générale est figurée par le cycle annuel par exemple. Dans ce cas, on parle de **tendance cyclique**.
+La **tendance** générale (*general trend*, en anglais) représente une variation lente dans un sens déterminé. Cependant, si le plus souvent la tendance correspond à une fonction plus ou moins monotone croissante ou décroissante, dans d’autres cas la tendance générale est figurée par le cycle annuel par exemple. Dans ce cas, on parle de **tendance cyclique** et nous l'analysons via l'analyse spectrale.
 
 Selon l’objet de l’étude entreprise, il peut être tout à la fois aussi important de l’estimer que de l’éliminer. L’estimer, car elle représente la trace la plus évidente et interprétable de l’évolution dans le temps. L’ôter, car la part de variance qui lui est attachée est souvent si forte qu’elle peut masquer les autres composantes du signal\ : cycle long, saison, phénomène de haute fréquence ou bien, lorsque c’est la tendance qui est cyclique, l’évolution croissante ou décroissante de la série. Les méthodes qui servent à l’estimer ou à l’éliminer font partie des méthodes de décomposition des séries spatio-temporelles qui seront étudiées dans le module suivant. Ici, nous nous contenterons seulement de tester son existence.
 
