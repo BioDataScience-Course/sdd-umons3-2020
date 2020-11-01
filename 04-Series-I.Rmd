@@ -20,7 +20,7 @@ Ce module nécessite d'être à l'aise avec R, RStudio et R Markdown. Les six pr
 
 ## Observations dépendantes du temps
 
-Démarrons tout de suite notre étude des séries chronologiques par plusieurs exemples concrets qui vont nous emmener dans les plaines enneigées du grand Nord Canadien, au sommet d'un volcan à Hawaï, ou encore, dans le cerveau d'un patient épileptique.
+Démarrons tout de suite notre étude des séries chronologiques par plusieurs exemples concrets qui vont nous emmener dans les plaines enneigées du grand Nord Canadien, au sommet d'un volcan à Hawaï, dans le cerveau d'un patient épileptique ou au large de la Mer Méditerranée.
 
 ### Lynx
 
@@ -67,9 +67,42 @@ plot(eeg)
 
 Ici, la série chronologique est comptabilisée sur l'axe du temps simplement avec le numéro de la mesure commençant par 2001, mais en réalité, 256 mesures sont réalisées par seconde ici. Dans cette série, les fluctuations sont importantes, mais apparaissent difficiles à interpréter sur le graphique brut.
 
+### Plancton méditerranéen
+
+Les séries chronologiques sont aussi appelées séries spatio-temporelles car sous certaines conditions, elles peuvent aussi servir à représenter des évènements qui varient spatialement, voir dans l'espace et le temps simultanément. Mais attention, quand nous parlons de variation spatiale, il ne peut s'agir que de variation **unidimensionnelle**, par exemple, le long d'un **transect** (tracé rectiligne ou non entre deux points et le long duquel les mesures sont réalisées). Un bon exemple d'une telle variation spatio-temporelle est représentée par l'étude du plancton en Mer Méditerranée entre Nice et la Corse.
+
+```{r, echo=FALSE, message=FALSE, fig.cap="Une séries de 68 stations équiréparties le long d'un transect entre Nice et la Corse (trait rouge) sont échantillonnées pour la physico-chimie (`marphy`) et le plancton (`marbio`)."}
+chart(data = map_data("france"), lat ~ long %group=% group) +
+  geom_polygon(fill = "gray", color = "black") +
+  geom_segment(aes(y = 43.7 , x = 7.25, yend = 42.56, xend = 8.75, color = "red"),
+    size = 0.8, show.legend = FALSE) +
+  theme_bw() +
+  coord_quickmap() +
+  labs(x = "", y = "")
+```
+
+Nous avons ici effectivement un axe qui varie spatialement le long du transect, mais en même temps dans le temps car les 68 stations ne sont pas échantillonnées *simultanément*, mais *successivement dans le temps* au fur et à mesure que le navire océanographique fait route entre Nice et Calvi en Corse. Nous avons déjà utilisé ces données au cours SDD II pour illustrer les analyses multivariées. Voyons ce que donnent les paramètres physico-chimiques sous forme de séries spatio-temporelles (notez que, comme `marphy` est un dataframe, nous utilisons la fonction `ts()` pour le transformer en séries spatio-temporelles, plus de détails sur cette dernière fonction seront donnés plus loin)\ :
+
+```{r}
+marphy <- ts(read("marphy", package = "pastecs"))
+plot(marphy, main = "Masses d'eaux entre Nice et la Corse",
+  xlab = "Transect Nice - Calvi (stations)")
+```
+
+Ici, nous avons pour rappel quatre variables enregistrées\ : la température (°C), la salinité de l'eau, la fluorescence (de la chlorophylle) qui est une mesure indirecte du contenu en phytoplancton dont l'abondance dépend elle-même du contenu en sels nutritifs (azote, phosphore, silice), et enfin la densité de l'eau en g/L. Nous observons ici des variations importantes et parfois assez abruptes. En fait, le transect croise un front constitué par une remontée d'eaux profondes, froides et riches en nutriments en plein milieu. De même, `marbio` est un dataframe que nous nous empressons de convertir avec `ts()`, mais ici nous choisissons trois séries parmi l'ensemble des 24 séries pour la représentation graphique à l'aide de l'opérateur `[,]`\ :
+
+```{r}
+marbio <- ts(read("marbio", package = "pastecs"))
+colnames(marbio) # Nom des différentes séries dans le jeu de données multivarié
+plot(marbio[, c("Acartia", "ClausocalanusA", "Pteropods")],
+  main = "Plancton entre Nice et la Corse",
+  xlab = "Transect Nice - Calvi (stations)")
+```
+
+Ici aussi la distribution du plancton le long du transect n'est pas homogène. Alors que les ptéropodes (mollusques planctoniques) se retrouvent essentiellement près de Nice, les crustacés copépodes comme *Acartia spp* ou *Clausocalanus spp* se retrouvent plutôt en pleine mer.
 
 ```{block2, type = 'note'}
-Au travers de ces trois exemples concrets, nous constatons que les séries chronologiques sont utilisées dans de nombreux domaines en biologie. Le dernier exemple en particulier nous laisse un peu démuni. Nous réalisons à ce stade que nous avons besoin d'une toute nouvelle panoplie d'outil pour analyser ce type de données car étant des mesures successives dans le temps d'un *même* individu, nous n'avons **pas d'indépendance des observations les unes par rapport aux autres**, qui est pourtant une hypothèse de départ de pratiquement toutes les techniques statistiques que nous avons étudiées jusqu'ici.
+Au travers de ces quatre exemples concrets, nous constatons que les séries spatio-temporelles sont utilisées dans de nombreux domaines en biologie. Le troisième exemple en particulier (EEG) nous laisse un peu démuni. Nous réalisons à ce stade que nous avons besoin d'une toute nouvelle panoplie d'outil pour analyser ce type de données car étant des mesures successives dans le temps d'un *même* individu, nous n'avons **pas d'indépendance des observations les unes par rapport aux autres**, qui est pourtant une hypothèse de départ de pratiquement toutes les techniques statistiques que nous avons étudiées jusqu'ici.
 ```
 
 ##### A vous de jouer ! {-}
@@ -79,9 +112,9 @@ Au travers de ces trois exemples concrets, nous constatons que les séries chron
 
 ## Qu'est-ce qu'une série chronologique ?
 
-Lorsque nous mesurons de manière répétée le *même* individu à des moments différents, nous parlons de **série chronologique**, de **séries temporelles**, ou de **série spatio-temporelle** (*space-time series* en anglais). Ce dernier terme "spatio-temporel" se réfère, en réalité, à un axe unidimensionnel que nous représentons toujours par convention sur l'axe des abscisses sur un graphique et le long duquel nos observations varient. Il peut s'agir du temps, ou d'une dimension spatiale linéaire (mesures le long d'un **transect**, par exemple), ou d'un mélange des deux c'est-à-dire que le temps se déroule alors que nous progressons dans nos mesures. Quoi qu'il en soit, le fait de mesurer toujours le même individu ou la même entité mène à une interdépendances des observations les unes par rapport aux autres.
+Lorsque nous mesurons de manière répétée le *même* individu à des moments différents, nous parlons de **série chronologique**, de **séries temporelles**, ou de **série spatio-temporelle** (*space-time series* en anglais). Ce dernier terme "spatio-temporel" se réfère, en réalité, à un axe unidimensionnel que nous représentons toujours par convention sur l'axe des abscisses sur un graphique et le long duquel nos observations varient. Il peut s'agir du temps, ou d'une dimension spatiale linéaire (mesures le long d'un **transect**, comme nous l'avons vu pour le plancton méditerranéen), ou d'un mélange des deux c'est-à-dire que le temps se déroule alors que nous progressons dans nos mesures le long du transect. Quoi qu'il en soit, le fait de mesurer toujours le même individu ou la même entité mène à une interdépendances des observations les unes par rapport aux autres.
 
-Cette propriété de corrélation au sein de la série entre les observations est dite **autocorrélation**. C'est la caractéristique principale d'une série temporelle que de contenir une autocorrélation non nulle. C'est cette autocorrélation qui fait que l'hypothèse d'indépendance des observations entre elles n'est pas respectée, et comme corollaire, que nous ne pouvons pas utiliser les outils de statistique classique lorsque nous avons affaire à des séries temporelles.
+Cette propriété de corrélation au sein de la série entre les observations est dite **autocorrélation**. C'est la caractéristique principale d'une série temporelle que de contenir une autocorrélation non nulle (dans le cas contraire, on parle de **bruit blanc**, *white noise* en anglais). C'est cette autocorrélation qui fait que l'hypothèse d'indépendance des observations entre elles n'est pas respectée, et comme corollaire, que nous ne pouvons pas utiliser les outils de statistique classique lorsque nous avons affaire à des séries temporelles.
 
 Donc, nous devons utiliser des outils statistiques spécialisés qui tiennent compte de l'autocorrélation. Il faut aussi noter que cette autocorrélation, si elle est très forte, peut être utilisée à notre avantage. En effet, nous pouvons imaginer *prédire* la valeur que prendra la variable mesurée dans la série au temps $t + \Delta t$, connaissant uniquement la valeur qu'elle prend au temps $t$ (et peut-être aussi, au temps $t - \Delta t$, $t - 2 \Delta t$, $t - 3 \Delta t$, ...). Nous appellerons $\Delta t$, l'intervalle temporel entre deux mesures successives, le **pas de temps** de notre série.
 
@@ -91,7 +124,7 @@ Au cours de notre exploration des séries temporelles, nous aborderons les fonct
 
 ### Séries régulières
 
-Une série régulière est un ensemble de données mesurées sur la même entité (même individu, même unité statistique) avec un **espacement constant dans le temps**. La série n'a pas de valeurs manquantes. Ce type de série a des avantages énormes car nous pouvons décaler la série d'un ou plusieurs pas de temps, et les observations après décalage correspondent aux **mêmes dates** que les observations originales, à part aux extrémités, bien entendu.
+Une série régulière est un ensemble de données mesurées sur la même entité (même individu, même unité statistique) avec un **espacement constant dans le temps** (ou le long d'un transect). La série n'a pas de valeurs manquantes. Ce type de série a des avantages énormes car nous pouvons décaler la série d'un ou plusieurs pas de temps, et les observations après décalage correspondent aux **mêmes dates** que les observations originales, à part aux extrémités, bien entendu.
 
 ![Le décalage d'une série régulière d'un pas de temps résulte en des observations aux mêmes dates, mais décalées d'une unité\ : *x*~1~ est maintenant à la même date que *x*~2~ avant le décalage, *x*~2~ à la même date que *x*~3~ avant, et ainsi de suite...](images/04-series1/lag1.png)
 
@@ -99,15 +132,25 @@ Après avoir effectué un décalage (*lag* en anglais) de un pas de temps, et mo
 
 $$L X_t = X_{t-1}$$
 
-Naturellement, nous pouvons décaler de plus de un pas de temps. Par exemple, si nous décalons de deux pas de temps, l'opérateur correspondant s'appelle alors *L*^2^, et le calcul correspond au schéma suivant\ :
+Nous pouvons calculer la **corrélation** $r$, par exemple à l'aide du coefficient de corrélation de Pearson (ou de Spearman) entre les deux lignes du tableau obtenu en accolant la série de départ $X_t$ et la même série décalée $LX_t$, amputées des extrémités ne comportant pas de paires d'observations (la version de Spearman se calculera sur les rangs des observations, voir [module 12 du cous SDD I](https://wp.sciviews.org/sdd-umons/?iframe=wp.sciviews.org/sdd-umons-2020/association-de-deux-variables.html))\ :
+
+$$r_{X_t,LX_t} = \frac{cov_{X_t,LX_t}}{\sqrt{S^2_{X_t} + S^2_{LX_t}}}$$
+
+Avec $cov$ la covariance et $S^2$ la variance. Cette corrélation étant calculée entre la série et elle-même, elle est appelée **autocorrélation**. Par simplicité, nous pouvons aussi noter le décalage choisi "tau" ($\tau$), et nous aurons alors l'autocorrélation correspondante à ce décalage qui sera notée $r(\tau)$ avec $\tau = 1$. Naturellement, nous pouvons décaler de plus de un pas de temps. Par exemple, si nous décalons de deux pas de temps, l'opérateur correspondant s'appelle alors *L*^2^\ :
 
 $$L^2 X_t = X_{t-2}$$
 
+Ce calcul correspond au schéma suivant\ :
+
 ![Décalage de deux pas de temps (*L*^2^)\ : *x*~1~ est maintenant à la même date que *x*~3~ avant le décalage, *x*~2~ à la même date que *x*~4~, etc.](images/04-series1/lag2.png)
 
-Si nous voulons rassembler la série de départ *X* et la série décalée *L*^2^ *X*, nous sommes maintenant obligés de laisser tomber les *deux* premières observations de *X* et les deux dernières de *L*^2^ *X*. De manière générale, nous définissons *L*^k^, avec *k* pouvant prendre des valeurs entières positives **ou négatives** (la série est décalée dans l'autre sens). *L*^0^ est un cas particulier où la série est simplement recopiée aux mêmes dates.
+Si nous voulons rassembler la série de départ *X* et la série décalée *L*^2^ *X*, nous sommes maintenant obligés de laisser tomber les *deux* premières observations de *X* et les deux dernières de *L*^2^ *X*. Nous pouvons naturellement aussi calculer l'autocorrélation $r_{X_t,L^2X_t}$, ou encore, $r(\tau)$ pour $\tau = 2$. 
+
+De manière générale, nous définissons *L*^k^, avec *k* pouvant prendre des valeurs entières positives **ou négatives** (la série est décalée dans l'autre sens).
 
 $$L^k X_t = X_{t-k}$$
+
+*L*^0^ est un cas particulier où la série est simplement recopiée aux mêmes dates. Comme la corrélation entre une série et elle-même est toujours parfaite, $r(\tau) = 1$ toujours pour $\tau = 0$. **L'autocorrélation pour un décalage nul vaut toujours un.** Notez que $r(\tau)$ est en fait une fonction dépendant de variations discrètes de $\tau$. On l'appelle donc la **fonction d'autocorrelation** (*autocorrelation fonction* en anglais). Cette fonction d'autocorrélation est un merveilleux outil pour analyser les caractéristiques de notre série... nous y reviendrons donc dans la partie analyse plus loin.
 
 R propose un type d'objet particulier pour représenter des séries régulières univariées (une seule variable mesurée à chaque fois)\ : les objets **ts**. Nos trois séries d'exemples de la section précédent sont des objets de ce type. Prenons `lynx` et examinons comment cet objet est représenté.
 
@@ -128,7 +171,6 @@ De même, la fonction de {pastecs} `is.tseries()` renvoie `TRUE` si l'objet est 
 library(pastecs)
 is.tseries(lynx)
 ```
-
 
 Pour inspecter (aux rayons X) un objet dans R, on peu le "déclasser" avec `unclass()`, ce qui a pour effet d'imprimer son contenu.
 
@@ -161,7 +203,30 @@ R mesure ici le temps sous forme décimale. C'est pratique, mais nous n'y sommes
 
 Dans notre série `fake_ser` de fréquence 12, le pas de temps est donc de un mois, soit 1/12 d'année. **Notez que le pas de temps est en fait l'_inverse_ de la fréquence des observations**. Si vous êtes plus à l'aise avec ce pas de temps, vous pouvez le substituer à la fréquence dans la fonction `ts()`via l'argument `deltat=`. Ainsi, indiquer `ts(...., frequency = 12)` ou `ts(...., deltat = 1/12)` est strictement équivalent.
 
-Plus tard, nous rencontrerons également les objets **mts** pour *multivariate time series*. Ces objets contiennent plusieurs variables mesurées sur le même individu au cours du temps. Le vecteur est alors remplacé par une matrice à *n* lignes (le nombre d'observations dans le temps) et *m* colonnes (le nombre de variables mesurées à chaque fois). L'attribut **tsp** est le même que pour **ts**.
+Nous rencontrons également des objets **mts** pour *multivariate time series*. Ces objets contiennent plusieurs variables mesurées sur la même entité au cours du temps. Le vecteur est alors remplacé par une matrice à *n* lignes (le nombre d'observations dans le temps) et *m* colonnes (le nombre de variables mesurées à chaque fois). L'attribut **tsp** est le même que pour **ts**. La sélection des séries au sein de la matrice se fait à l'aide de l'opérateur "crochet" `[,]` où la ou les séries d'intérêt sont reprises en second argument après la virgule soit sous forme d'un vecteur d'entiers qui représentent les positions des colonnes à conserver, soit sous forme d'un vecteur de chaînes de caractères qui reprennent les noms des séries à conserver. Les séries multivariées `marbio` et `marphy` en sont des bons exemples. Les objets **mts** sont également des objets **ts** et des objets **matrix** (on dit qu'elles *héritent* de ces classes^[D'un point de vue purement technique, l'"héritage" est un peu particulier dans ces objets dits "S3", mais cela a peu d'importance ici et va bien au delà de ce que vous devez comprendre pour manipuler les séries spatio-temporelles dans R.])\ :
+
+```{r}
+class(marphy)
+```
+
+Comme la température et la densité sont les première et quatrième colonnes de `marphy`, nous pouvons les extraire par position (et `colnames()` est utilisé pour renvoyer les noms des colonnes dans une matrice et donc par héritage, dans un objet **mts**)\ :
+
+```{r}
+# Nom de toutes les séries dans marphy
+colnames(marphy)
+# Nom après sélection de deux séries
+colnames(marphy[, c(1, 4)])
+```
+
+La sélection à l'aide des identifiants est souvent préférable, car plus explicite. Le même résultat est obtenu avec\ :
+
+```{r}
+colnames(marphy[, c("Temperature", "Density")])
+```
+
+```{block2, type = 'warning'}
+N'essayez pas d'utiliser la sélection à l'aide de `[,]` sur un objet **ts** contenant une série univariée. Vous génèreriez une erreur car cet objet contient un *vecteur* et non pas une *matrice*. De plus, cela n'a aucun sens de faire une sélection parmi... une seule série dans cet objet\ !
+```
 
 ##### A vous de jouer ! {-}
 
@@ -169,9 +234,9 @@ Plus tard, nous rencontrerons également les objets **mts** pour *multivariate t
 
 ### Séries à trous
 
-Une série à trous est une série régulière, mais avec des valeurs manquantes. Comme R représente des valeurs manquantes dans un vecteur par `NA`, il est possible de créer et manipuler des séries à trous à l'aide des objets **ts** et **mts**. Par contre, certaines méthodes statistiques ne gèrerons pas ces valeurs manquantes et refuseront de renvoyer un résultat.
+Une série à trous est une série régulière, mais avec des valeurs manquantes. Comme R représente des valeurs manquantes dans un vecteur par `NA`, il est possible de créer et manipuler des séries à trous à l'aide des objets **ts** et **mts**. Par contre, certaines méthodes statistiques ne gérerons pas ces valeurs manquantes et refuseront de renvoyer un résultat.
 
-En profitant des propriétés de dépendance partielle de la série, il est possible d'estimer des valeurs raisonnables pour remplacer les données manquantes, si elles sont peu nombreuses. Par exemple, il est possible de faire une interpolation linéaire entre les deux observations qui encadrent la valeur manquante. Cette technique, et d'autres, seront abordées dans le module suivant dans la section relative à la **régularisation**. Retenez juste, à ce stade, que notre objectif sera de régulariser autant que possible une série à trous avant de l'analyser.
+En profitant des propriétés d'autocorrélation de la série, il est possible d'estimer des valeurs raisonnables pour remplacer les données manquantes si elles sont peu nombreuses. Par exemple, il est possible de faire une interpolation linéaire entre les deux observations qui encadrent la valeur manquante. Cette technique, et d'autres, seront abordées dans le module suivant dans la section relative à la **régularisation**. Retenez juste, à ce stade, que notre objectif sera de régulariser autant que possible une série à trous avant de l'analyser.
 
 ### Séries irrégulières
 
@@ -179,7 +244,7 @@ Dès que le pas de temps entre les observations n'est pas constant, nous parlons
 
 **TODO: introduction rapide à {xts} et conversion entre objets.**
 
-De manière générale, nous avons toujours intérêt à réaliser une séries régulière, ou la plus régulière possible. Ensuite, il faut penser aux techniques de régularisation si c'est faisable pour obtenir une série régulière qui approxime suffisamment bien les données de départ. En effet, la plupart des techniques d'analyse des séries temporelles se basent sur des séries régulières.
+De manière générale, nous avons toujours intérêt à réaliser une séries régulière, ou la plus régulière possible. Ensuite, il faut penser aux techniques de régularisation si c'est faisable pour obtenir une série régulière qui approxime suffisamment bien les données de départ. En effet, la plupart des techniques d'analyse des séries temporelles se basent sur des séries régulières, et en tous cas celles du package {pastecs}.
 
 ##### A vous de jouer ! {-}
 
@@ -197,7 +262,7 @@ De manière générale, nous avons toujours intérêt à réaliser une séries r
 
 - Nous pouvons créer un objet **ts** ou **mts** à l'aide de la fonction `ts()`. Nous devons donner le vecteur ou la matrice des observations, ainsi que deux des trois paramètres de **tsp**. Nous pouvons substituer le **pas de temps** à la **fréquence** des observations via l'argument `deltat=`. En fait, `deltat == 1/frequence`, le pas de temps est l'inverse de la fréquence.
 
-- Les séries régulières doivent être représentées par des objets **xts** et le package {xts} propose une large palette de fonction pour manipuler de tels objets.
+- Les séries irrégulières doivent être représentées par des objets **xts** et le package {xts} propose une large palette de fonction pour manipuler de tels objets.
 
 
 ##### Pour en savoir plus {-}
@@ -222,11 +287,11 @@ Les descripteurs statistiques tels que la moyenne, la médiane, l'écart type, e
 
 ##### Exemple {-}
 
-On peut calculer des statistiques glissantes pour la série `ClausocalanusA` de `marbio` par groupe de 10 stations, les imprimer et faire un graphique de la "moyenne glissante" à l’aide des instructions suivantes:
+On peut calculer des statistiques glissantes pour la série `ClausocalanusA` de `marbio` par groupe de 10 stations, les imprimer et faire un graphique de la "moyenne glissante" à l’aide des instructions suivantes\ :
 
 ```{r}
 library(pastecs)
-data(marbio, package = "pastecs")
+marbio <- ts(read("marbio", package = "pastecs"))
 statsl <- stat.slide(1:68, marbio[, "ClausocalanusA"], xmin = 0, n = 7,
   deltat = 10)
 statsl
@@ -237,7 +302,7 @@ plot(statsl, stat = "mean", leg = TRUE, lpos = c(55, 2500),
   xlab = "Station", ylab = "ClausocalanusA")
 ```
 
-Toujours pour la même série, on peut calculer toutes les statistiques sur des intervalles irréguliers (seules les quatre premiers sont imprimés), puis représenter l’étendue (minimum, maximum) et la médiane pour chaque intervalle comme suit\ :
+Toujours pour la même série, on peut calculer toutes les statistiques sur des intervalles irréguliers, puis représenter l’étendue (minimum, maximum) et la médiane pour chaque intervalle comme suit (ces intervalles correspondent aux différentes masses d'eaux croisées le long du transect, voir légende du graphique)\ :
 
 ```{r}
 statsl2 <- stat.slide(1:68, marbio[, "ClausocalanusA"],
@@ -247,24 +312,24 @@ statsl2
 ```
 
 ```{r}
-plot(statsl2, stat = "median", xlab = "Stations", ylab = "Counts",
+plot(statsl2, stat = "median", xlab = "Stations", ylab = "Effectifs",
   main = "Clausocalanus A")     # Médiane
 lines(statsl2, stat = "min")    # Minimum
-lines(statsl2, stat = "max")     # Maximum
-lines(c(17, 17), c(-50,2600), col = 4, lty = 2) # Séparations
+lines(statsl2, stat = "max")    # Maximum
+lines(c(17, 17), c(-50,2600), col = 4, lty = 2) # Séparations des masses d'eaux
 lines(c(25, 25), c(-50,2600), col = 4, lty = 2)
 lines(c(30, 30), c(-50,2600), col = 4, lty = 2)
 lines(c(41, 41), c(-50,2600), col = 4, lty = 2)
 lines(c(46, 46), c(-50,2600), col = 4, lty = 2)
-text(c(8.5, 21, 27.5, 35, 43.5, 57), 2300,
-  labels = c("Peripheral Zone", "D1", "C", "Front", "D2", "Central Zone")) # Labels
-legend(0, 1900, c("series", "median", "range"), col = 1:3, lty = 1)
+text(c(8.4, 21, 27.5, 35, 43.5, 57.2), 2300,
+  labels = c("Zone périphérique", "D1", "C", "Front", "D2", "Zone centrale")) # Labels
+legend(0, 1900, c("série", "médian", "étendue"), col = 1:3, lty = 1)
 ```
 
 Enfin, on peut extraire différentes statistiques, les valeurs de la série initiale (`y`), les valeurs de temps de la série (`x`), et le vecteur temps de coupure des périodes (`xcut`) à partir de l’objet **stat.slide** renvoyé\ :
 
 ```{r}
-statsl2$stat[c("mean", "pos.mean", "geo.mean", "pen.mean"), ]
+statsl2$stat[c("mean", "median", "min", "max"), ]
 statsl2$y
 statsl2$x
 statsl2$xcut
@@ -273,7 +338,7 @@ statsl2$xcut
 
 ##### A vous de jouer ! {-}
 
-`r learnr("C04La_stat_slide", title = "Les Statistiques glissantes", toc = "Tutoriel : Statistiques glissantes")`
+`r learnr("C04La_stat_slide", title = "Statistiques glissantes", toc = "Statistiques glissantes")`
 
 ### Manipulations de ts
 
@@ -285,16 +350,16 @@ tser <- ts(sin((1:100) / 6 * pi) + rnorm(100, sd = 0.5), start = c(1998, 4),
 tser
 ```
 
-##### A vous de jouer ! {-}
-
-`r learnr("C04Lb_ts_create", title = "Création d'objet ts", toc = "Tutoriel : Objet ts")`
-
 Créons maintenant une série multiple en prenant notre série de départ, ainsi qu'une version décalée de cinq mois à l'aide de la fonction `stats::lag()` et représentons cela graphiquement\ :
 
 ```{r}
 mtser <- ts.intersect(tser, stats::lag(tser, 5))
-plot(mtser)
+plot(mtser, xlab = "Temps", main = "Série tser et série décalée de 5 mois")
 ```
+
+##### A vous de jouer ! {-}
+
+`r learnr("C04Lb_ts_create", title = "Création d'objet ts", toc = "Création d'objet ts")`
 
 
 #### Manipulation du temps
@@ -316,7 +381,7 @@ tser.cycle
 boxplot(split(tser, tser.cycle), names = month.abb, col = "cornsilk")
 ```
 
-Une autre manipulation courante de l'axe temporel consiste à **aggréger** les données en des pas de temps plus longs. `aggregate()` permet de réduire le nombre d’observations en diminuant la fréquence. Par exemple pour transformer la série `tser` qui a un pas de temps de un mois en une série de pas de temps de un trimestre, en calculant des **moyennes trimestrielles**, nous ferons\ :
+Une autre manipulation courante de l'axe temporel consiste à **agréger** les données en des pas de temps plus longs. `aggregate()` permet de réduire le nombre d’observations en diminuant la fréquence. Par exemple pour transformer la série `tser` qui a un pas de temps de un mois en une série de pas de temps de un trimestre, en calculant des **moyennes trimestrielles**, nous ferons (puisqu'il y a quatre trimestres dans une année, nous indiquons 4 ici)\ :
 
 ```{r}
 aggregate(tser, 4, mean)
@@ -334,24 +399,28 @@ La fonction `stats::lag()` permet de décaler la série en arrière dans le temp
 
 ##### A vous de jouer ! {-}
 
-`r learnr("C04Lc_ts_manip", title = "Manipulation des séries chronologiques", toc = "Tutoriel : Manipulation des objets ts")`
+`r learnr("C04Lc_ts_manip", title = "Manipulation des séries chronologiques", toc = "Manipulation des objets ts")`
 
-## Analyse de séries spatio-temporelles
+##### Exercicez-vous\ ! {-}
 
-**ATTENTION! Tout ce qui suit doit encore être remanié et finalisé\ !**
+Manipulez et décrivez les différentes séries d'exemples. Notez par exemple que `EEG` est constituée de mesures effectuées à un rythme de 256 par seconde, mais que l'axe du temps reprend simplement les observations les unes après les autres (ou si vous préférez, une "unité" de temps de 1/256 sec et une fréquence de un). Comment feriez-vous pour transformer cette série avec une unité de temps de la seconde\ ? Ou de la milliseconde\ ?
 
 
-Les différentes méthodes présentées dans ce chapitre permettent de caractériser des séries spatio-temporelles, que ce soit en analysant l’autocorrélation ou la cross-corrélation, la quantité d’information (points de retournement, tournogramme), en effectuant une analyse spectrale, ou en déterminant l’existence d’une tendance générale ou locale. Le chapitre suivant traitera plus particulièrement de la décomposition de séries en plusieurs composantes (tendance, cycle saisonnier, résidus par exemple). Bien que la décomposition et l’analyse soient des phases du traitement des séries spatio-temporelles qui ne se font pas l’une sans l’autre, nous les traitons dans des chapitres différents parce qu’elles renvoient des résultats différents. Alors que les techniques d’analyse ne modifient pas la série de départ et renvoient seulement les résultats statistiques de l’analyse, les décompositions renvoient des objets plus complexes qui contiennent aussi les composantes issues du traitement, composantes qui peuvent être transformées à nouveau en objet ‘time series’ pour être traitées ou analysées en cascade éventuellement. Ce processus complexe, lié à l’organisation objet du code de la librairie PASTECS, sera donc traité intégralement dans le chapitre suivant, et ne sera pas du tout abordé dans celui-ci.
+## Analyse de séries
+
+Les différentes techniques présentées dans cette section permettent de caractériser des séries spatio-temporelles, que ce soit en analysant l’autocorrélation ou la cross-corrélation, la quantité d’information (points de retournement, tournogramme), en effectuant une analyse spectrale, ou en déterminant l’existence d’une tendance générale ou locale. Le module suivant traitera plus particulièrement de la décomposition de séries en plusieurs composantes (tendance, cycle saisonnier, résidus par exemple). Bien que la décomposition et l’analyse soient des phases du traitement des séries spatio-temporelles qui ne se font pas l’une sans l’autre, nous les traitons dans des chapitres différents parce qu’elles renvoient des résultats différents. Alors que les techniques d’analyse ne modifient pas la série de départ et renvoient seulement les résultats statistiques de l’analyse, les décompositions renvoient des objets plus complexes qui contiennent aussi les composantes issues du traitement, composantes qui peuvent être transformées à nouveau en objets **ts** ou **mts**  pour être traitées ou analysées en cascade éventuellement.
 
 ### Autocorrélation, autocovariance, cross-corrélation et cross-covariance
 
-Une série spatio-temporelle est caractérisée principalement par une autocorrélation non nulle, ce qui signifie que les différentes observations dans la série ne sont pas indépendantes les unes des autres. Cette autocorrélation s’étudie en considérant le profil de la fonction d’autocorrélation obtenu en décalant la série d’une valeur progressivement croissante et en comparant la série initiale et la série décalée. Le coefficient de corrélation obtenu sera d’autant plus grand que les deux séries (initiale et décalée) sont similaires. A l’inverse, si les séries sont opposées, la corrélation sera négative. Une autocorrélation nulle indique qu’il n’y a pas de corrélation entre la série initiale et la série décalée au pas considéré. Le graphique de l’autocorrélation (caractéristique d’une série périodique) pour `tser` (une série artificielle similaire à celle étudiée dans le chapitre précédent) est obtenu par la fonction `acf()`\ :
+Une série spatio-temporelle est caractérisée principalement par une autocorrélation non nulle nous l'avons déjà vu, ce qui signifie que les différentes observations dans la série ne sont pas indépendantes les unes des autres. Cette autocorrélation s’étudie en considérant le profil de la **fonction d’autocorrélation** L'autocorrélation sera d’autant plus grande que les deux séries (initiale et décalée) sont similaires. A l’inverse, si les séries sont opposées, l'autocorrélation sera négative. Une autocorrélation nulle indique qu’il n’y a pas de corrélation entre la série initiale et la série décalée au pas considéré. Le graphique de l’autocorrélation (caractéristique d’une série périodique) pour notre série artificielle `tser` est obtenu par la fonction `acf()`\ :
 
 ```{r}
 tser <- ts(sin((1:100) / 6 * pi) + rnorm(100, sd = 0.5), start = c(1998, 4),
   frequency = 12)
 acf(tser)
 ```
+
+Pour un décalage nul, la première barre verticale monte jusqu'à un toujours. Les barrés suivantes montrent jusqu'où l'**effet mémoire** de la série se marque. Les traits bleus horizontaux représentent une enveloppe de confiance à 95%. Donc, les barres qui dépassent (largement) de l'intervalle entre ces deux traits bleus sont significatives. Nous voyons ici que l'effet mémoire se marque sur les deux mois qui suivent (2 barres au dessus du trait bleu). Ensuite, le graphique est caractéristique d'une série périodique. En effet, l'autocorrélation passe par un minimum lorsque la série est décalée d'une demi-période. Ici, le cycle a une période d'un an. Nous voyons que nous passons par une autocorrélation négative et minimale après un décalage de 6, puis de 18 mois. L'axe des abscisses *Lag* est exprimé dans l'unité de la série qui est l'année ici. Cela correspond donc à respectivement 0.5 et 1.5 unités. Par contre, l'autocorrélation redevient positive et maximale pour un décalage d'une période exactement ou d'un multiple de cette période. ainsi, nous avons un mode pour un décalage de 1 année. Nous étudierons juste en dessous une technique plus puissante pour détecter les cycles dans une séries (analyse spectrale), mais lorsqu'ils sont flagrants comme ici, ils sont également clairement visisbles sur le graphique de l'autocorrélation.
 
 De même, on peut tracer l’autocovariance (la covariance est calculée entre la série de départ et la série décalée à la place de la corrélation) en précisant l’argument `type = "covariance"` à l’appel de `acf()`. On a aussi la possibilité de calculer une autocorrélation partielle avec `type = "partial"`. En outre, R fournit aussi `ccf()`, fonction qui calcule la cross-corrélation ou la cross-covariance entre deux séries\ :
 
@@ -361,6 +430,10 @@ ccf(mtser[, 1], mtser[, 2])
 ```
 
 On retrouve bien une cross-corrélation maximale pour un décalage de 5 entre la série de départ (`mtser[, 1]`) et la série décalée de 5 observations vers la gauche (`mtser[, 2]`).
+
+##### Exercez-vous {-}
+
+Si vous voulez affiner votre compréhension du graphique de l'autocorrélation, générez et examinez ces graphiques pour nos différentes séries d'exemple. Les séries `lynx` et `co2` doivent certainement présenter une variation périodique claire, mais pour `co2`, une tendance générale forte se superpose. Les autres séries sont moins claires sur le graphique obtenu avec `plot()`... que pouvez-vous observer sur le graphique de l'autocorrélation\ ?
 
 ### Analyse spectrale
 
