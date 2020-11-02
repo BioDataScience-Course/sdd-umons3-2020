@@ -446,10 +446,16 @@ On retrouve bien une cross-corrélation maximale pour un décalage de cinq entre
 
 Si vous voulez affiner votre compréhension du graphique de l'autocorrélation, générez et examinez ces graphiques pour nos différentes séries d'exemple. Les séries `lynx` et `co2` doivent certainement présenter une variation périodique claire, mais pour `co2`, une tendance générale forte se superpose. Les autres séries sont moins claires sur le graphique obtenu avec `plot()`... que pouvez-vous observer sur le graphique de l'autocorrélation\ ?
 
+##### Pour en savoir plus {-}
+
+- Aide en ligne de `?acf` et `?plot.acf` pour les différents arguments utilisables.
+
+- [Manuel de {pastecs} en ligne](https://github.com/phgrosjean/pastecs/blob/master/manual/pastecs_manuel_utilisateur.pdf), en français, outre la section concernant l'autocorrélation dont la présente partie s'inspire très largement, une section est également dévolue à l'autocorrélation multiple et à son utilisation pour la détection de transitions dans une série.
+
 
 ### Analyse spectrale
 
-Afin d'identifier de manière plus fines les composantes cycliques d'une séries chronologique que via le graphique de l'autocorrélation, nous pouvons considérer que cette série est la combinaison d'un ensemble de signaux (co)sinusoïdaux de fréquence croissante. Pour rappel, la **période** d'un signal cyclique est le temps nécessaire pour accomplir exactement un cycle. Par contre, la **fréquence**, notée oméga ($\omega$) est l'inverse de de cette période ($\omega = 1/période$) et cela correspond au nombre de cycles qui rentrent dans une unité de mesure du temps. Un signal périodique élémentaire peut s'écrire alors à l'aide d'une fonction cosinus à trois paramètres\ : outre la fréquence $\omega$, il y a l'**amplitude** du signal notée $A$ et la **phase** phi ($\phi$) qui définit où le cycle commence sur l'axe du temps. Cette phase est un peu l'équivalent de l'ordonnée à l'origine pour une droite, soit un décalage du signal sur l'axe.
+Afin d'identifier de manière fines les composantes cycliques d'une séries chronologique, nous pouvons considérer que cette série est la combinaison d'un ensemble de signaux (co)sinusoïdaux de fréquence croissante. Pour rappel, la **période** d'un signal cyclique est le temps nécessaire pour accomplir exactement un cycle. Par contre, la **fréquence**, notée oméga ($\omega$) est l'inverse de de cette période ($\omega = 1/période$) et cela correspond au nombre de cycles qui rentrent dans une unité de mesure du temps. Un signal périodique élémentaire peut s'écrire alors à l'aide d'une fonction cosinus à trois paramètres\ : outre la fréquence $\omega$, il y a l'**amplitude** du signal notée $A$ et la **phase** phi ($\phi$) qui définit où le cycle commence sur l'axe du temps. Cette phase est un peu l'équivalent de l'ordonnée à l'origine pour une droite, soit un décalage du signal sur l'axe.
 
 $$x_t = A \cdot \cos(2 \pi \omega t + \phi)$$
 
@@ -469,7 +475,7 @@ abline(h = 0, col = "gray")
 abline(v = 0, col = "gray")
 ```
 
-Sur le graphique précédent, nous avons représenté trois cosinusoïdes pour vous illustrer l'effet des trois paramètres.
+Sur le graphique nous avons représenté trois cosinusoïdes pour vous illustrer l'effet des trois paramètres.
 
 - Avec $\omega$ = 3, nous avons exactement trois cycles dans une unité de *t*, donc, trois cycles entre 0 et 1 pour toutes les courbes. En faisant varier $\omega$ on resserre ou étale les cycles sur l'axe des abscisses.
 
@@ -481,25 +487,25 @@ Les mathématiciens nous apprennent que l'on peut s'affranchir de $\phi$ à cond
 
 $$A \cdot \cos(2 \pi \omega t + \phi) = \beta_1 \cdot \cos(2 \pi \omega t) + \beta_2 \cdot \sin(2 \pi \omega t)$$
 
-En fait, $\beta_1 = A \cdot \cos(\phi)$ et $\beta_2 = -A \cdot \sin(\phi)$. Cette reparamétrisation nous ouvre les portes de la **transformation de Fourier** qui consiste à considérer un signal de forme quelconque comme une somme de sinus et cosinus de fréquences différentes. Pour $n$ observations de $x_t$, nous pourrons écrire\ :
+En fait, $\beta_1 = A \cdot \cos(\phi)$ et $\beta_2 = -A \cdot \sin(\phi)$. Cette reparamétrisation nous ouvre les portes de la **transformation de Fourier** qui consiste à considérer un signal de forme quelconque comme une somme de sinus et cosinus de fréquences différentes. Pour $n$ observations de $x_t$, nous pourrons réécrire la série sous forme d'une somme de termes cycliques comme ceci\ :
 
-$$x_t = \sum^{n/2}_{i = 1} \left[ \beta_1 (\frac{i}{n}) \cos(2 \pi \omega_i t) + \beta_2 (\frac{i}{n}) \sin(2 \pi \omega_i t) \right]$$
+$$x_t = \sum^{n/2}_{i = 1} \left[ \beta_{1 i} \cos(2 \pi \omega_i t) + \beta_{2 i} \sin(2 \pi \omega_i t) \right]$$
 
-Si nous considérons $n/2$ fréquences différentes, nous avons $n$ paramètres à estimer, puisque pour chaque fréquence, nous avons deux paramètres ($\beta_1$ et $\beta_2$) à estimer à chaque fois. Or, avec un même nombre de paramètres que d'observations, nous ajustons **exactement** le modèle constitué de sommes de sinusoïdes et cosinusoïdes à travers toutes les valeurs observées. Ce problème est, en outre, facile à résoudre sur ordinateur à l'aide d'un algorithme appelé FFT (pour *Fast Fourier Transform* en anglais) qui permet de calculer très rapidement tous ces paramètres.
+Les $\oméga_i$ représentent des fréquences croissantes que nous fixons nous-même au départ. Les $\beta_{1 i}$ et $\beta_{2 i}$ sont des paramètres qui sont déterminés pour que l'égalité soit rencontrée. Si nous considérons $n/2$ fréquences différentes, comme c'est le cas ici, nous avons donc $n$ paramètres $\beta_.$ à estimer, puisque pour chaque fréquence $\omega_i$, nous avons deux paramètres ($\beta_{1 i}$ et $\beta_{2 i}$) à estimer à chaque fois. Or, avec un même nombre de paramètres que d'observations, nous ajustons **exactement** le modèle constitué de sommes de sinusoïdes et cosinusoïdes à travers toutes les valeurs observées. Cette équation est, en outre, facile à résoudre numériquement sur ordinateur à l'aide d'un algorithme appelé FFT (pour *Fast Fourier Transform* en anglais) qui permet de calculer très rapidement tous les paramètres $\beta_.$.
 
-Nous arrivons à ce qui nous intéresse. L'amplitude de chaque signal de fréquence différente constituant notre série peut s'exprimer au travers de ce qu'on appelle un **périodogramme** qui se calcule comme suit\ :
+Nous arrivons à ce qui nous intéresse. L'amplitude de chaque signal de fréquence différente constituant notre série peut s'exprimer au travers de ce qu'on appelle un **périodogramme** qui se calcule comme suit à un facteur d'échelle près\ :
 
-$$P (\frac{i}{n}) = \hat \beta_1^2 (\frac{i}{n}) + \hat \beta_2^2 (\frac{i}{n})$$
+$$P_i = \hat \beta_{1 i}^2 + \hat \beta_{2 i}^2$$
 
-avec $\hat \beta_1 (\frac{i}{n})$ et $\hat \beta_2 (\frac{i}{n})$, les estimateurs des paramètres $\beta_1$ et $\beta_2$ pour les différentes fréquences $\omega_i$ considérées sur base de l'échantillon dont nous disposons (nos observations). Bien que la démonstration de ceci sorte du cadre de ce cours (elle fait intervenir la théorie de l'information et la probabilité d'observer un pic ou un creux dans une série à un instant *t* donné, ce qu'on appelle un point de retournement) il est possible d'estimer la probabilité qu'une valeur de $P (\frac{i}{n})$ se produise. Nous pouvons dès lors en dériver un test d'hypothèse\ : si la valeur de $P (\frac{i}{n})$ est supérieure à un seuil défini pa rapport à $\alpha$, nous pourrons considérer qu'il existe un signal significatif à la fréquence correspondante dans notre série.
+avec $\hat \beta_{1 i}$ et $\hat \beta_{2 i}$ qui sont les *estimateurs* des paramètres $\beta_{1 i}$ et $\beta_{2 i}$ pour les différentes fréquences $\omega_i$ sur base de l'échantillon dont nous disposons (nos observations). Bien que la démonstration de ceci sorte du cadre de ce cours --elle fait intervenir la théorie de l'information et la probabilité d'observer un pic ou un creux dans une série à un instant *t* donné, ce qu'on appelle un point de retournement-- il est possible d'estimer la probabilité qu'une valeur de $P_i$ se produise dans une série non périodique. Nous pouvons dès lors en dériver un test d'hypothèse. dont l'interprétation sera la suivante\ : **si la valeur de $P_i$ est supérieure à un seuil défini par rapport à $\alpha$, nous pourrons considérer qu'il existe un signal significatif à la fréquence correspondante dans notre série**. Autrement dit, pour cette fréquence-là, il est très peu probable (probabilité du test < $\alpha$) qu'une telle amplitude de signal apparaisse par pur hasard dans la série.
 
 ```{block2, type = 'note'}
-L’estimation fournie par le périodogramme donne un diagramme très irrégulier. Pour y remédier, on divise l’intervalle des fréquences en bandes centrées autour de *j* fréquences équidistantes. Ensuite, on lisse le signal à l'aide d'une moyenne mobile pondérée associée à chaque bande de fréquence (nous verrons au module suivant ce qu'est une moyenne mobile, retenez simplement que c'est un moyen efficace de lisser une courbe). Le périodogramme lissé est ainsi beaucoup plus facile à interpréter (voir exemple plus bas).
+L’estimation fournie par le périodogramme brut donne un diagramme très irrégulier. Pour y remédier, on divise l’intervalle des fréquences en bandes centrées autour de *j* fréquences équidistantes. Ensuite, on lisse le signal à l'aide d'une moyenne mobile pondérée associée à chaque bande de fréquence (nous verrons au module suivant ce qu'est une moyenne mobile, retenez simplement que c'est une technique efficace pour lisser une courbe). Le périodogramme lissé est ainsi beaucoup plus facile à interpréter, mais au prix d'une perte de résolution au niveau des fréquences, exprimée par une **largeur de bande** plus grande dans le périodogramme.
 ```
 
 ##### Exemple {-}
 
-Sous R, la fonction `spectrum()` trace à la fois le périodogramme brut et le périodogramme lissé. Ainsi, les spectresbruts et lissés de `tser` sont obtenus côte à côte par\ :
+Sous R, la fonction `spectrum()` trace à la fois le périodogramme brut et le périodogramme lissé. Ainsi, les spectres bruts et lissés de `tser` sont obtenus côte à côte par\ :
 
 ```{r}
 par(mfrow = c(1, 2))            # Place deux graphes côte à côte
@@ -508,11 +514,11 @@ spectrum(tser, spans = c(3, 5)) # Périodogramme lissé
 par(mfrow = c(1, 1))            # Valeur par défaut pour mfrow
 ```
 
-Le lissage du périodogramme fait intervenir un argument `spans =` qui prend un vecteur de deux entiers impairs. Plus ces valeurs seront élevées, plus le lissage sera important, mais attention à ne pas tomber dans l'excès non plus. En pratique, nous pouvons tester différentes combinaisons et retenir celle qui donne le meilleur périodogramme. Notez comme le lissage a changé la largeur de bande (*bandwidth* en anglais) entre les deux graphiques, qui représente la *résolution* du périodogramme en fréquences différentes.
+Le lissage du périodogramme fait intervenir un argument `spans=` qui prend un vecteur de deux entiers impairs. Plus ces valeurs seront élevées, plus le lissage sera important, mais attention à ne pas tomber dans l'excès non plus. En pratique, nous pouvons tester différentes combinaisons et retenir celle qui donne visuellement le meilleur périodogramme. Notez comme le lissage a changé la largeur de bande (*bandwidth* en anglais) entre les deux graphiques.
 
-Pour l'interprétation, nous nous référons à la barre bleue à droite du graphique qui matérialise la zone sur l'axe des ordonnées pour laquelle une fréquence peut être considérée comme significative. Alors que sur le périodogramme brut il peut sembler que la courbe traverse cette zone sensible un grand nombre de fois, c'est le périodogramme lissé qui nous indique de manière correcte que ces données artificielles ne comportent qu'une seule fréquence significative au seuil $\alpha$ de 5%\ : la fréquence de un.
+Pour l'interprétation, nous nous référons à la barre bleue à droite du graphique qui matérialise la zone sur l'axe des ordonnées pour laquelle une fréquence peut être considérée comme significative d'après le test d'hypothèse associé, en utilisant $\alpha$ = 5%. Alors que sur le périodogramme brut il peut sembler que la courbe traverse cette zone sensible un grand nombre de fois, c'est le périodogramme lissé qui nous indique de manière correcte que ces données artificielles ne comportent qu'une seule fréquence significative au seuil $\alpha$ de 5%\ : la fréquence de un. Le périodogramme brut est donc inutilisable pour identifier correctement les fréquences significatives. Nous utiliserons donc *toujours* en pratique un périodogramme lissé pour nos analyses.
 
-R offre aussi la possibilité de représenter le **périodogramme cumulé** qui permet souvent d’identifier plus clairement les fréquences significatives sous forme d'un saut vertical brutal dans la courbe qui sort de l'enveloppe de confiance à 95% matérialisée par deux traits pointillés bleus (ici, à une fréquence de un).
+R offre aussi la possibilité de représenter le **périodogramme cumulé** qui permet souvent d’identifier plus clairement les fréquences significatives sous forme d'un saut vertical brutal dans la courbe qui sort de l'enveloppe de confiance à 95% matérialisée par deux traits pointillés bleus (ici, le saut se fait bien à une fréquence de un).
 
 ```{r}
 cpgram(tser)
@@ -521,32 +527,49 @@ cpgram(tser)
 ```{block2, type = 'warning'}
 L'analyse spectrale ne peut se faire que sur une série qui ne présente *pas* de tendance à long terme. On parle alors de **série stationnarisée**. Si ce n'est pas le cas, nous devons éliminer cette tendance générale *avant* de faire l'analyse spectrale. Les techniques pour éliminer cette tendance générale seront vues au prochain module.
 
-Parmi nos séries d'exemple, `co2` présente une tendance générale croissante très marquée. Cette série ne peut donc pas être analysées à l'aide de `spectrum()` telle quelle. Nous devons d'abord la stationnariser, donc éliminer sa tendance générale.
+Parmi nos séries d'exemples, `co2` présente une tendance générale croissante très marquée. Cette série ne peut donc pas être analysées à l'aide de `spectrum()` ou `cpgram()` telle quelle. Nous devons d'abord la stationnariser, donc éliminer sa tendance générale.
 ```
 
 ### Analyse spectrale croisée
 
-L’analyse spectrale peut être étendue au cas des signaux bivariés, tout comme le fait la corrélation croisée. On pourra détecter les oscillations qui sont importantes *simultanément* dans deux séries, tester la corrélation entre les mouvements de même période, et estimer le déphasage éventuel entre ces oscillations.
+L’analyse spectrale peut être étendue au cas de signaux bivariés, tout comme le fait la corrélation croisée. On pourra détecter les oscillations qui sont importantes *simultanément* dans deux séries, tester la corrélation entre les mouvements de même période, et estimer le déphasage éventuel entre ces oscillations. Cette partie est présentée sans démonstration et comme matériel complémentaire facultatif. Veuillez vous référez à l'aide en ligne de `?stats::spectrum` et au [manuel de {pastecs}](https://github.com/phgrosjean/pastecs/blob/master/manual/pastecs_manuel_utilisateur.pdf) pour plus de détails.
 
-On définit la corrélation avec retard entre deux signaux: *C*~xy~($\phi$) et *C*~yx~($\phi$). Les formules sont comparables à celles de l’autocorrélation, mais au lieu de considérer au numérateur le produit de valeurs réduites sans décalage et après décalage, on considère leur produit décalé pour deux descripteurs (cross-corrélation). Il y a donc deux fonctions de corrélation avec retard selon que l’on choisit tel ou tel descripteur en avance ou en retard sur l’autre.
+<details><summary>Exemple d'analyse spectrale croisée</summary>
 
-Les fonctions de corrélation croisées ne sont pas paires: . On calculera un spectre croisé qui correspondra à:
-
-avec : **cospectre réel** et : **spectre de quadrature**. Ce spectre montre les liens entre les processus *x* et *y*, fréquence par fréquence. S’il n’y a pas de déphasage, est nul. C’est parce que la fonction d’autocovariance n’est pas paire que le spectre est un nombre complexe. On peut écrire aussi:
-
-avec\ : l’amplitude et : la phase en radians (l’argument du nombre complexe du spectre croisé). Si $\alpha$ = *p* on a opposition complète de phase.
-
-Le coefficient de **cohérence** teste l’intensité de la liaison linéaire entre deux processus (corrélation entre deux signaux pour chaque fréquence). Il varie entre 0 et 1. La cohérence au carré entre deux oscillations de fréquence *f* est de la forme:
-
-##### Exemple {-}
-
-En mode multivarié, R propose aussi des outils pour mener à bien une analyse spectrale croisée. La fonction `spectrum()` renvoie un objet **spec** qui possède une méthode `plot()` permettant de tracer le périodogramme (par défaut), le graphe de cohérence au carré (`plot.type = "coherency"`) ou le graphe des phases (`plot.type = "phase"`). Tous ces graphes sont accompagnés d’une indication de l’intervalle de confiance\ :
+La fonction `spectrum()` peut aussi être utilisée sur un objet **mts** renfermant deux séries mesurées aux mêmes dates. Dans ce cas, le calcul renvoie un objet **spec** plus complet dont la méthode `plot()` permet de tracer trois graphiques différents. Le premier (par défaut) est le périodogramme superposé des deux séries. Le second est obtenu en indiquant l'argument `plot.type = "coherency"` est le graphe de cohérence au carré qui indique quelles sont les fréquences **simultanément** significatives dans les deux séries. Enfin, le graphe des phases est obtenu avec l'argument `plot.type = "phase"`. Il montre le déphasage éventuel entre les deux séries à chaque fréquence. Tous ces graphes sont accompagnés d’une indication de l’intervalle de confiance à 95%. Pour bien comprendre ces graphiques, reprenons notre série artificielle à laquelle nous avons ajouté la même série décalée dans le temps de 5 mois `mtser`.
 
 ```{r}
 mtser_spc <- spectrum(mtser, spans = c(3, 3))
+```
+
+Le périodogramme dans ce premier graphique (obtenu par défaut à partir de `spectrum()`) nous indique que seule la fréquence un est significative, et ce, dans les deux séries (trait noir plein et rouge pointillé).
+
+```{r}
 plot(mtser_spc, plot.type = "coherency")
+```
+
+Le graphique de la cohérence au carré nous montre aussi que les deux séries ont une cohérence maximale et très nette pour une fréquence de un (l'enveloppe de confiance à 95% en bleu se resserre très nettement à cet endroit). Avec des données artificielles aussi nettes, les deux graphiques peuvent sembler redondants. En pratique, le graphique de cohérence au carré est plus efficace pour détecter la cohérence cyclique entre les deux séries que les périodogrammes superposés.
+
+```{r}
 plot(mtser_spc, plot.type = "phase")
 ```
+
+Enfin, le graphique des phases est à lire au niveau de la ou des fréquences significatives et cohérentes. Ici, au niveau de la fréquence de un. Nous avons un angle de déphasage de -2.6 exprimé en radians (valeur allant de $-\pi$ à +$+\pi$). Un petit calcul est nécessaire pour déterminer le décalage temporel auquel cela correspond. Nous devons diviser la phase par $2 \pi \omega$ pour obtenir le décalage en unité de mesure temporelle. Comme ici, il s'agit d'une fraction d'année, nous préférons changer d'unité de temps en l'exprimant en mois (multiplication par douze)\ :
+
+```{r}
+-2.6 / (2 * pi * 1) * 12
+```
+
+Ceci nous indique que la première série est *avancée* sur la seconde de 5 mois via une valeur négative. C'est bien exact\ !
+
+</details>
+
+##### Pour en savoir plus {-}
+
+- [Manuel en ligne de {pastecs}}(https://github.com/phgrosjean/pastecs/blob/master/manual/pastecs_manuel_utilisateur.pdf), en français. La section consacrée à l'analyse harmonique et spectrale (croisée) est suivie d'explications concernant les points de retournement et de leur application via le tournogramme pour identifier le pas de temps qui maximise l'information dans la série, ainsi que le variogramme et le distogramme qui fournissent des outils complémentaires potentiellement utiles.
+
+- [Explication du périodogramme](https://online.stat.psu.edu/stat510/lesson/6/6.1), en anglais.
+
 
 ### Tendance générale
 
