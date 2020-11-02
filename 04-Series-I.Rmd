@@ -759,9 +759,37 @@ identify(ts2_lt)
 
 Ensuite, vous cliquez sur les points du graphique qui vous semblent définir les deux segments de droites formant le "V" (donc, la première observation, puis celle à la pointe du "V", et enfin, une observation vers la fin de la série). Le gif animé suivant montre cette procédure.
 
+![Utilisation de `identify()` avec un graphique généré à la Console R pour déterminer les points de transitions des segments de droites représentant les sommes cumulées.](images/04-series1/identify_local_trend.gif)
 
-Le vecteur `$pos` renvoie les index des points cliqués dans la série. Les tendances moyennes entre ces points sont renvoyées dans `$trends`. La valeur de référence $k$ est ici reportée dans moyenne sur l'ensemble de la série (par défaut, ou la valeur de référence rentrée dans `$k` (moyenne globale de la série par défaut, mais vous pouvez la changer en utilisant `local.trend(series, k = …)`).
+Le vecteur `$pos` renvoie les index des points cliqués dans la série. Les tendances moyennes entre ces points sont renvoyées dans `$trends`. La valeur de référence $k$ est ici reportée (par défaut c'est la moyenne de toute la série, ou la valeur de `$k` indiquée en utilisant `local.trend(series, k = …)`). Nous avons identifié trois points (`$pos`)\ : le 1^er^, le 51^ème^et le 96^ème^. Nous allons maintenant utiliser le code suivant dans un chunk de notre document R Markdown pour "rejouer" notre analyse et obtenir les résultats dans notre rapport\ :
 
+```{r}
+# Créer un vecteur ici avec les positions cliquées sur le graphique
+pos <- c(1, 51, 96)
+# Function pour le calcul
+lt_calc <- function(x, pos) {
+  n <- length(pos)
+  k <- attr(x, "k")
+  x_val <- as.numeric(x)[pos]
+  trends <- (x_val[2:n] - x_val[1:(n - 1)]) / (pos[2:n] - pos[1:(n - 1)]) + k
+  list(pos = pos, trends = trends, k = k)
+}
+# Calcul des tendances locales
+lt_calc(ts2_lt, pos)
+```
+
+Nous avons identifié deux phases. La première commence à la première observation et se termine à la 51^ème^ avec une moyenne de 4,24. La seconde commence à la 51^ème^et se termine à la 96^ème^ avec une moyenne de 5,11. La technique a donc effectué un bon travail pour retrouver les deux phases sur l'axe *t*, et a donné des estimations pas trop mauvaises des moyennes durant ces deux phases, compte tenu du bruit blanc important dans la série.
+
+Si vous avez affaire à un objet **mts**, n'oubliez pas d'extraire la série que vous voulez traiter avec `local.trend()` à l'aide de l'opérateur `[,]`.
+
+##### Exercez-vous {-}
+
+Appliquez la technique des sommes cumulées sur les diverses séries d'exemple pour vous familiariser avec son utilisation, en particulier la partie interactive avec `identify()` dans la console R de RStudio\ :
+
+- Est-ce que cette technique est appropriée pour `co2`\ ? Pourquoi\ ?
+- L'application sur `lynx` pose un challenge à cause d'une dominance très nette de cycles.
+- Pour `eeg`, malgré qu'il s'agisse d'une série univariée, elle est encodée comme une matrice. Vous devez donc utiliser `eeg[, 1]` dans `local.trend()`. Ici, la technique prend tout son sens.
+- De même pour `marbio`et `marphy` où nous savons d'emblée qu'il existe différentes phases successives correspondant aux différentes masses d'eaux traversées par le transect.
 
 ##### A vous de jouer ! {-}
 
