@@ -570,130 +570,191 @@ Ceci nous indique que la première série est *avancée* sur la seconde de 5 moi
 
 ##### Pour en savoir plus {-}
 
-- [Manuel en ligne de {pastecs}}(https://github.com/phgrosjean/pastecs/blob/master/manual/pastecs_manuel_utilisateur.pdf), en français. La section consacrée à l'analyse harmonique et spectrale (croisée) est suivie d'explications concernant les points de retournement et de leur application via le tournogramme pour identifier le pas de temps qui maximise l'information dans la série, ainsi que le variogramme et le distogramme qui fournissent des outils complémentaires potentiellement utiles.
+- [Manuel en ligne de {pastecs}](https://github.com/phgrosjean/pastecs/blob/master/manual/pastecs_manuel_utilisateur.pdf), en français. La section consacrée à l'analyse harmonique et spectrale (croisée) est suivie d'explications concernant les points de retournement et de leur application via le tournogramme pour identifier le pas de temps qui maximise l'information dans la série, ainsi que le variogramme et le distogramme qui fournissent des outils complémentaires potentiellement utiles.
 
 - [Explication du périodogramme](https://online.stat.psu.edu/stat510/lesson/6/6.1), en anglais.
+
+- Une autre présentation de l'[analyse spectrale](https://bookdown.org/rdpeng/timeseriesbook/spectral-analysis.html), théorie et application dans R, en anglais.
 
 
 ### Tendance générale
 
 La **tendance** générale (*general trend*, en anglais) représente une variation lente dans un sens déterminé. Cependant, si le plus souvent la tendance correspond à une fonction plus ou moins monotone croissante ou décroissante, dans d’autres cas la tendance générale est figurée par le cycle annuel par exemple. Dans ce cas, on parle de **tendance cyclique** et nous l'analysons via l'analyse spectrale.
 
-Selon l’objet de l’étude entreprise, il peut être tout à la fois aussi important de l’estimer que de l’éliminer. L’estimer, car elle représente la trace la plus évidente et interprétable de l’évolution dans le temps. L’ôter, car la part de variance qui lui est attachée est souvent si forte qu’elle peut masquer les autres composantes du signal\ : cycle long, saison, phénomène de haute fréquence ou bien, lorsque c’est la tendance qui est cyclique, l’évolution croissante ou décroissante de la série. Les méthodes qui servent à l’estimer ou à l’éliminer font partie des méthodes de décomposition des séries spatio-temporelles qui seront étudiées dans le module suivant. Ici, nous nous contenterons seulement de tester son existence.
+Selon l’objet de l’étude entreprise, il peut être tout à la fois aussi important de l’estimer que de l’éliminer. L’estimer, car elle représente la trace la plus évidente et interprétable de l’évolution dans le temps. L’ôter (c'est-à-dire, **stationnariser** la série), car la part de variance qui lui est attachée est souvent si forte qu’elle peut masquer les autres composantes du signal\ : cycle long, saison, phénomène de haute fréquence. Les méthodes qui servent à l’estimer ou à l’éliminer font partie des techniques de décomposition des séries spatio-temporelles qui seront étudiées dans le module suivant. Ici, nous nous contenterons seulement de tester son existence.
 
-Il est possible de tester de manière non paramétrique l’existence d’une tendance. Si on effectue une corrélation linéaire entre les valeurs successives d’un processus et les valeurs des dates d’observations (définies par une suite d’entiers croissants), on va pouvoir tester si la tendance générale est significativement linéairement croissante ou décroissante. Cependant la tendance générale peut être présente et ne pas correspondre à une droite. C’est pourquoi, pour tester l’existence d’une tendance de forme quelconque, on va remplacer les valeurs observées par leurs rangs, puis calculer leur corrélation non paramétrique de Spearman avec le temps.
+Il est possible de tester de manière non paramétrique l’existence d’une tendance. Si nous calculons une corrélation linéaire entre les valeurs successives d’un processus et les dates d’observations (définies par une suite d’entiers croissants), on va pouvoir tester si la tendance générale est significativement linéaire croissante ou décroissante. Cependant la tendance générale peut être présente et ne pas correspondre à une droite. C’est pourquoi, pour tester l’existence d’une tendance de forme quelconque, on va remplacer les valeurs observées par leurs *rangs*, puis calculer leur **corrélation non paramétrique de Spearman $\rho$ avec le temps**.
 
-Soit une série de *n* observations. Si on appelle le rang moyen, *R*~x~ le rang de la valeur de l’observation *x*, *R*~t~ le rang de la valeur de l’abscisse temporelle correspondante, *ex* le nombre d’ex æquos, la formule s’écrit\ :
-
-Les valeurs du coefficient de Spearman sont comprises entre –1 et +1. Si la série est purement aléatoire, la moyenne de *rs* est égale à 0 et sa variance est égale à 1/(n-1). La distribution des *rs* est normale pour *n* > 50. On calcule ici la quantité\ :
-
-qui suit une loi *t* de Student, avec *n* - 2 degrés de liberté, valable pour tout *n*.
+Les valeurs du coefficient de Spearman sont comprises entre –1 et +1. Si la série est purement aléatoire, la valeur de $\rho$ tend vers zéro et sa variance est égale à 1/(*n*-1). Un test d'hypothèse existe pour déterminer si un coefficient de corrélation est significativement différent de zéro ou non. Nous pouvons réutiliser ce test, mais dans le cas présent, les hypothèses testées sont\ : $H_0:$ pas de tendance générale et $H_1:$ tendance générale présente.
 
 ```{block2, type = 'warning'}
-On constate que lorsque le nombre d’ex æquos correspondant aux valeurs nulles est supérieur à 80%, la valeur de ce coefficient est totalement biaisée.
+On constate que lorsque le nombre d’ex æquos (correspondant par exemple à des valeurs nulles pour un phénomène rare dans le temps) est supérieur à 80%, la valeur de ce coefficient est totalement biaisée, et donc, le test d'hypothèse associé n'est pas utilisable.
 ```
 
-##### Exemple {-}
+##### Exemples {-}
 
-On peut estimer si la série 8 du tableau `marbio` contient une tendance significative comme suit\ :
+On peut estimer si `co2` présente une tendance générale significative au seuil $\alpha$ de 5% comme ceci avec la fonction `trend.test()` de {pastecs}\ :
 
-&gt; data(marbio)
-&gt; trend.test(marbio\[,8\])
- Spearman's rank correlation rho
+```{r}
+data("co2", package = "datasets")
+library(pastecs)
+trend.test(co2)
+```
 
-data: marbio\[, 8\] and time(marbio\[, 8\])
-S = 43853, p-value = 0.1836
-alternative hypothesis: true rho is not equal to 0
-sample estimates:
- rho
-0.1630113
+L'avis nous prévient qu'il existe des ex æquos. Vérifier qu'ils ne soient pas trop nombreux et toujours considérer dans ce cas-là que le test est approché (autrement dit, se méfier lorsque la valeur *p* est proche de $\alpha$).
 
-Warning message:
-p-values may be incorrect due to ties in: cor.test.default(x, time(x), alternative = "two.sided", method = "spearman")
+```{r}
+# Nombre total d'observations dans la série
+(n <- length(co2))
+# Nombre d'ex æquos
+n - length(unique(co2))
+```
 
-Il est possible de faire un bootstrap sur ce test pour déterminer de manière plus précise (c'est-à-dire par rapport à la distribution intrinsèque) la significativité du test\ :
+Le nombre d'ex æquos est minime ici, et la valeur *p* est très petite et bien inférieure à $\alpha$. Nous en concluons que la tendance est significative au seuil $\alpha$ de 5%. Par ailleurs, comme $\rho$ est positif (il vaut 0.988), la tendance est à l'augmentation dans le temps. Mais cela, nous l'avions bien évidemment déjà observé sur le graphique de la série.
 
-&gt; marbio8.trend.test &lt;- trend.test(marbio\[,8\], R=999)
-&gt; marbio8.trend.test
+```{r}
+plot(co2, xlab = "Années", ylab = "CO2 atmosphérique [ppm]")
+```
 
-BLOCK BOOTSTRAP FOR TIME SERIES
+Effectuons le même calcul pour `eeg`.
 
-Fixed Block Length of 1
+```{r}
+data("eeg", package = "TSA")
+trend.test(eeg)
+```
 
-Call:
-tsboot(tseries = x, statistic = trend.test, R = R, l = 1, sim = "fixed")
+```{r}
+# Nombre total d'observations dans la série
+(n <- length(eeg))
+# Nombre d'ex æquos
+n - length(unique(eeg))
+```
 
-Bootstrap Statistics :
- original bias std. error
-t1\* 0.1630113 -0.1642905 0.1199864
+Ici, la valeur *p* est légèrement supérieure à $\alpha$, mais le nombre d'ex æquos ne nous permet pas de tirer de conclusions avec cette forme du test.
 
-&gt; plot(marbio8.trend.test)
+#### Test par bootstrap
 
-&gt; boot.ci(marbio8.trend.test, conf=c(0.95, 0.99),
-+ type="norm”)
-BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-Based on 1000 bootstrap replicates
+Les plus futés d'entre vous l'auront remarqué\ : le test de corrélation exige, en principe, que les observations soient indépendantes les unes des autres. Or, nous nous trouvons ici en présence d'une série chronologique où, par définition ce n'est pas le cas\ ! Des corrections sont appliquées en réalité (voir la formule de calcul du test dans le [manuel de {pastecs}](https://github.com/phgrosjean/pastecs/blob/master/manual/pastecs_manuel_utilisateur.pdf)), mais ce n'est pas suffisant.
 
-CALL :
-boot.ci(boot.out = marbio8.trend.test, conf = c(0.95, 0.99),
- type = "norm")
+Une meilleure version de ce test est réalisée par *bootstrap*. Cette technique consiste à rééchantillonner aléatoirement l'échantillon pour simuler un grand nombre de fois des mesures différentes de la série. Ce rééchantillonnage introduit une fluctuation dans le calcul de $\rho$, et il est possible de démontrer que, lorsque *n* est suffisamment grand et le bootstrap est réalisé correctement, toutes les valeurs obtenues pour le $\rho$ bootstrapé permettent d'**estimer sa distribution réelle**. Cette dernière est bien plus proche de la réalité si le bootstrap est réalisé en tenant compte de l'autocorrélation éventuelle de la série. R permet de faire ce type de calcul qui est intégré dans la fonction `trend.test()` de {pastecs}, en précisant l'argument `R=`qui indique le nombre de fois que le bootstrap doit être réalisé. Des exemples pratiques sont plus parlants.
 
-Intervals :
-Level Normal
-95% ( 0.0921, 0.5625 )
-99% ( 0.0182, 0.6364 )
-Calculations and Intervals on Original Scale
+##### Exemples {-}
 
-&gt; marbio8.trend.test$p.value
-\[1\] 0.09
+Testons la tendance dans `co2` en bootstrapant 999 fois notre série (on a donc 1000 valeurs de $\rho$ avec la valeur observée dans l'échantillon de départ.)
 
-Les résultats peuvent varier quelque peu d'un bootstrap à l'autre. Dans les deux cas, on en conclut que la série n'a pas de tendance significative au seuil *p* = 5%, mais pas au seuil *p* = 10% dans le cas du test bootstrapé seulement.
+```{r}
+set.seed(9037)
+(co2_trend_test <- trend.test(co2, R = 999))
+```
+
+Le calcul est plus long, mais nous n'avons plus l'avis concernant les ex æquos car ceux-ci sont pris en compte dans la distribution bootstrapée. Nous voyons que la fonction `tsboot()` est utilisée en interne. C'est cette fonction qui prend en compte l'autocorrélation temporelle de la série dans le calcul. Mais comment interpréter ce test\ ? Nous devons passer par une représentation graphique de la distribution bootstrapée\ :
+
+```{r}
+plot(co2_trend_test)
+```
+
+L'histogramme à gauche représente la distribution de $\rho$, mais après transformation $t = \rho \cdot \sqrt(\frac{n - 2}{1 - \rho^2})$, nous obtenons en fait une statistique qui suit à peu près une distribution *t* de Student. Sa valeur bootstrapée est notée $t^*$. Le trait vertical en pointillé représente la valeur observée dans l'échantillon. Nous déterminons combien de fois $t^*$ est plus extrême (c'est-à-dire, plus grand en valeur absolue) que $t$ pour un test bilatéral. Ceci représente une estimation de la valeur *p* du test qui est confrontée à $\alpha$. Donc, si la valeur *p* < $\alpha$, nous rejetons $H_0$ et concluons qu'une tendance générale significative au seuil $\alpha$ existe dans la série.
+
+Le graphique de droite vous est familier. Il s'agit d'un graphique quantile-quantile qui compare la distribution $t^*$ à une distribution théorique *t* de Student. Nous voyons ici que les deux distributions correspondent bien. Cela signifie que la distribution bootstrapée est quasi-confondue à une *t* de Student. Donc, le test simple non bootstrapé est parfaitement valable dans ce cas-ci (et se calcule bien plus rapidement).
+
+Pour obtenir la valeur *p* du test, nous faisons\ :
+
+```{r}
+co2_trend_test$p.value
+```
+
+De même, nous pouvons obtenir un intervalle de confiance comme ceci\ :
+
+```{r}
+boot::boot.ci(co2_trend_test, conf = 0.95, type = "norm")
+```
+
+Comme cet intervalle de confiance ne contient pas zéro, nous en concluons toujours que nous rejetons $H_0:$. Notez bien que les résultats peuvent varier quelque peu d'un bootstrap à l'autre, et que nous avons utilisé `set.seed(x)`, en prenant bien soin d'utiliser un nombre `x`différent à chaque fois et pris au hasard, afin de rendre notre analyse reproductible dans ce bookdown (ou tout autre document R Markdown).
+
+Maintenant que nous avons compris comment utiliser le test bootstrapé sur un exemple où la tendance générale est flagrante, voyons sur un jeu de données plus problématique\ : `eeg`. Vu la longueur de la série, nous nous limitons à `R = 99`, mais plus le nombre de valeurs calculées est grand, plus le résultat est précis naturellement.
+
+```{r}
+set.seed(1563)
+(eeg_trend_test <- trend.test(eeg, R = 99))
+```
+
+La valeur de *p* vaut\ :
+
+```{r}
+eeg_trend_test$p.value
+```
+
+... et le graphique\ :
+
+```{r}
+plot(eeg_trend_test)
+```
+
+La distribution n'est pas très différente d'une *t* de Student, et d'autre part, la valeur *p* vaut 6%, donc juste supérieure à un seuil $\alpha$ de 5% que nous avons choisi avant de faire ce test. Nous en concluons que nous ne rejetons pas $H_0$ et que cette série ne comporte pas de tendance générale significative à ce seuil. Dans le cas présent, la valeur *p* bootstrapée n'est pas très différente de celle calculée à l'aide d'un test paramétrique considérant une distribution théorique idéale. Ceci se produit lorsque les deux distributions (bootstrapée *versus* théorique) sont similaires, ce que le graphique quantile-quantile nous indique.
+
+##### Pour en savoir plus {-}
+
+- Le [Manuel en ligne de {pastecs}](https://github.com/phgrosjean/pastecs/blob/master/manual/pastecs_manuel_utilisateur.pdf), en français, détaille les calculs réalisés pour ce test de tendance.
+
+- Une [introduction au bootstrap](https://www.imo.universite-paris-saclay.fr/~poursat/STA212/1.%20Bootstrap.pdf) en français et pas trop technique.
+
+- [Aide en ligne de la fonction `tsboot()`](https://www.rdocumentation.org/packages/boot/versions/1.3-25/topics/tsboot) qui explique comment le bootstrap sur série chronologique est réalisé, en anglais.
+
 
 ### Tendance locale
 
-Une méthode simple dite des **sommes cumulées**, permet de reconnaître les **changements de tendance** d’une série. Elle permet\ :
+Nous pouvons être confrontés à des séries qui montrent **différentes phases d'évolution à long terme**, par exemple, une croissance, suivie d'une décroissance. Dans ce cas, la tendance générale risque de ne pas être significative, alors qu'elle le serait si les deux phases de la série sont séparées l'une de l'autre et analysées individuellement. Ceci montre qu'il est utile d'identifier les cas où des phases successives existent dans notre série, et surtout, à indiquer à quelles date(s) la ou les transitions se font.
+
+Une méthode simple dite des **sommes cumulées**, permet de reconnaître de tels **changements de tendance** d’une série. Elle permet\ :
 
 - de détecter les changements survenant dans le niveau moyen de la série,
 - de déterminer la date d’apparition de ces changements,
 - d’estimer la valeur moyenne d’intervalles homogènes.
 
-Soit une série échantillonnée régulièrement à pas constant *x*~t~, *t* variant entre 1 et *n*. Choisissons une valeur de référence *r* (par exemple la moyenne). On retire cette valeur *r* de toutes les estimations de la série, puis on effectue le cumul des valeurs successives\ :
+En partant d'une série régulière $x_t$ avec *n* observations, nous allons choisir une **valeur de référence** $k$. Cette valeur est par défaut la moyenne des $x_t$ pour toute la série, mais nous pouvons très bien choisir une autre constante. Ensuite, nous allons **cumuler les observations jusqu'à chaque position $q$, donc pour $t = q$**, tout en soustrayant $k$ autant de fois qu'il y a d'observations dans notre somme cumulée ($q$ fois). Le calcul de la somme cumulée $S_q$ est donc\ :
 
-Donc:
+$$S_q = \sum_{i = 1}^q x_{t_i} - q \cdot k$$
 
-Cette somme cumulée est très sensible au changement de la valeur moyenne d’une série. Une propriété de ce type de graphique est que toute moyenne locale se déduit immédiatement de la pente. Soit deux points *x*~i~ et *x*~j~ limites inférieure et supérieure d’une séquence relativement monotone (constante, croissante ou décroissante). La pente *p* entre ces deux valeurs séparées par *k* intervalles de temps (*j* – *i* = *k*), vaudra *p* = (*x*~j~ – *x*~i~) / *k*. En développant\ :
-
-d’où\ :
-
-La moyenne locale entre deux points distants de *k* est égale à la pente du graphique des sommes cumulées plus la valeur de référence *r* choisie.
+Cette somme cumulée est très sensible au changement de la valeur moyenne d’une série. Une propriété de ce type de graphique est que toute moyenne locale se déduit immédiatement de la pente du segment de droite pour ces sommes cumulées, additionné de la valeur de référence $k$.
 
 ##### Exemple {-}
 
-Pour déterminer si les valeurs moyennes de la huitième série du tableau `bnr` restent constante ou non en fonction du temps, on entrera\ :
+Partons d'un exemple artificiel. Imaginons une série chronologique de 100 observations pour laquelle les 50 premières ont une moyenne de 4 et les 50 suivantes, une moyenne de 5, simulant ainsi un changement brutal de régime entre la 50^ème^et la 51^ème^ observations. Cette série présente enfin un bruit blanc important qui masque cette transition, et qui rend en tous cas son positionnement précis sur l'axe du temps impossible.
 
 ```{r}
-data("bnr", package = "pastecs")
-bnr8_lt <- local.trend(bnr[, 8])
+# Tendances locales
+trend <- ts(c(rep(4, 50), rep(5, 50)))
+# Bruit blanc
+set.seed(742)
+noise <- ts(rnorm(100, sd = 0.8))
+# Série artificielle
+ts2 <- trend + noise
+plot(ts2)
 ```
 
-La courbe des sommes cumulées (cusum, en rouge par défaut) est superposée à la courbe initiale (en pointillé noir par défaut, et mis à la même échelle que la courbe cusum) amplifie les changements de valeur moyenne au cours du temps. Ainsi, des segments croissants ou décroissants dans la courbe cusum mettent en évidence des valeurs moyennes différentes dans la série. En utilisant la function `identify()`, on peut cliquer autant de points que désirés sur la courbe cusum et obtenir le calcul des valeurs moyennes entre ces points (sur le graphe précédent, nous avons cliqué successivement les points 1, 25, 57, 75 et 101)\ :
+La présence des deux phases n'est pas visible tant le bruit blanc est dominant et les masquent. Traçons maintenant le graphique des sommes cumulées de cette série à l'aide de `local.trend()`\ :
+
+```{r}
+ts2_lt <- local.trend(ts2)
+```
+
+Le graphique montre la série en trait noir pointillé sur laquelle le signal des sommes cumulées est superposé en rouge. Le but pour détecter les phases différentes est de considérer ces sommes cumulées comme un ensemble de segments de droites, et d'identifier les points de départ et de fin de chaque segment. Il ne faut pas regarder trop dans le détail. Ici, les sommes cumulées forment globalement un "V" très net. Elles sont donc composées de deux segments de droites qui représentent les deux branches du "V".
+
+Lorsque le graphique est tracé dans l'onglet "Plots" de Rstudio, il peut être manipulé de manière interactive. La fonction `identify()` permet alors de cliquer sur des points et d'enregistrer leurs positions sur le graphique. Dans un document R Markdown, cette interaction n'est **pas** possible malheureusement... et de toutes façons, elle n'est pas automatisable, rendant le document Markdown non reproductible.
+
+A ce stade, il est tout de même très pratique de pouvoir cliquer sur le graphique pour identifier les différents segments de droites. Vous pouvez le faire en exécutant le code suivant dans l'onglet "Console" de RStudio en le copiant depuis le document R Markdown (ou du document en ligne) et en le collant dans la console R.
 
 ```{r, eval=FALSE}
-identify(bnr8_lt)
+# Copiez et collez ces deux lignes de code dans la console et exécutez-les
+ts2_lt <- local.trend(ts2)
+identify(ts2_lt)
 ```
 
-```
-$pos
-[1] 1 25 57 75 101
+Ensuite, vous cliquez sur les points du graphique qui vous semblent définir les deux segments de droites formant le "V" (donc, la première observation, puis celle à la pointe du "V", et enfin, une observation vers la fin de la série). Le gif animé suivant montre cette procédure.
 
-$trends
-[1] 40.04167 69.71875 166.27778 32.34615
 
-$k
-[1] 71.26214
-```
+Le vecteur `$pos` renvoie les index des points cliqués dans la série. Les tendances moyennes entre ces points sont renvoyées dans `$trends`. La valeur de référence $k$ est ici reportée dans moyenne sur l'ensemble de la série (par défaut, ou la valeur de référence rentrée dans `$k` (moyenne globale de la série par défaut, mais vous pouvez la changer en utilisant `local.trend(series, k = …)`).
 
-Les tendances moyennes entre ces points sont renvoyées dans `$trends`. La valeur moyenne sur l'ensemble de la série (par défaut, ou la valeur de référence rentrée dans `local.trend(series, k = …)`) est reprise dans `$k`. Remarquons que les points 25 et 57 ont pratiquement même ordonnée (on pourrait les relier avec un segment de droite horizontal), et donc, la moyenne locale entre ces deux points est proche de la valeur de référence `$k`. Par contre, entre les points 1 et 25, la courbe cusum est décroissante, ce qui exprime une valeur moyenne inférieure à la valeur de référence (40.0 < 71.3). A l'opposé, la courbe cusum est croissante entre les points 57 et 75, ce qui indique une valeur moyenne entre ces points supérieure à la valeur de référence (166.3 > 71.3).
 
 ##### A vous de jouer ! {-}
 
