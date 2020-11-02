@@ -745,7 +745,14 @@ Lorsque le graphique est tracé dans l'onglet "Plots" de Rstudio, il peut être 
 A ce stade, il est tout de même très pratique de pouvoir cliquer sur le graphique pour identifier les différents segments de droites. Vous pouvez le faire en exécutant le code suivant dans l'onglet "Console" de RStudio en le copiant depuis le document R Markdown (ou du document en ligne) et en le collant dans la console R.
 
 ```{r, eval=FALSE}
-# Copiez et collez ces deux lignes de code dans la console et exécutez-les
+# Copiez et collez ces lignes de code dans la console et exécutez-les
+# Données (remplacez par votre propre code)
+trend <- ts(c(rep(4, 50), rep(5, 50)))
+set.seed(742)
+noise <- ts(rnorm(100, sd = 0.8))
+ts2 <- trend + noise
+# Analyse des tendances locales
+library(pastecs)
 ts2_lt <- local.trend(ts2)
 identify(ts2_lt)
 ```
