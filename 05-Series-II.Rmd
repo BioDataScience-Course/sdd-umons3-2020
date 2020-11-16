@@ -30,6 +30,10 @@ Un modèle **multiplicatif** se définira selon un schéma équivalent, mais dan
 
 On pourrait encore définir des modèles **mixtes** où certaines composantes sont multiplicatives alors que d’autres sont additives, mais il n’y a alors plus moyen de les linéariser. Pour cette raison, de tels modèles sont très peu répandus. La nature de la ou des composantes dépend du traitement effectué. Par exemple pour un **filtrage**, il s’agit de la série filtrée; pour une **stationnarisation**, il s’agit de la tendance générale extraite, pour une **désaisonnalisation**, il s’agit du cycle saisonnier, etc.
 
+##### A vous de jouer ! {-}
+
+`r h5p(35, height = 270, toc = "Stationnarisation d'une série")`
+
 ### Fonction générale de décomposition
 
 Dans {PASTECS}pastecs}, toutes les techniques de décomposition de série fonctionnent selon le même canevas et renvoient toutes un objet **tsd** (*time series decomposition*). Cet objet contient à la fois les composantes de la ou des séries qui ont été décomposées, des informations sur la méthode utilisée, ainsi que des données supplémentaires qui servent au diagnostic du traitement réalisé.
@@ -37,6 +41,10 @@ Dans {PASTECS}pastecs}, toutes les techniques de décomposition de série foncti
 La fonction centrale qui effectue le traitement sur une ou plusieurs séries et renvoie un objet **tsd** est `tsd()`. Son argument `method=` permet de sélectionner une méthode de traitement à appliquer à toutes les séries à décomposer. Son argument `type=` indique si le modèle est additif ou multiplicatif. Cette fonction appelle d’autres fonctions plus simples `decxxx()` où `xxx` est le nom de la méthode (ex\ : `decmedian()` pour la méthode des médianes mobiles, par exemple). Les fonctions `decxxx()` ne peuvent traiter qu’une série à la fois, et ne sont normalement pas appelées directement par l'utilisateur. Toutefois, étant donné qu’elles renvoient aussi des objets **tsd**, l’utilisateur avancé peut les préférer pour des questions de performance ou de simplicité dans ses propres scripts.
 
 Une fois qu’une décomposition est réalisée, il est possible d’extraire les différentes composantes (grâce à `tseries()`) ou une partie d’entre elles (en utilisant la méthode `extract()`) et de les retransformer en objet séries régulières (objet **ts** ou **mts**). On peut ainsi appliquer de nouvelles méthodes de décomposition sur un ou plusieurs composants et approfondir l’analyse des séries par des traitements de décomposition en cascade jusqu’à ce qu’on ait extrait et analysé toute l’information pertinente contenue dans ces séries.
+
+##### A vous de jouer ! {-}
+
+`r h5p(34, height = 270, toc = "But de la fonction tsd()")`
 
 ##### Exemple {-}
 
@@ -139,6 +147,10 @@ La méthode des différences ne permet donc pas d’évaluer la tendance mais de
 La méthode des différences, dans une version légèrement différente, est également efficace pour éliminer une tendance sinusoïdale. Si on dispose par exemple de séries pluriannuelles avec un pas d’observation mensuel, dans la mesure où on considère que la variabilité saisonnière peut être modélisée par une sinusoïde (ce qui n’est pas le cas en général, car souvent les cycles annuels biologiques sont "télescopés"\ : la période de reproduction printanière est souvent décalée d’une année sur l’autre…), alors on remplace les données *X*<sub>*t*</sub> par les écarts aux moyennes des mois respectifs. Si la série était une sinusoïde, un tel filtrage aurait pour effet de la transformer en une droite. Supposons que l’on ait *n* années, la valeur désaisonnalisée *Y*<sub>*t*</sub> au mois *i* s’écrira:
 
  où *X*<sub>*i*</sub> sont les valeurs respectives rencontrées au mois *i* pendant les *n* années considérées. Cette méthode n’est pas implémentée dans ***decdiff()***, mais elle est disponible dans ***decloess()******* avec les arguments **order = "periodic"** et **trend = FALSE**.
+ 
+##### A vous de jouer ! {-}
+
+`r h5p(32, height = 270, toc = "But de la méthode des différences")`
 
 ##### Exemple {-}
 
@@ -195,6 +207,11 @@ L’application du filtre des MB induit un mouvement périodique appelé **effet
 
 A noter que sous S+/R, on dispose d'autres fonctions très puissantes de lissage, notamment le ***kernel smoothing*** et le ***supersmoother*** de Friedmann. Toutes les techniques de décompositions non prévues dans ***tsd()*** peuvent toutefois être utilisées à l'aide de la méthode **"reg"**, puisque cette dernière demande la série initiale et la série traitée (sans se préoccuper du traitement effectué par ailleurs) pour créer l'objet *'tsd'*.
 
+##### A vous de jouer ! {-}
+
+`r h5p(33, height = 270, toc = "But de la méthode des moyennes mobiles")`
+
+
 ##### Exemple {-}
 
 On peut filtrer 10 fois de suite la série ***ClausocalanusB*** (en log) du jeu de données ***marbio*** par une moyenne mobile simple et centrée d’ordre 2, puis tracer le graphe de la filtration par:
@@ -239,6 +256,10 @@ Le lissage (ou filtrage) des médianes mobiles peut être itérativement répét
 2.  4(3RSR)2H: ce lissage est préconisé par Tukey (1977). Il est généralement appliqué deux fois: on calcule les résidus d’un premier lissage, on effectue un second lissage du même type sur ces résidus, et on additionne les deux séries lissées ensemble.
 
 Ce filtre peut être appliqué soit pour lisser, soit surtout pour segmenter une série. La courbe obtenue est voisine de celle de départ (différent d’avec les moyennes mobiles), sauf en ce qui concerne les grands pics et les grands creux de la série. Ceux-ci sont ignorés et on constate un lissage en forme de plateaux successifs. En effet, si on prend trois points successifs, on obtiendra fatalement un plateau en conservant la valeur centrale. Si on répète ce procédé, on tend à créer des plateaux de plus de deux valeurs. Ce lissage peut aussi servir à détecter un petit nombre de classes et à reconnaître des discontinuités ponctuelles.
+
+##### A vous de jouer ! {-}
+
+`r h5p(36, height = 270, toc = "But de la méthode des médianes mobiles")`
 
 ##### Exemple: {-}
 
