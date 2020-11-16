@@ -6,6 +6,10 @@ SciViews::R
 
 ##### Objectifs {-}
 
+- Pouvoir reconnaître les séries temporelles constituées d'addition de signaux élémentaires (modèle additif), ou de leur multiplication (modèle multiplicatif).
+
+- Maîtriser les principales manières de filtrer un signal spation-temporelle pour en extraire une caractéristique particulière.
+
 - Être capable de décomposer une série régulière en ses différentes composantes, tendances, cycles et bruit blanc.
 
 - Pouvoir régulariser une série irrégulière dans le but de l'analyser ensuite.
@@ -14,21 +18,33 @@ SciViews::R
 
 Ce module nécessite que vous maîtrisiez parfaitement toutes les notions et techniques abordées dans le précédent module.
 
-**ATTENTION : Toute cette section est en cours de rédaction. Elle n'estv pas encore prête\ !**
 
-## Décomposition de séries temporelles
+## Décomposition de séries
 
-Toutes les techniques présentées dans cette partie ont pour but de décomposer des séries spatio-temporelles régulières (donc, à pas de temps constant et sans trous) en deux ou plusieurs composantes. On extrait soit une composante issue d’un filtrage ou d’un lissage, ou alors correspondant à un modèle (variation cyclique, tendance linéaire, polynomiale, exponentielle, etc, …). Quel que soit le nombre de composantes obtenues, la dernière est toujours le résidu (**residuals**), c’est-à-dire, la fraction de la série initiale (**series**) qui ne se retrouve dans aucune des autres composantes (**components**).
+Toutes les techniques présentées dans cette partie ont pour but de décomposer des séries spatio-temporelles régulières (donc, à pas de temps constant et sans trous) en deux ou plusieurs composantes. On extrait soit une composante issue d’un filtrage ou d’un lissage, ou alors correspondant à un modèle (variation cyclique, tendance linéaire, polynomiale, exponentielle, etc, …). Quel que soit le nombre de composantes obtenues, la dernière est toujours le résidu (*residuals* en anglais), c’est-à-dire, la fraction de la série initiale (*series*) qui ne se retrouve dans aucune des autres composantes (*components*).
 
-Pour un modèle **additif**, on aura\ :
+Pour un **modèle additif**, si nous extrayons par exemple deux composantes, on aura\ :
 
-**residuals** = **series** – **components**
+**residuals** = **series** – **component1** - **component2**
 
 Un tel modèle est également appelé **linéaire** lorsque chaque composante est une combinaison linéaire de la ou des variables dépendantes, en l’occurrence pour les séries spatio-temporelles, le temps ou l’espace, ou les deux ensemble.
 
-Un modèle **multiplicatif** se définira selon un schéma équivalent, mais dans ce cas, c’est le produit des composantes qui donnera la série. Une des composantes (la série filtrée, la série désaisonnalisée ou la tendance générale, selon le contexte), est alors exprimée dans les mêmes unités que la série de départ, alors que les autres sont des facteurs multiplicatifs adimensionnels. Il est possible de transformer un modèle multiplicatif en un modèle additif en passant aux logarithmes, puisque le log d’un produit est égal à la somme des log des facteurs. Si l’opération donne une combinaison linéaire des log des facteurs, on dit que l’on a **linéarisé** le modèle par la transformation logarithmique.
+Un **modèle multiplicatif** se définira selon un schéma équivalent, mais dans ce cas, c’est le produit des composantes qui donnera la série. Une des composantes (la série filtrée, la série désaisonnalisée ou la tendance générale, selon le contexte), est alors exprimée dans les mêmes unités que la série de départ, alors que les autres sont des facteurs multiplicatifs adimensionnels. Il est possible de transformer un modèle multiplicatif en un modèle additif par une transformation logarithmiques du signal observé, puisque le *logarithme d’un produit* est égal à la *somme des logarithmes des facteurs*. Si l’opération donne une combinaison linéaire des log des facteurs, on dit que l’on a **linéarisé** le modèle par la transformation logarithmique.
 
-On pourrait encore définir des modèles **mixtes** où certaines composantes sont multiplicatives alors que d’autres sont additives, mais il n’y a alors plus moyen de les linéariser. Pour cette raison, de tels modèles sont très peu répandus. La nature de la ou des composantes dépend du traitement effectué. Par exemple pour un **filtrage**, il s’agit de la série filtrée; pour une **stationnarisation**, il s’agit de la tendance générale extraite, pour une **désaisonnalisation**, il s’agit du cycle saisonnier, etc.
+On pourrait encore définir des modèles **mixtes** où certaines composantes sont multiplicatives alors que d’autres sont additives, mais il n’y a alors plus moyen de les linéariser. Pour cette raison, de tels modèles sont très peu répandus. La nature de la ou des composantes dépend du traitement effectué. Par exemple pour un **filtrage**, il s’agit de la série filtrée, pour une **stationnarisation**, il s’agit de la tendance générale extraite, pour une **désaisonnalisation**, il s’agit du cycle saisonnier, etc.
+
+Lorsqu'un cycle et une tendance à long terme sont tous deux présents dans la série, nous pouvons aisément discerner le modèle additif du modèle multiplicatif. En effet, dans le premier cas, l'**amplitude** du signal cyclique ne varie pas en fonction de la tendance, contrairement au second cas, comme illustré ci-dessous.
+
+```{r, echo=FALSE}
+time <- 1:300
+trend1 <- 0.07 * time - 0.00035 * time^2 + 10
+cycle1 <- 1 * sin(time/2) + 4
+plot(time, trend1 + cycle1, type = "l", xlab = "Temps", ylab = "Série additive")
+trend2 <- 0.07 * time - 0.00035 * time^2 + 10
+cycle2 <- 0.5 * sin(time/2) + 1
+plot(time, trend2 * cycle2, type = "l", xlab = "Temps", ylab = "Série multiplicative")
+```
+
 
 ##### A vous de jouer ! {-}
 
@@ -36,9 +52,9 @@ On pourrait encore définir des modèles **mixtes** où certaines composantes so
 
 ### Fonction générale de décomposition
 
-Dans {PASTECS}pastecs}, toutes les techniques de décomposition de série fonctionnent selon le même canevas et renvoient toutes un objet **tsd** (*time series decomposition*). Cet objet contient à la fois les composantes de la ou des séries qui ont été décomposées, des informations sur la méthode utilisée, ainsi que des données supplémentaires qui servent au diagnostic du traitement réalisé.
+Dans {pastecs}, toutes les techniques de décomposition de série fonctionnent selon le même canevas et renvoient toutes un objet **tsd** (*time series decomposition*). Cet objet contient à la fois les composantes de la ou des séries qui ont été décomposées, des informations sur la méthode utilisée, ainsi que des données supplémentaires qui servent au diagnostic du traitement réalisé.
 
-La fonction centrale qui effectue le traitement sur une ou plusieurs séries et renvoie un objet **tsd** est `tsd()`. Son argument `method=` permet de sélectionner une méthode de traitement à appliquer à toutes les séries à décomposer. Son argument `type=` indique si le modèle est additif ou multiplicatif. Cette fonction appelle d’autres fonctions plus simples `decxxx()` où `xxx` est le nom de la méthode (ex\ : `decmedian()` pour la méthode des médianes mobiles, par exemple). Les fonctions `decxxx()` ne peuvent traiter qu’une série à la fois, et ne sont normalement pas appelées directement par l'utilisateur. Toutefois, étant donné qu’elles renvoient aussi des objets **tsd**, l’utilisateur avancé peut les préférer pour des questions de performance ou de simplicité dans ses propres scripts.
+La fonction centrale qui effectue le traitement sur une ou plusieurs séries et renvoie un objet **tsd** est `tsd()`. Son argument `method=` permet de sélectionner une méthode de traitement à appliquer à toutes les séries à décomposer. Son argument `type=` indique si le modèle est additif ou multiplicatif. Cette fonction appelle d’autres fonctions plus simples `decxxx()` où `xxx` est le nom de la méthode (ex\ : `decmedian()` pour la méthode des médianes mobiles, par exemple, que nous étudierons plus loin). Les fonctions `decxxx()` ne peuvent traiter qu’une série à la fois, et ne sont normalement pas appelées directement par l'utilisateur^[Toutefois, étant donné que les fonctions `decxxx()` renvoient aussi des objets **tsd**, l’utilisateur avancé peut les préférer pour des questions de performance ou de simplicité dans ses propres scripts.].
 
 Une fois qu’une décomposition est réalisée, il est possible d’extraire les différentes composantes (grâce à `tseries()`) ou une partie d’entre elles (en utilisant la méthode `extract()`) et de les retransformer en objet séries régulières (objet **ts** ou **mts**). On peut ainsi appliquer de nouvelles méthodes de décomposition sur un ou plusieurs composants et approfondir l’analyse des séries par des traitements de décomposition en cascade jusqu’à ce qu’on ait extrait et analysé toute l’information pertinente contenue dans ces séries.
 
@@ -48,85 +64,104 @@ Une fois qu’une décomposition est réalisée, il est possible d’extraire le
 
 ##### Exemple {-}
 
-On peut régulariser les séries 3 à 8 du jeu de données `releve` à l’aide de la méthode linéaire comme suit\ :
+Notre jeu de données `co2` est un bon point de départ pour explorer la décomposition d'une série spatio-temporelle.
 
-&gt; data(releve)
-&gt; rel.regy &lt;- regul(releve$Day, releve\[3:8\], xmin=6, n=87,
-+ units="daystoyears", frequency=24, tol=2.2, methods="linear",
-+ datemin="21/03/1989", dateformat="d/m/Y")
+```{r}
+data("co2", package = "datasets")
+plot(co2)
+```
 
-Ensuite, on va transformer les séries régularisées en objets ‘time series’ utilisables par `tsd()`\ :
+En effet, nous voyons clairement deux composantes présentes\ : un cycle saisonnier d'une part, et une tendance à l'augmentation sur le long terme, d'autre part. De plus, le modèle est très clairement additif ici car l'amplitude du cycle ne dépend pas de la valeur atteinte par la tendance générale. Voyons en pratique comment se fait cette décomposition.
 
-&gt; rel.ts &lt;- tseries(rel.regy)
+Une technique efficace pour lisser une série, et en particulier, en éliminer un cycle est la décomposition par moyennes mobiles. Pour l'instant, concentrez-vous sur la façon d'utiliser ce filtrage et sur ce qui en résulte. Nous aborderons un peu plus loin le détail des techniques employées. Nous utilisons donc `tsd(<series>, method = "average", type = "additive", <autres arguments>)`.
 
-Nous pouvons à présent effectuer simultanément une décomposition de toutes les séries contenues dans ***rel.ts***. Par exemple, pour extraire un cycle saisonnier par la méthode LOESS, nous entrons:
+```{r, message=FALSE}
+library(pastecs)
+co2_dec <- tsd(co2, method = "average", type = "additive", order = 6, times = 3)
+plot(co2_dec, col = 1:3)
+```
 
-&gt; rel.dec &lt;- tsd(rel.ts, method="loess", s.window=13, trend=FALSE)
-&gt; rel.dec
-Call:
-tsd(x = rel.ts, method = "loess", s.window = 13, trend = FALSE)
-Series:
-\[1\] "Astegla" "Chae" "Dity" "Gymn" "Melosul" "Navi"
-Components for Astegla
-\[1\] "seasonal" "residuals"
-Components for Chae
-\[1\] "seasonal" "residuals"
-Components for Dity
-\[1\] "seasonal" "residuals"
-Components for Gymn
-\[1\] "seasonal" "residuals"
-Components for Melosul
-\[1\] "seasonal" "residuals"
-Components for Navi
-\[1\] "seasonal" "residuals"
+Nous verrons plus loin ce que `order=` et `times=` veut dire. A noter que `type = "additive"` est la valeur par défaut et peut donc être omise ici. La méthode `plot()` est ensuite utilisée sur l'objet résultant (ici en utilisant les couleurs de la palette par défaut, 1 = noir, 2 = rouge et 3 = vert pour mettre en évidence les différentes séries). L'axe des abscisses numérote ici les observations par ordre croissant pour les retrouver facilement dans l'objet de départ si nécessaire. En haut sur le graphique, la série de départ en noir, au milieu en rouge, la série filtrée, et en bas en vert, les résidus qui contiennent entre autres le cycle.
 
-On peut maintenant afficher le graphe correspondant à la décomposition de l’une des séries, par exemple ***Melosul***:
+L'objet `co2_dec` est de classe **tsd**.
 
-&gt; plot(rel.dec, series=5, col=1:3)
+```{r}
+class(co2_dec)
+```
 
-Enfin, l’extraction de composantes de certaines séries et leur transformation en nouveaux objets *‘ts*’ se fait comme suit (par exemple, on extrait uniquement la composante ***deseasoned*** des séries 3 à 6, et puis on affiche les 10 premiers éléments contenus dans les ‘time series’ extraites):
+Outre son graphique qui est des plus utiles pour juger le résultat de notre décomposition visuellement, nous pouvons retransformer toutes les composantes obtenues en un objet **mts** à l'aide de `tseries()`; ou alors, extraire une ou plusieurs composantes avec `extract()`. Effectuons les deux successivement. 
 
-&gt; rel.des &lt;- extract(rel.dec, series=3:6, components="deseasoned")
-&gt; rel.des\[1:10,\]
- Dity.deseasoned Gymn.deseasoned Melosul.deseasoned Navi.deseasoned
-\[1,\] -1856.450218 728.08507 11232.346 1263.204
-\[2,\] -326.203029 925.87962 4857.551 2193.775
-\[3,\] -5.397257 958.98367 12218.422 2141.072
-\[4,\] 305.799403 725.75255 19485.965 2042.397
-\[5,\] 510.738352 389.66511 19241.367 2524.486
-\[6,\] 673.469410 46.52693 16485.644 2800.179
-\[7,\] 666.811431 -205.96157 17601.801 2505.898
-\[8,\] 668.430789 928.90368 16997.344 2273.421
-\[9,\] 694.149206 -1949.28870 17367.641 1813.558
-\[10,\] 696.564421 -1890.15039 16520.938 1603.852
+```{r}
+co2_mts <- tseries(co2_dec)
+class(co2_mts)
+colnames(co2_mts) # Nom des séries dans l'objet mts
+plot(co2_mts)
+```
+En partant d'un objet **ts** qui contient une série unique, nous aboutissons donc à un objet **mts** qui contient deux composantes nommées `filtered` et `residuals` après avoir appliqué `tsd(method = "average")` suivi de `tseries()`. La composante `filtered` est essentiellement la tendance à long terme dans le cas présent, tandis que les résidus sont constitués par la série **stationnarisée** dont la tendance générale est retirée. Nous pouvons parfaitement continuer à travailler avec cet objet **mts**, et c'est d'ailleurs assez pratique de conserver les deux composantes dans un même objet. Les analyses se font comme d'habitude en sélectionnant la série à traiter à l'aide de l'opérateur `[,]`\ :
 
-Ces objets peuvent ensuite être analysés avec les outils destinés aux séries régulières (autocorrélation, analyse spectrale, etc.) ou être décomposés à leur tour par un nouvel appel à ***tsd()*******. Par exemple, nous pouvons éliminer la tendance générale présente dans les résidus (**stationnarisation**) par la méthode des moyennes mobiles, en leur appliquant une nouvelle fois ***tsd()***, avec l’argument **method = "average"** (notez que la série ***Melosul*** est en position 3 maintenant):
+```{r}
+acf(co2_mts[, "filtered"])
+```
 
-&gt; rel.des.dec &lt;- tsd(rel.des, method="average", order=2, times=10)
-&gt; plot(rel.des.dec, series=3, col=c(2,4,6))
+Nous avons ici un parfait exemple de fonction d'autocorrelation pour une tendance pure.
 
-Dans ce dernier graphe, ***series*** correspond donc à la composante ***deseasoned ***issue du premier traitement, ***filtered*** correspond à la tendance générale présente dans cette série désaisonnalisée et ***residuals*** correspond à la partie (pseudo-)stationnaire qu’il reste de la série après élimination d’un cycle saisonnier (premier traitement) et d’une tendance générale (second traitement) selon un modèle additif (la somme de toutes les composantes redonne la série de départ). Pour le graphe, on aurait donc pu préciser **labels = c("deseasoned", "trend", "residuals")** pour être plus clair. Notons au passage qu’il est possible de faire d’autres types de graphiques à l’aide de la méthode ***plot()*******. Par exemple, pour représenter de manière superposée la série désaisonnalisée et la tendance qui en est extraite (ce qui est peut-être plus parlant dans ce cas), nous pourrions entrer:
+Nous pouvons aussi **extraire** une ou plusieurs composantes de `co2_tsd`. Si nous souhaitons extraire la composante résiduelle uniquement sous forme d'un objet **ts** que nous appelerons `co2_stat`, nous ferons ceci\ :
 
-&gt; plot(rel.des.dec, series=3, col=c(2,4), stack=FALSE,
-+ resid=FALSE, labels=c("without season cycle", "trend"),
-+ lpos=c(0,55000))
+```{r}
+co2_stat <- extract(co2_dec, components = "residuals")
+class(co2_stat) # C'est bien une série univariée
+plot(co2_stat)
+```
 
-On peut continuer l’analyse en approfondissant de plus en plus les décompositions et les analyses des composantes jusqu’à ce que l’on considère avoir extrait toute l’information contenue dans la ou les séries initiales. Par exemple, on pourrait effectuer une analyse spectrale des résidus après élimination du cycle saisonnier et de la tendance générale:
+Comme `co2_stat` est maintenant une série stationnarisée, nous pouvons réaliser une analyse spectrale dessus.
 
-&gt; rel.res2 &lt;- extract(rel.des.dec, components="residuals")
-&gt; spectrum(rel.res2\[,3\], spans=c(5,7))
+```{r}
+spectrum(co2_stat, span = c(5, 3))
+```
 
-A l’évidence, il y a encore un signal cyclique de fréquence 2,5-3 dans les résidus qui n’a pas encore été extrait.
+Nous avons un cycle saisonnier très net, et un second pic mais tout juste pas significatif. Rien n'interdit de décomposer encore plus avant notre série, par exemple, en déterminant comment la composante saisonnière peut être ajustée ou non avec un signal sinusoïdal parfait (encore une fois, les détails de la technique seront abordés plus loin). Il nous suffit de construire un modèle sinusoïdal qui s'ajuste dans les données et d'utiliser ensuite `tsd(<series>, method = "reg", xreg = predict(<model>))` pour effectuer la décomposition de la série à l'aide de ce modèle (nous utilisons une astuce pour ajuster ce modèle sinusoïdal à l'aide de `lm()` que nous expliquerons, encore une fois, plus loin).
 
-> Les sept fonctions suivantes (**decdiff()**, **decaverage()**, **decmedian()**, **decevf()**, **decreg()**, **decensus() **et** decloess()**) sont utilisées par **tsd()**, mais sont aussi fournies séparément pour permettre à l’utilisateur avancé de réaliser ses propres routines de décomposition indépendamment de la fonction **tsd()**. Nous en verrons quelques unes par la suite dans ce cours.
+```{r}
+t <- time(co2_stat) # t est la variable indépendante du modèle
+co2_lm <- lm(co2_stat ~ I(cos(2*pi*t)) + I(sin(2*pi*t)))
+plot(t, predict(co2_lm), type = "l")
+```
 
-### Filtrage d’une série spatio-temporelle
+L'objet `co2_lm` contient notre modèle. Sa méthode `predict()` permet de déterminer les valeurs de CO~2~ prédites par ce modèle, et c'est ces valeurs que nous utilisons ensuite pour notre décomposition\ :
 
-Le filtrage d’une série ou chronique consiste à remplacer chaque valeur de cette série par une combinaison de ses diverses valeurs. Un filtrage est dit** linéaire** lorsqu’il utilise une combinaison linéaire des valeurs de cette série:
+```{r}
+co2_dec2 <- tsd(co2_stat, method = "reg", xreg = predict(co2_lm))
+plot(co2_dec2, col = 1:3)
+```
 
-où *X*<sub>*t*</sub> est la série de départ, *Y*<sub>*t*</sub> est la série filtrée. Les méthodes des différences ou la méthode des moyennes mobiles sont des filtres linéaires, alors que la médiane mobile, par exemple, est un filtre non linéaire. Lorsque le filtre conduit à réduire la variance en éliminant notamment les très hautes fréquences, on parle aussi de **lissage** du signal (smoothing en anglais).
+Ici, nos deux composantes se nomment `model` et `residuals`. Que donne l'analyse spectrale sur les résidus après avoir éliminé notre cycle saisonnier parfaitement sinusoïdal\ ?
 
-### Filtrage linéaire par la méthode des différences
+```{r}
+co2_resid <- extract(co2_dec2, components = "residuals")
+plot(co2_resid)
+spectrum(co2_resid, span = c(7, 5))
+```
+
+La composante saisonnière a bien été éliminée, mais une composante de période de 2 ans apparaît maintenant significative. Nous pouvons continuer la décomposition, mais à ce stade, il faut rester prudent car les techniques de décomposition peuvent introduire des biais. Donc, nous devons nous demander si cette composante cyclique à deux ans est réelle ou s'il s'agit d'un artéfact des méthodes utilisées en amont. La réponse dépendra essentiellement des propriétés des techniques de décomposition... que nous allons étudier maintenant dans les sections suivante de ce module.
+
+```{block2, type = 'note'}
+Avec `tsd()` vous avez plusieurs méthodes de décomposition disponibles, même si nous n'en avons abordé jusqu'ici que deux. Avec `method=`\ :
+
+- `"diff"` pour la méthode des différence,
+- `"average"` pour les moyennes mobiles,
+- `"median"` pour les médianes mobiles,
+- `"evf"` pour le filtrage par les vecteurs propres de l'ACP,
+- `"reg"` pour décomposer selon un modèle (droite ou courbe de régression),
+- `"loess"` pour une décomposition plus complète en tendance générale, cycle saisonnier et résidus.
+```
+
+## Filtrage d’une série
+
+Le filtrage d’une série consiste à remplacer chaque valeur de cette série par une combinaison de ses diverses valeurs. Lorsque le filtre conduit à réduire la variance en éliminant notamment les très hautes fréquences, on parle aussi de **lissage** du signal (*smoothing* en anglais). Nous allons à présent aborder quelques techniques de filtrage et découvrir dans quelles situations elles sont utiles.
+
+**Le texte qui suit doit encore être édité...**
+
+### Filtrage par différences
 
 La méthode des différences a pour but d’éliminer la tendance. Ce n’est valable que si la série a une tendance monotone et non en "dents de scie". Autrement dit, cela suppose que la série est autocorrélée positivement. Pour décrire la méthode, définissons d’abord la notion **d’opérateur de retard**:
 
@@ -161,7 +196,7 @@ On peut calculer la différence du second ordre (**lag = 1**) pour la série ***
 &gt; ClausoB.dec &lt;- decdiff(ClausoB.ts, lag=1, order=2, ends="fill")
 &gt; plot(ClausoB.dec, col=c(1,4,2), xlab="stations")
 
-### Filtrage linéaire par les moyennes mobiles
+### Moyennes mobiles
 
 La moyenne mobile (MB) remplace chaque observation par une moyenne pondérée sur les termes situés de part et d’autre de cette observation. Par exemple, si la MB est calculée sur trois termes, on aura:
 
@@ -240,7 +275,7 @@ On peut aussi désaisonnaliser la série ***Melosul*** du jeu de données ***rel
 
 Comme on peut le constater, le "cycle saisonnier" est de forme quelconque dans ***residuals***. Il s’agit en fait de toutes les oscillations de fréquences de 12 mois, ainsi que les plus petites harmoniques qui ont été éliminées, pour ne laisser que les oscillations plus longues dans ***filtered***. Attention toutefois à l’effet Slutsky-Yule si le filtre est appliqué plusieurs fois.
 
-### Filtrage non linéaire par les médianes mobiles
+### Médianes mobiles
 
 Au lieu d'utiliser des moyennes mobiles, on peut appliquer des médianes mobiles. Dans ce cas, on considérera également une fenêtre impaire à *k* termes et on calculera sa médiane:
 
@@ -283,6 +318,10 @@ Les différents "paliers" sont ici mis en évidence. Un graphique superposé (ma
 &gt; text(c(8.5,21,27.5,35,43.5,57), 8.7, labels=c("Peripheral Zone",
 + "D1", "C", "Front", "D2", "Central Zone"))
 
+## Régressions et séries
+
+Les régressions linéaires et non linéaires, surtout s'il s'agit de modèles ajustés par les moindres carrés, ne sont *a priori* pas compatibles avec les séries spatio-temporelles puisqu'elles nécessitent une indépendance des observation, une distribution Normale des résidus, etc. Mais en fait toutes ces conditions s'appliquent aux **tests d'hypothèses** autour de le régression. Si nous nous contentons d'utiliser la régression pour estimer la forme d'une composante, et ensuite que nous l'extrayons sans utiliser le tableau de l'ANOVA, les tests de Student sur les paramètres, etc., alors notre usage de cet outil sera approprié ici.
+
 ### Estimation de la tendance par régression
 
 Les méthodes de filtrage présentées ci-dessus permettent d’extraire ou d’éliminer une tendance de forme quelconque (on n’a pas d’idée *a priori* de sa forme; on ne cherche pas à la modéliser). Les méthodes d’estimation par régression, au contraire, font appel à des hypothèses très fortes quant à sa nature: on cherche à ajuster une ou plusieurs équations fonctionnelles à la tendance de la série.
@@ -313,7 +352,7 @@ Avec le calcul des résidus, on peut tester l’ajustement par analyse de la var
 
 <span id="anchor-26"></span>Exemples:
 
-Modèle linéaire de la tendance
+### Tendance linéaire
 
 On peut effectuer une régression linéaire sur la série ***Density*** du jeu de données ***marphy*** afin de l'utiliser comme estimation de la tendance générale dans une décomposition de cette série spatio-temporelle. La variable indépendante (x) est le temps que l'on reconstitue à partir de la série spatio-temporelle à l'aide de la fonction ***time()***. Ensuite, on effectue la régression linéaire à l'aide de la fonction ***lm()******* qui demande de spécifier le modèle sous forme **Y ~ X**, avec **Y** étant la variable dépendante et **X** étant la variable indépendante. La méthode ***summary()******* retourne un rapport détaillé sur cette régression:
 
@@ -353,7 +392,7 @@ La décomposition de la série ***density*** est réalisée grâce à ***decreg(
 &gt; density.dec &lt;- decreg(density, xreg)
 &gt; plot(density.dec, col=c(1, 3, 2), xlab="stations")
 
-Modèle polynomial de la tendance
+### Tendance polynomiale
 
 Nous pouvons bien entendu nous demander si une droite est le meilleur modèle qui soit pour représenter la tendance générale dans cette série. Ainsi, par exemple, on aurait pu également choisir un polynôme d'ordre 2 pour représenter cette tendance, ce qui donne:
 
@@ -391,7 +430,7 @@ C'est effectivement beaucoup mieux que le modèle linéaire. La décomposition d
 &gt; density.dec2 &lt;- decreg(density, xreg2)
 &gt; plot(density.dec2, col=c(1, 3, 2), xlab="stations")
 
-Modèle non linéaire de la tendance
+### Tendance non linéaire
 
 Nous pourrions bien entendu tester également des polynômes d'ordre 3, 4,…, mais nous nous arrêterons-là dans notre exemple pour tester une autres possibilité: l'utilisation d'un modèle non linéaire pour représenter la tendance générale dans cette série, par exemple, une courbe logistique:
 
@@ -425,9 +464,9 @@ Nous utilisons maintenant la fonction ***nls()******* en lieu et place de la fon
 &gt; density.decl &lt;- decreg(density, xregl)
 &gt; plot(density.decl, col=c(1, 3, 2), xlab="stations")
 
-Modèle sinusoidal de tendance cyclique
+Modèle sinusoidal
 
-Pour terminer, nous allons illustrer l'utilisation d'un modèle sinusoidal pour représenter une composante saisonnière dans une série. Pour ce faire, nous utiliserons une série artificielle périodique:
+Pour terminer, nous allons illustrer l'utilisation d'un modèle sinusoidal pour représenter une **composante cyclique**, par exemple saisonnière dans une série. Pour ce faire, nous utiliserons une série artificielle périodique:
 
 &gt; tser &lt;- ts(sin((1:100)/12\*pi)+rnorm(100, sd=0.3), start=c(1998,
 + 4), frequency=24)
@@ -466,7 +505,7 @@ Conformément à notre construction de la série aléatoire, les paramètres **c
 
 &gt; plot(tser.dec, col=c(1, 4, 2), xlab="stations")
 
-### Décomposition par LOESS
+## Décomposition par LOESS
 
 LOESS est une méthode de régression polynomiale locale. Pour chaque valeur *X*<sub>*t*</sub> d’une série *X*, on va considérer les *k* voisins à gauche et à droite, éventuellement pondérés (par exemple par la distance les séparant de *X*<sub>*t*</sub>). On effectue une régression par les moindres carrés d’un polynôme d’ordre *p* (habituellement *p* vaut 1 ou 2), et on récupère la valeur prédite au temps *t* (voir Cleveland *et al*, 1992). Si l’ordre *p* du polynôme vaut 0, on se ramène à une moyenne mobile.
 
