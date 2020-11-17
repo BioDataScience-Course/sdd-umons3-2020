@@ -145,12 +145,19 @@ spectrum(co2_resid, span = c(7, 5))
 
 La composante saisonnière a bien été éliminée, mais une composante de période de 2 ans apparaît maintenant significative. Nous pouvons continuer la décomposition, mais à ce stade, il faut rester prudent car les techniques de décomposition peuvent introduire des biais. Donc, nous devons nous demander si cette composante cyclique à deux ans est réelle ou s'il s'agit d'un artéfact des méthodes utilisées en amont. La réponse dépendra essentiellement des propriétés des techniques de décomposition... que nous allons étudier maintenant dans les sections suivante de ce module.
 
+Les plus pointilleux d'entre vous auront remarqué un comportement bizarre de nos résidus à la seconde étape de décomposition, au début et en fin de série avec des valeurs qui deviennent très extrêmes. Ceci est un **effet de bord** lié à la façon dans les moyennes mobiles opèrent en début et fin de série. Cela ne se voit pas trop dans les résidus de la première décomposition, mais un effet d'amplification du biais apparaît lors de la seconde décomposition. **Vous devez toujours garder à l'esprit qu'aucune méthode de décomposition de série n'effectue un travail parfait. Des anomalies et des faux-positifs (par exemple, des "cycles fantômes") peuvent apparaître suite aux traitements réalisés antérieurement**. Ici, nous pouvons utiliser la fonction `window()` et raccourcir la série aux deux bouts pour éliminer l'artéfact. Cela n'aura pas trop de conséquences néfastes. Mais restez toujours vigilant\ ! Pour cette raison, et parce les séries combinant une tendance générale et un cycle saisonnier sont très fréquentes, les statisticiens ont mis au point des techniques qui permettent de séparer ces deux composantes des résidus *sans* artéfacts. L'une de ces techniques se nomme LOESS (prononcez "LO-ESSE", pas "LEUS"). Voici ce que cela donne sur `co2` (encore une fois, l'explication des arguments de la fonction sera réalisée plus loin).
+
+```{r}
+co2_loess <- tsd(co2, method = "loess", s.window = "periodic", trend = TRUE)
+plot(co2_loess, col = 1:4)
+```
+
 ```{block2, type = 'note'}
 Avec `tsd()` vous avez plusieurs méthodes de décomposition disponibles, même si nous n'en avons abordé jusqu'ici que deux. Avec `method=`\ :
 
-- `"diff"` pour la méthode des différence,
 - `"average"` pour les moyennes mobiles,
 - `"median"` pour les médianes mobiles,
+- `"diff"` pour la méthode des différence,
 - `"evf"` pour le filtrage par les vecteurs propres de l'ACP,
 - `"reg"` pour décomposer selon un modèle (droite ou courbe de régression),
 - `"loess"` pour une décomposition plus complète en tendance générale, cycle saisonnier et résidus.
