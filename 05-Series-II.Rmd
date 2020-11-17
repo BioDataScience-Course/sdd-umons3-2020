@@ -148,9 +148,18 @@ La composante saisonnière a bien été éliminée, mais une composante de péri
 Les plus pointilleux d'entre vous auront remarqué un comportement bizarre de nos résidus à la seconde étape de décomposition, au début et en fin de série avec des valeurs qui deviennent très extrêmes. Ceci est un **effet de bord** lié à la façon dans les moyennes mobiles opèrent en début et fin de série. Cela ne se voit pas trop dans les résidus de la première décomposition, mais un effet d'amplification du biais apparaît lors de la seconde décomposition. **Vous devez toujours garder à l'esprit qu'aucune méthode de décomposition de série n'effectue un travail parfait. Des anomalies et des faux-positifs (par exemple, des "cycles fantômes") peuvent apparaître suite aux traitements réalisés antérieurement**. Ici, nous pouvons utiliser la fonction `window()` et raccourcir la série aux deux bouts pour éliminer l'artéfact. Cela n'aura pas trop de conséquences néfastes. Mais restez toujours vigilant\ ! Pour cette raison, et parce les séries combinant une tendance générale et un cycle saisonnier sont très fréquentes, les statisticiens ont mis au point des techniques qui permettent de séparer ces deux composantes des résidus *sans* artéfacts. L'une de ces techniques se nomme LOESS (prononcez "LO-ESSE", pas "LEUS"). Voici ce que cela donne sur `co2` (encore une fois, l'explication des arguments de la fonction sera réalisée plus loin).
 
 ```{r}
-co2_loess <- tsd(co2, method = "loess", s.window = "periodic", trend = TRUE)
+co2_loess <- tsd(co2, method = "loess", s.window = 6, trend = TRUE)
 plot(co2_loess, col = 1:4)
 ```
+
+Contrairement à la décomposition précédente, notez que nous avons laissé plus de libertés au signal saisonnier en vert qui varie donc légèrement d'une année à l'autre. Nous aurions aussi pu imposer le même signal (mais pas *nécessairement* sinusoïdal) chaque année en indiquant `s.window = "periodic"`. Naturellement ici, si les caractéristiques des composantes `trend` et `seasonal` sont assez évidentes, nous pourrions nous poser des questions concernant `residuals`. Comme cette série est stationnaire, nous pouvons directement en faire une analyse spectrale pour rechercher un ou plusieurs autres cycles de fréquence différente de un an.
+
+```{r}
+co2_resid2 <- extract(co2_loess, components = "residuals")
+spectrum(co2_resid2, spans = c(5, 3))
+```
+
+Ici, tout se passe comme si nous avions éliminé totalement tout signal de fréquence entière (1, 2, 3, ...) et qu'ensuite d'autres signaux apparaissent. Ce sont probablement des cycles fantômes issus du traitement... tout comme le cycle à fréquence deux observé plus haut reste questionnable. **Gardez toujours votre esprit critique aiguisé en pareil situation\ !** Par exemple, quelle est l'étendue des signaux correspondants à nos trois composantes\ ? Pour la tendance, nous allons de 320 à 370 ppm, soit environ 50 ppm. Pour la composante saisonnière, l'amplitude du signal est de presque 3 ppm (le signal oscille entre 3 ppm et -3 ppm), soit une étendue de 6 ppm. Enfin, pour les résidus, l'échelle de l'axe s'étale de -0.6 à 0.4, soit 1 ppm, donc, une amplitude maximum de 0.5 ppm pour un éventuel cycle. Que peut-on encore extraire d'intéressant comme signal avec une si petite amplitude relative de presque un ordre de grandeur inférieur à l'amplitude du signal saisonnier qui lui, est bien concret dans notre série\ ? Voilà le type de raisonnement logique que vous devez utiliser, au delà de ce que les calculs vous montrent.
 
 ```{block2, type = 'note'}
 Avec `tsd()` vous avez plusieurs méthodes de décomposition disponibles, même si nous n'en avons abordé jusqu'ici que deux. Avec `method=`\ :
