@@ -247,6 +247,14 @@ A noter que sous S+/R, on dispose d'autres fonctions très puissantes de lissage
 `r h5p(33, height = 270, toc = "But de la méthode des moyennes mobiles")`
 
 
+```{r, echo=FALSE, results='asis'}
+assignation("C04Ga_ts", 
+  url = "https://github.com/BioDataScience-Course/C05Ga_tsd",
+  course.urls = c(
+    'S-BIOG-025' = "https://classroom.github.com/a/V8--eYkL"),
+  toc = "Décomposition d'une série spatio-teporelle")
+```
+
 ##### Exemple {-}
 
 On peut filtrer 10 fois de suite la série ***ClausocalanusB*** (en log) du jeu de données ***marbio*** par une moyenne mobile simple et centrée d’ordre 2, puis tracer le graphe de la filtration par:
@@ -908,3 +916,9 @@ La série de départ apparaît en noir, la série régularisée avec une fenêtr
 ### Conversion en séries régulières
 
 Comme nous l'avons vu au paragraphe présentant les fonctions générales de régularisation, la fonction ***tseries()******* permet de convertir un objet *‘regul’* issu d’une régularisation (de même d’ailleurs qu’un objet *‘tsd’* issu d’une décomposition, voir plus loin) en objets *‘ts’* contenant **toutes** les séries. Pour extraire **une partie** des séries présentes dans l’objet *‘regul’*, utiliser plutôt la méthode ***extract()******* de l’objet. Enfin, la fonction ***is.tseries()******* est utile pour tester si un objet est une série régulière. Elle est équivalent à la fonction ***is.ts()******* proposées en standard dans R.
+
+## Récapitulatif des exercices
+
+Dans ce module 5, vous aviez à réaliser les exercices suivants\ :
+
+`r show_ex_toc()`
