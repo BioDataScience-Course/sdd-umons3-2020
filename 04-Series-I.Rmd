@@ -433,7 +433,15 @@ acf(white_noise)
 
 Effectivement, pratiquement toutes les barres sont comprises à l'intérieur de l'enveloppe de confiance à 95%. Il est normal que 5% des barres sortent de cette enveloppe. A part la première pour un décalage nul qui ne doit pas être comptabilisée, nous avons une barre qui sort très légèrement sur 20, soit 5% (il pourrait aussi y en avoir deux ou trois, ou bien zéro au contraire par le biais du hasard, sans que cela ne change nos conclusions). Ce type de graphique doit nous diriger immédiatement vers la conclusion que l'autocorrélation est nulle ou négligeable dans la série.
 
-Si le graphique de la fonction d'autocorrélation a des barres qui sont toutes positives significatives, cela signifie probablement qu'une tendance générale à l'augmentation domine le signal (elle est alors déjà bien souvent visible dans le graphique de la série elle-même).
+Si le graphique de la fonction d'autocorrélation a des barres qui sont toutes positives significatives, cela signifie probablement qu'une tendance générale à l'augmentation domine le signal (elle est alors déjà bien souvent visible dans le graphique de la série elle-même). Si les barres sont toutes significatives et qu'il y a en plus une oscillation, nous avons alors à la fois une tendance et un cycle dont les effets sont à peu près équivalents. Le graphique de la fonction d'autocorrélation suivant est issu de la décomposition du jeu de données `co2` où nous avons extrait uniquement la tendance générale (voir l'exemple de décomposition de la série `co2` plus loin).
+
+```{r, echo=FALSE}
+data("co2", package = "datasets")
+library(pastecs)
+co2_dec <- tsd(co2, method = "average", type = "additive", order = 6, times = 3)
+co2_trend <- extract(co2_dec, components = "filtered")
+acf(co2_trend)
+```
 
 Bien que nettement moins utilisé en pratique, on peut également tracer le graphique de l’autocovariance (la covariance est calculée entre la série de départ et la série décalée à la place de la corrélation) en précisant l’argument `type = "covariance"` à l’appel de `acf()`. On a aussi la possibilité de calculer une autocorrélation partielle avec `type = "partial"`. En outre, R fournit également `ccf()`, fonction qui calcule la **cross-corrélation** (ou corrélation croisée) ou la cross-covariance entre deux séries. Ceci peut s'avérer utile pour déterminer s'il y a une dépendance entre les deux séries, et éventuellement estimer également un décalage éventuel dans le temps pour cette dépendance. A titre d'illustration, prenons notre série artificielle `tser` et décalons-là de cinq mois. Traçons ensuite le graphique de cross-corrélation entre ces deux séries\ :
 
@@ -639,6 +647,10 @@ Ici, la valeur *p* est légèrement supérieure à $\alpha$, mais le nombre d'ex
 Les plus futés d'entre vous l'auront remarqué\ : le test de corrélation exige, en principe, que les observations soient indépendantes les unes des autres. Or, nous nous trouvons ici en présence d'une série chronologique où, par définition ce n'est pas le cas\ ! Des corrections sont appliquées en réalité (voir la formule de calcul du test dans le [manuel de {pastecs}](https://github.com/phgrosjean/pastecs/blob/master/manual/pastecs_manuel_utilisateur.pdf)), mais ce n'est pas suffisant.
 
 Une meilleure version de ce test est réalisée par *bootstrap*. Cette technique consiste à rééchantillonner aléatoirement l'échantillon pour simuler un grand nombre de fois des mesures différentes de la série. Ce rééchantillonnage introduit une fluctuation dans le calcul de $\rho$, et il est possible de démontrer que, lorsque *n* est suffisamment grand et le bootstrap est réalisé correctement, toutes les valeurs obtenues pour le $\rho$ bootstrapé permettent d'**estimer sa distribution réelle**. Cette dernière est bien plus proche de la réalité si le bootstrap est réalisé en tenant compte de l'autocorrélation éventuelle de la série. R permet de faire ce type de calcul qui est intégré dans la fonction `trend.test()` de {pastecs}, en précisant l'argument `R=`qui indique le nombre de fois que le bootstrap doit être réalisé. Des exemples pratiques sont plus parlants.
+
+```{block2, type = 'warning'}
+La fonction `trend.test()` de {pastecs} version < 1.4 est incompatible avec le tidyverse et avec l'instruction `SciViews::R`. La SciViews Box jusqu'à sa version 2020 contient la version 1.3 de {pastecs} par défaut. Il faut donc forcer la mise-à-jour avant de pouvoir réaliser l'analyse de test de tendance via bootstrap. Cela se fait facilement avec l'instruction suivante à la console R\ : `remotes::install_github("phgrosjean/pastecs@v1.4.0", upgrade = FALSE)`. Cette opération ne doit être réalisée qu"une seule fois, mais si le package est déjà chargé en mémoire avant la mise-à-jour, il faut redémarrer R pour être certain d'utiliser la dernière version (menu RStudio `Session -> Restart R`). Pour vérifier la version utilisée, on peut faire\ : `packageVersion("pastecs")`.
+```
 
 ##### Exemples {-}
 
