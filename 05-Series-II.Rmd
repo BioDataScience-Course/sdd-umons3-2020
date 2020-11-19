@@ -481,6 +481,16 @@ On peut voir que la cohérence est très faible entre les deux séries, c’est 
 &gt; melo.dec3 &lt;- decloess(melo.ts, s.window="periodic", trend=TRUE)
 &gt; plot(melo.dec3, col=c(1,4,3,2))
 
+##### A vous de jouer ! {-}
+
+```{r, echo=FALSE, results='asis'}
+assignation("C05Gb_ts_adv", 
+  url = "https://github.com/BioDataScience-Course/C05Gb_ts_adv",
+  course.urls = c(
+    'S-BIOG-025' = "https://classroom.github.com/g/ZD6gTPvE"),
+  toc = "Analyse libre d'une série spatio-teporelle")
+```
+
 ## Régularisation 
 
 Les méthodes présentées dans cette partie permettent de transformer une série spatio-temporelle échantillonnée avec un pas de temps irrégulier ou présentant des trous, en une série régulière. Malheureusement, en biologie, on a rarement affaire à des séries parfaitement régulières, soit parce qu’il y a des observations manquantes, soit parce qu’on ne contrôle pas l’intervalle de temps. Dans ce cas, la régularisation est une opération préliminaire indispensable à beaucoup d’analyses de séries spatio-temporelles, que ce soit avec les outils {pastecs} ou avec d'autres méthodes. Les objets **ts** doivent être *d’office* des séries spatio-temporelles régulières dans R. Cette étape est donc requise pour adapter des **data frames** avant de pouvoir les transformer en séries temporelles\ ! Plusieurs méthodes de régularisation sont disponibles dans {pastecs}\ : régularisation par valeur constante (`regconst()`), linéaire (`reglin()`), par courbes splines (`regspline()`) et par la méthode des aires (`regarea()`). Afin de simplifier le travail de régularisation, et de faciliter ensuite la création des séries temporelles, toutes ces fonctions ont été regroupées sous une fonction commune `regul()`.
