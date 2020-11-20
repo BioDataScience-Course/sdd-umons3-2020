@@ -148,7 +148,7 @@ La composante saisonnière a bien été éliminée, mais une composante de péri
 Les plus pointilleux d'entre vous auront remarqué un comportement bizarre de nos résidus à la seconde étape de décomposition, au début et en fin de série avec des valeurs qui deviennent très extrêmes. Ceci est un **effet de bord** lié à la façon dans les moyennes mobiles opèrent en début et fin de série. Cela ne se voit pas trop dans les résidus de la première décomposition, mais un effet d'amplification du biais apparaît lors de la seconde décomposition. **Vous devez toujours garder à l'esprit qu'aucune méthode de décomposition de série n'effectue un travail parfait. Des anomalies et des faux-positifs (par exemple, des "cycles fantômes") peuvent apparaître suite aux traitements réalisés antérieurement**. Ici, nous pouvons utiliser la fonction `window()` et raccourcir la série aux deux bouts pour éliminer l'artéfact. Cela n'aura pas trop de conséquences néfastes. Mais restez toujours vigilant\ ! Pour cette raison, et parce les séries combinant une tendance générale et un cycle saisonnier sont très fréquentes, les statisticiens ont mis au point des techniques qui permettent de séparer ces deux composantes des résidus *sans* artéfacts. L'une de ces techniques se nomme LOESS (prononcez "LO-ESSE", pas "LEUS"). Voici ce que cela donne sur `co2` (encore une fois, l'explication des arguments de la fonction sera réalisée plus loin).
 
 ```{r}
-co2_loess <- tsd(co2, method = "loess", s.window = 6, trend = TRUE)
+co2_loess <- tsd(co2, method = "loess", s.window = 13, trend = TRUE)
 plot(co2_loess, col = 1:4)
 ```
 
@@ -409,7 +409,7 @@ plot(density_poly2dec, stack = FALSE, resid = FALSE, col = c(1, 2),
   main = "Tendance polynomiale d'ordre 2")
 ```
 
-N'oubliez pas d'utiliser `I()` dans la formule pour indiquer un calcul, sinon, `lm()` recherchera une variable qui s'appellerait `t^2` et ne la trouverait pas bien sûr. C'est déjà nettement mieux. Et que donne un polynôme d'ordre trois\ ?
+N'oubliez pas d'utiliser `I()` dans la formule pour indiquer un calcul, sinon, `lm()` recherchera une variable qui s'appellerait `t^2` et ne la trouverait pas bien sûr (et en plus, le message d'erreur n'est pas toujours très explicite dans ce cas). Ce modèle polynomial d'ordre deux est déjà nettement mieux. Et que donne un polynôme d'ordre trois\ ?
 
 ```{r}
 density_poly3 <- lm(density ~ t + I(t^2) + I(t^3))
@@ -420,7 +420,7 @@ plot(density_poly3dec, stack = FALSE, resid = FALSE, col = c(1, 4),
   main = "Tendance polynomiale d'ordre 3")
 ```
 
-In ne semble pas que le gain soit flagrant ici. Testons à présent une modèle non linéaire. Par exemple, une courbe logistique. Le principe est le même, si ce n'est que nous utilisons ici la fonction `nls()` à la place de `lm()` et le modèle `SSfpl(..., A, B, xmid, scal)` pour le modèle logistique à quatre paramètres (voyez le module 4 du cours SDD II).
+Il ne semble pas que le gain soit flagrant ici... peut-être du côté de la Corse, et encore. Testons à présent une modèle non linéaire. Par exemple, une courbe logistique. Le principe est le même, si ce n'est que nous utilisons ici la fonction `nls()` à la place de `lm()` et le modèle `SSfpl(..., A, B, xmid, scal)` pour le modèle logistique à quatre paramètres (voyez le module 4 du cours SDD II).
 
 ```{r}
 density_logis <- nls(density ~ SSfpl(t, A, B, xmid, scal))
@@ -437,7 +437,7 @@ Nous pouvons à présent extraire la composante résiduelle pour observer les an
 
 ```{r}
 density_ano <- extract(density_logisdec, components = "residuals")
-plot(density_ano)
+plot(density_ano, xlab = "Stations", ylab = "Anomalies de densité [g/L]")
 ```
 
 A partir de là, nous pouvons analyser classiquement cette nouvelle série. Notez la diminution importante de densité au niveau du front vers la station 28 qui est clairement mise en évidence maintenant.
@@ -458,20 +458,20 @@ Dès lors, et à condition de cibler une fréquence particulière $\omega$ connu
 
 $$\beta_1 \cdot T_1 + \beta_2 \cdot T_2$$
 
-Cette dernière forme est assimilable à un polygone d'ordre deux dont l'ordonnée à l'origine vaut zéro, et que nous pouvons ajuster par régression polynomiale à l'aide de la fonction `lm()`.
+Cette dernière forme est assimilable à une régression multiple sur deux variables indépendantes $T_1$ et $T_2$ dont l'ordonnée à l'origine vaut zéro, et que nous pouvons ajuster facilement à l'aide de la fonction `lm()`.
 
 ##### Exemple {-}
 
-Nous avons déjà ajusté un tel modèle dans le jeu de données `co2` plus haut, mais sans l'expliquer complètement. A présent que nous avons vu l'astuce de la substitution de variable dans la forme sinus/cosinus de l'équation de la courbe sinusoïdale, nous comprenons mieux comment nous avons procédé. Utilisons maintenant un modèle sinusoïdal pour estimer la variation de la température au château de Nottingham pendant 20 ans au 20^ème^siècle. Comme les temératures sont enregistrées en °F, nous nous empressons de les convertir en °C (°C = (°F - 32) / 1.8).
+Nous avons déjà ajusté un tel modèle dans le jeu de données `co2` plus haut, mais sans l'expliquer complètement. A présent que nous avons vu l'astuce de la substitution de variable dans la forme sinus/cosinus de l'équation de la courbe sinusoïdale, nous comprenons mieux comment nous avons procédé. Utilisons maintenant un modèle sinusoïdal pour estimer la variation de la température au château de Nottingham pendant 20 ans au 20^ème^siècle. Comme les températures sont enregistrées en °F, nous nous empressons de les convertir en °C (°C = (°F - 32) / 1.8).
 
 ```{r}
 data("nottem", package = "datasets")
 nottem <- (nottem - 32) / 1.8 # °F -> °C
 tsp(nottem) # Données mensuelles, unité: 1 an
-plot(nottem)
+plot(nottem, xlab = "Temps [années]", ylab = "Température [°C]")
 ```
 
-Comme l'unité de temps choisie ici est l'année, et que cela correspond à la la fréquence du signal voulu, nous avons dons $\omega = 1$.
+Comme l'unité de temps choisie ici est l'année, et que cela correspond à la la fréquence du signal voulu, nous avons donc $\omega = 1$.
 
 ```{r}
 t <- time(nottem)
@@ -480,7 +480,7 @@ nottem_sin <- lm(nottem ~ I(cos(2*pi*omega*t)) + I(sin(2*pi*omega*t)))
 coef(nottem_sin)
 nottem_sindec <- tsd( nottem, method = "reg", xreg = predict(nottem_sin))
 plot(nottem_sindec, stack = FALSE, resid = FALSE, col = 1:2,
-  xlab = "Temps [années]", ylab = "Température [°F]",
+  xlab = "Temps [années]", ylab = "Température [°C]",
   main = "Variations saisonnière sinusoïdales")
 ```
 
@@ -488,39 +488,64 @@ Notre modèle sinusoïdal semble s'adapter relativement bien pour représenter l
 
 ## Décomposition par LOESS
 
-LOESS est une méthode de régression polynomiale locale. Pour chaque valeur *X*<sub>*t*</sub> d’une série *X*, on va considérer les *k* voisins à gauche et à droite, éventuellement pondérés (par exemple par la distance les séparant de *X*<sub>*t*</sub>). On effectue une régression par les moindres carrés d’un polynôme d’ordre *p* (habituellement *p* vaut 1 ou 2), et on récupère la valeur prédite au temps *t* (voir Cleveland *et al*, 1992). Si l’ordre *p* du polynôme vaut 0, on se ramène à une moyenne mobile.
+LOESS (prononcez "LO-ESSE") est une méthode de régression polynomiale locale. Pour chaque valeur $X_t$ d’une série $X$, on va considérer les *k* voisins à gauche et à droite, éventuellement pondérés (par exemple par la distance les séparant de $X_t$). On effectue une régression par les moindres carrés d’un polynôme d’ordre *p* (habituellement *p* vaut 1 ou 2), et on récupère la valeur prédite au temps $t$ (voir Cleveland *et al*, 1992). Il s'agit donc de l'utilisation d'une régression polynomiale dans une fenêtre mobile. Si l’ordre *p* du polynôme vaut 0, le calcul se ramène à une moyenne mobile classique.
 
 Avec un choix judicieux de *k*, et éventuellement en réitérant le processus, on va pouvoir extraire la tendance générale. Comme avec la méthode des moyennes mobiles, on va aussi pouvoir désaisonnaliser une série en prenant une fenêtre égale à un an, donc, en considérant 12 termes pour des données mensuelles (13 en fait pour une fenêtre centrée sur les observations de la série). Une combinaison de ces deux traitements va permettre de décomposer une série en tendance, cycle saisonnier et résidus selon un modèle additif. On peut aussi n’extraire que le cycle saisonnier et les résidus (surtout utile lorsque la tendance générale *est* périodique sur un an).
 
 Comme les résidus ont rarement une distribution normale et ne sont souvent pas indépendants entre eux dans les séries, les hypothèses de base indispensables pour la régression à l’aide de la méthode des moindres carrés sont violées la plupart du temps. Ainsi, pour obtenir une estimation plus exacte des composantes, il est possible d’utiliser une méthode de régression plus robuste (*i.e.*, moins sensible à la violation de ces hypothèses de base). On peut par exemple décider de pondérer les valeurs de manière inversement proportionnelle à leur influence respective sur la régression. Ainsi, une valeur qui, à elle seule, aurait tendance à tirer la courbe vers elle (valeur isolée, très éloignée du nuage formé par toutes les autres) recevra une pondération très faible afin de minimiser son effet.
 
+L'algorithme implémenté dans `decloess()` ou `tsd(method = "loess")`, lui-même implémenté dans `stl()` est en réalité un peu plus complexe, avec des passages multiples des différents filtres dans un ordre particulier, et avec un calcul supplémentaire éventuellement entre ces passages. Ceci explique que la méthode est plus efficace qu'une simple moyenne mobile. Cependant, les explications ci-dessus suffisent pour en comprendre le principe général. Si vous êtes intéressés par les détails, vous pouvez lire la page d'aide de `?stl`. 
+
 ##### Exemple {-}
 
-L’utilisation de ***decloess()******* pour extraire un cycle saisonnier à partir de la méthode des différences a déjà été présentée dans l’exemple de ***tsd()***. Nous le reprenons ici, et nous explorerons ensuite d’autres valeurs pour les paramètres, afin de voir leurs effets sur la décomposition:
+Le jeu de données qui se prête merveilleusement bien à la décomposition LOESS est `co2`. Nous l'avons déjà réalisée. Néanmoins, nous la reprenons ici pour discuter de différentes valeurs possibles des arguments qui vont influer sur la forme des différentes composantes extraites.
 
-&gt; data(releve)
-&gt; melo.regy &lt;- regul(releve$Day, releve$Melosul, xmin=9, n=87,
-+ units="daystoyears", frequency=24, tol=2.2, methods="linear",
-+ datemin="21/03/1989", dateformat="d/m/Y")
-&gt; melo.ts &lt;- tseries(melo.regy)
-&gt; melo.dec &lt;- decloess(melo.ts, s.window="periodic")
-&gt; plot(melo.dec, col=1:3)
+```{r}
+data("co2", package = "datasets")
+plot(co2)
+```
 
-Avec l’option **s.window = "periodic"**, la forme de la composante cyclique saisonnière est quelconque, mais est reproduite à l’identique pour toutes les années (puisque la même moyenne mensuelle est utilisée pour chaque mois de chaque année). Avec l’option **s.window = 13** et **s.degree = 0**, on obtient pratiquement le même résultat. Par contre, avec **s.degree = 1**, on va permettre une variation de la composante cyclique saisonnière d’une année sur l’autre:
+```{r}
+co2_loess <- tsd(co2, method = "loess", s.window = 13)
+plot(co2_loess, col = 1:3)
+```
 
-&gt; melo.dec2 &lt;- decloess(melo.ts, s.window=13, s.degree=1)
-&gt; plot(melo.dec2, col=1:3)
+L'argument `s.window =` n'a pas de valeur par défaut et doit donc être toujours fourni. Il s'agit de l'étendue de la fenêtre de décomposition saisonnière (attention\ : l'étendue est bien 2 *k* + 1, où *k* est l'argument `order =` pour les moyennes mobiles). Nous choisissons la valeur impaire immédiatement supérieure à la fréquence des observations pour une unité d'un an (ou d'un cycle, en tous cas). Donc, pour des données mensuelles, `s.window = 13`. Une autre valeur possible est `s.window = "periodic"`. Dans ce cas, la valeur moyenne à chaque mois sera calculée sur toute la longueur de la série. Il en résulte un signal cyclique de forme quelconque, mais *strictement identique chaque année*\ :
 
-Une étude de la cohérence (voir analyse des séries spatio-temporelle, paragraphe analyse spectrale croisée) entre les deux composantes ***deseasoned*** et ***seasonal*** sous R donne:
+```{r}
+co2_loess <- tsd(co2, method = "loess", s.window = "periodic")
+plot(co2_loess, col = 1:3)
+```
 
-&gt; melo.tsd &lt;- tseries(melo.dec2)
-&gt; melo.spc &lt;- spectrum(melo.tsd, spans=c(3,3), plot=FALSE)
-&gt; plot(melo.spc, plot.type="c")
+L'argument `s.degree =` indique le degré du polynôme utilisé pour l'extraction de la composante saisonnière. Il peut valoir zéro (valeur par défaut pour utiliser les moyennes mobiles). Donc, notre première décomposition en n'indiquant que `s.window = 13` se rapproche en fait à l'application d'un lissage par moyenne mobile. Lorsque `s.degree = 1`, nous ajustons une droite par les moindres carrés à chaque fois dans le fenêtre. Le signal résultant est très légèrement différent (non perceptible ici).
 
-On peut voir que la cohérence est très faible entre les deux séries, c’est le principe même de la décomposition saisonnière. Enfin, sous R uniquement, on peut également extraire la tendance (selon un modèle additif), simultanément à un cycle saisonnier qui se répète d’année en année (**s.window = "periodic"**) ou qui évolue au cours du temps (**s.window  frequency**), en précisant **trend = TRUE**:
+```{r}
+co2_loess <- tsd(co2, method = "loess", s.window = 13, s.degree = 1)
+plot(co2_loess, col = 1:3)
+```
 
-&gt; melo.dec3 &lt;- decloess(melo.ts, s.window="periodic", trend=TRUE)
-&gt; plot(melo.dec3, col=c(1,4,3,2))
+L'argument `trend =` indique si nous désaisonnalisons uniquement ou si nous retirons également une tendance générale. La valeur par défaut est `trend = FALSE`. Si nous indiquons `trend = TRUE`, la fonction utilise des valeurs par défaut pour `t.window =`, la largeur de la fenêtre pour l'extraction de la tendance (voir `?stl` pour l'explication plus détaillée et pour le calcul de la valeur pas défaut). Enfin, `t.degree = 1` par défaut, mais il peut aussi être ramené à zéro. Cette dernière valeur est moins intéressante dans le cas de la tendance bien souvent.
+
+```{r}
+co2_loess <- tsd(co2, method = "loess", s.window = 13, trend = TRUE)
+plot(co2_loess, col = 1:4)
+```
+
+Si nous diminuons la valeur de `t.window =`, la tendance générale est moins lissée. La plupart du temps, les valeurs par défaut conviennent très bien.
+
+```{r}
+co2_loess <- tsd(co2, method = "loess", s.window = 13, trend = TRUE, t.window = 7)
+plot(co2_loess, col = 1:4)
+```
+
+Enfin, en présence de valeurs extrêmes suspectes, nous pouvons utiliser une régression robuste à la place d'une régression par les moindres carrés classiques. Il suffit pour cela de préciser `robust = TRUE` (pas nécessaire ici).
+
+```{r}
+co2_loess <- tsd(co2, method = "loess", s.window = 13, trend = TRUE, robust = TRUE)
+plot(co2_loess, col = 1:4)
+```
+
+Enfin, terminons en signalant que si la méthode est prévue pour traiter uniquement des modèles additifs, `decloess()` et `tsd(method = "loess")` sont également capables de traiter des modèles multiplicatifs avec `type = "multiplicative"` grâce à l'astuce de la transformation logarithmique du signal implémentée en interne dans ces fonctions, mais `stl()`, elle ne le peut pas.
 
 ##### A vous de jouer ! {-}
 
