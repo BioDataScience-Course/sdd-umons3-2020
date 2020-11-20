@@ -559,373 +559,94 @@ assignation("C05Gb_ts_adv",
 
 ## Régularisation 
 
-Les méthodes présentées dans cette partie permettent de transformer une série spatio-temporelle échantillonnée avec un pas de temps irrégulier ou présentant des trous, en une série régulière. Malheureusement, en biologie, on a rarement affaire à des séries parfaitement régulières, soit parce qu’il y a des observations manquantes, soit parce qu’on ne contrôle pas l’intervalle de temps. Dans ce cas, la régularisation est une opération préliminaire indispensable à beaucoup d’analyses de séries spatio-temporelles, que ce soit avec les outils {pastecs} ou avec d'autres méthodes. Les objets **ts** doivent être *d’office* des séries spatio-temporelles régulières dans R. Cette étape est donc requise pour adapter des **data frames** avant de pouvoir les transformer en séries temporelles\ ! Plusieurs méthodes de régularisation sont disponibles dans {pastecs}\ : régularisation par valeur constante (`regconst()`), linéaire (`reglin()`), par courbes splines (`regspline()`) et par la méthode des aires (`regarea()`). Afin de simplifier le travail de régularisation, et de faciliter ensuite la création des séries temporelles, toutes ces fonctions ont été regroupées sous une fonction commune `regul()`.
+La régularisation d'une série spatio-temporelle permet de transformer une série échantillonnée avec un pas de temps irrégulier ou présentant des trous en une série régulière. Malheureusement, en biologie, on a rarement affaire à des séries parfaitement régulières, soit parce qu’il y a des observations manquantes, soit parce qu’on ne contrôle pas l’intervalle de temps. Dans ce cas, la régularisation est une opération préliminaire indispensable à beaucoup d’analyses de séries spatio-temporelles, que ce soit avec les outils {pastecs} ou avec d'autres méthodes. Les objets **ts** doivent être *d’office* des séries spatio-temporelles régulières dans R. Cette étape est donc requise pour adapter des **data frames** avant de pouvoir les transformer en séries temporelles\ ! Plusieurs méthodes de régularisation sont disponibles dans {pastecs}\ : régularisation par valeur constante (`regconst()`), linéaire (`reglin()`), par courbes splines (`regspline()`) et par la méthode des aires (`regarea()`). Afin de simplifier le travail de régularisation, et de faciliter ensuite la création des séries temporelles, toutes ces fonctions ont été regroupées sous une fonction commune `regul()`, dans la même philosophie que `tsd()` regroupe les différentes techniques de décomposition, par ailleurs implémentées par les fonctions `decXXX()`.
 
 ```{block2, type = 'warning'}
 Toutes ces méthodes sont à utiliser **avec précaution**. Il est très facile d’obtenir n’importe quoi si l’on choisit des mauvais paramètres\ ! Il n’y a pas de règle absolue dans leurs choix, étant donné qu’ils sont liés à la nature-même des données à régulariser. Par exemple, il faut être extrêmement attentif à ne pas régulariser à tort des données physico-chimiques (par exemple à l’aide de la méthode des aires avec une très grande fenêtre).
 ```
 
-Quelle que soit la méthode utilisée, on doit veiller à obtenir un pas de temps de la série régulière aussi proche que possible du pas de temps (moyen) de la série échantillonnée. De même, on doit aussi essayer d’obtenir autant de valeurs non interpolées que possible dans la série régulière finale. Quant à l’extrapolation (obtenue à l’aide de l’argument `rule = 2`), elle est à proscrire. La fonction `regul()` admet beaucoup de paramètres. Vous êtes invité à essayer différents réglages sur ses propres données, et à visualiser le résultat à l’aide de `plot.regul()` et `hist.regul()` pour vous familiariser avec ses possibilités.
+Quelle que soit la méthode utilisée, on doit veiller à obtenir un pas de temps de la série régulière aussi proche que possible du pas de temps (moyen) de la série échantillonnée. De même, on doit aussi essayer d’obtenir autant de valeurs non interpolées que possible dans la série régulière finale. Quant à l’extrapolation (obtenue à l’aide de l’argument `rule = 2`), elle est à proscrire. La fonction `regul()` admet beaucoup de paramètres. Vous êtes invité à essayer différents réglages sur vos propres données, et à visualiser le résultat à l’aide de `plot.regul()` et `hist.regul()` pour vous familiariser avec ses possibilités. La transformation du temps depuis un décompte des jours vers une "année numérique simplifiée" (longueur de 365,25 jours, et chaque mois correspondant à exactement 1/12 de cette valeur) n'est pas très intuitive, mais une fois que l'on a compris le principe, c'est très facile à faire avec l'argument `units = "daystoyears"` de `regul()` (voir l'exemple ci-dessous).  
 
-Dans le cas où l’on voudrait condenser des données aléatoires (par exemple, transformer un échantillonnage mensuel en valeurs saisonnières ou des données quotidiennes en série par semaine ou par mois), il vaut mieux condenser les données en calculant des moyennes ou des médianes successives. On peut aussi régulariser la série avec le pas temps initial si ce dernier est un multiple du pas de temps visé, et utiliser ensuite la fonction `aggregate()` de R, que nous avons déjà utilisée.
+Dans le cas où l’on voudrait condenser des données (par exemple, transformer un échantillonnage mensuel en valeurs saisonnières ou des données quotidiennes en série par semaine ou par mois), il vaut mieux agréger les données en calculant des moyennes ou des médianes successives. On peut aussi régulariser la série avec le pas temps initial si ce dernier est un multiple du pas de temps visé, et utiliser ensuite la fonction `aggregate()` de R, que nous avons déjà utilisée.
 
-Dans le cadre de ce cours, la régularisation de série irrégulière est une matière optionnelle. Cependant, comme il y a de fortes chances que vous rencontriez des séries irrégulières en biologie, 
+Dans le cadre de ce cours, la régularisation de série irrégulière est une matière optionnelle. La présentation très succincte ci-dessus vous permet de prendre connaissance de l'existence de ces techniques (faites toujours `?<nom_de_function` pour lire la page d'aide de chaque fonction citée comme point de départ). Revenez vers cette section, et vers les liens qu'elle renferme, si vous vous trouver confronté à une situation où un régularisation de série est nécessaire. Le [manuel de {pastecs}]((https://github.com/phgrosjean/pastecs/blob/master/manual/pastecs_manuel_utilisateur.pdf)) renferme tout un chapitre qui décrit en détails comment procéder. 
 
-### Choix du pas de temps
+### Application pratique
 
-Dans le cas de séries initiales très irrégulières, les fonctions `regul.screen()` et `regul.adj()` permettent de déterminer quels sont les meilleurs paramètres temporels pour la série régularisée afin qu’un maximum d’observations de la série initiale coïncident avec les valeurs de temps échantillonnées pour la série régularisée. Une fenêtre de tolérance pour déterminer si les valeurs coïncident est utilisée. Celle-ci est calculée en interne à l’aide de la fonction `match.tol()` qui ne sera donc en principe pas utilisée directement. Un exemple d'utilisation de ces fonctions est donné dans le paragraphe suivant.
+Nous reprenons ici l'exemple de la régularisation d'une série phytoplanctonique très irrégulière de {pastecs} par interpolation linéaire\ :
 
-### Fonction de régularisation
+<details><summary>Régularisation de la série `Navi` du jeu de données `releve`</summary>
 
-Dans {pastecs}, la régularisation d’une ou plusieurs séries se fait grâce à la fonction `regul()` qui renvoie un objet **regul** (en fait, une liste contenant un **data frame** qui représente la ou les séries régularisées, accompagnées d’un certains nombres d’attributs supplémentaires qui permettent le diagnostic du traitement, ainsi que l’extraction aisée des objets time series **ts** à partir de cette matrice à l’aide de `extract()` ou `tseries()`. La méthode `summary()` résume le résultat de la régularisation. La méthode `specs()` récupère les spécifications d’un objet **regul** pour éventuellement les appliquer à une nouvelle régularisation. La méthode `plot()` permet de réaliser facilement le graphe superposé de la série initiale et de la série finale à des fins de comparaison. La méthode `lines()` permet de superposer à un graphe déjà tracé une autre série régularisée (par exemple pour comparer deux méthodes de régularisation entre elles). La méthode `identify()` permet de sélectionner des points sensibles lors de la régularisation directement sur le graphe. La méthode `hist()` permet de représenter les points qui correspondent entre la série originale et la série régularisée, en fonction de la tolérance choisie dans le temps pour déclarer que les données sont équivalentes. Pour l’utilisateur avancé, les fonctions de régularisations respectives `regconst()`, `reglin()`, `regspline()` et `regarea()` sont aussi disponibles mais ne prennent pas en charge tout le traitement annexe de diagnostic et d’extraction de séries chronologiques. Par contre, ces dernières fonctions peuvent s’avérer plus pratiques dans des scripts et programmes personnels.
-
-Dans la plupart des logiciels, le temps est exprimé par rapport à une date de départ arbitraire (par exemple, le 1^er^ janvier 1970 par défaut dans R). Les dates antérieures à cette valeur de départ sont exprimées par des valeurs négatives. Les dates sont manipulées en interne comme des nombres décimaux classiques. La partie entière de la date représente le jour, la partie décimale représente l’heure. Par exemple, le nombre 1.5 représente le 2 janvier 1970, à 12:00:00 (le "second jour et demi" par rapport à la date de départ qui vaut 0) dans R, si l'origine temporelle n'a pas été redéfinie. Il est possible de connaître l'origine temporelle utilisée sur votre système grâce à la function `getOption()`, et la modifier en appelant la même fonction\ :
+Il s'agit du dénombrement de phytoplancton, et en particulier, la diatomée *Navicula sp* en une station unique entre le 21 mars 1989 et le 3 novembre 1992.
 
 ```{r}
-options("chron.origin") # Regarde sa valeur
-options(chron.origin = c(month = 1, day = 1, year = 1990))
-options("chron.origin")
-options(chron.origin = NULL) # Revient vers la valeur pas défaut
-options("chron.origin")
+phyto <- read("releve", package = "pastecs")
+chart(data = phyto, Navi ~ Day) +
+  geom_line()
 ```
 
-Lorsque `chron.origin = NULL`, cela signifie que c'est la valeur par défaut du 01/01/1970 dans R qui est prise en compte.
+Examinons un peu le pas de temps entre les différentes observations.
 
-```{block2, type = 'warning'}
-Si vous définissez des dates, et puis que vous modifiez `chron.origin` entre deux calculs, les mêmes variables risquent de se référer à des dates différentes avant et après le changement! Pour éviter cela, et aussi pour prendre en compte les fuseaux horaires et les horaires été/hiver, R utilise un format plus complexe de dates appelé **POSIXt**. Nous invitons le lecteur intéressé à consulter l'aide en ligne sous R à la rubrique `?DateTimeClasses`.
+```{r}
+releve$Day
+length(releve$Day)
+gaps <- releve$Day[2:61] - releve$Day[1:60]
+gaps
+range(gaps)
+mean(gaps)
 ```
 
-Les séries temporelles dans R admettent toute autre représentation arbitraire du temps en mode décimal. On peut par exemple décider de décompter les secondes écoulées à partir d’un temps de référence à l’aide de la partie entière du nombre (dixièmes, centièmes, etc. de secondes pour la partie décimale). Cela pourra être renseigné par l’argument `units=` de `regul()` dans lequel on entrera `"sec"` au lieu de `"days"` par défaut. L'utilisateur peut donc se référer à n'importe quelle échelle de temps, avec une unité au choix qu'il peut préciser dans l'argument `units=`. Cependant, il est conseillé de s'en tenir aux unités reconnues par les fonctions de la libraire PASTECS, parce que cela permettra notamment un formattage idéal des unités dans les sorties graphiques à l'aide de la fonction `GetUnitText()` (utilisée en interne, et donc, normalement pas appelée directement par l'utilisateur). Ces unités reconnues sont\ : `"years"`, `"days"`, `"weeks"`, `"hours"`, `"min"` et `"sec"`.
+Nous avons donc entre 7 et 67 jours entre deux observations avec un écart moyen de 22 jours. Ici, nous pouvons utiliser les fonction `regul.screen()` et `regul.adj()` pour trouver le meilleur pas de temps pour la régularisation. Ce travail est réalisé dans le manuel de {pastecs} qui suggère que trois semaines (21 jours) est un bon pas de temps. Mais afin d'avoir un nombre d'observations entier (fréquence entière), nous raccourcirons quelque peu cet intervalle. Si nous considérons 18 observations par an (`frequence = 18`), l'intervalle de temps entre deux observations sera alors de 365.25/18 = 20,3 jours.
 
-Une échelle particulièrement utile pour manipuler des séries pluriannuelles est **"years"**. Dans ce mode, la partie entière représente l’année, et la partie décimale représente le mois, le jour, l’heure, etc… Ainsi par exemple, 1998.167 représente le 1<sup>er</sup> mars 1998 à 00:00:00 heures, soit 1998 + 2/12 (0/12 pour début janvier, 1/12 pour début février, 2/12 pour début mars, …, 11/12 pour début décembre). En général, on travaille sur des données mensuelles dans ce mode, et on arrondit au mois près. Il s’agit en réalité d’une approximation puisque tous les mois n’ont pas le même nombre de jours (ni toutes les années), mais c’est une représentation pratique qui permet de se débarrasser des tracas liés aux nombres de jours par mois, aux années bissextiles, etc… Dans la fonction *** regul()***** **il est possible de préciser **units = "daystoyears"** qui convertit automatiquement des dates classiques où l’unité est le jour dans le mode d’unité **"years"**.
+Nous allons donc régulariser le jeu de données avec cette valeur en convertissant le temps en unité d'année. Afin d'éviter les difficultés du calendrier (année bissextile ou non, mois de 31, 30, 29 ou 28 jours), nous allons "lisser" le temps en utilisant l'argument `units = "daystoyears"`. En partant d'une mesure du temps écoulé depuis une date de départ en jours (dans `Day`), nous considérerons donc 265,25 jours par an et 1/12 d'année exactement pour chaque mois. Le début et la fin des années et des mois ne correspondront plus *exactement* au débuts et fins de dates calendriers (à un jour ou deux près maximum), mais dans le cadre d'effets annuels et inter-annuels, cela a peu d'importance\ : les êtres vivants se soucient relativement peu, en général, de notre calendrier Grégorien\ ! Par contre, ce type de manipulation ne tiendrait plus la route, par exemple, pour des données boursières ou économique. En effet, dans ce cas, les jours de week-end et les jours fériés sont susceptibles de différer significativement du point de vue des valeurs mesurées (valeurs boursière, activité économique, déplacements liés au travail ou aux vacances, etc.).
 
-> A noter que, d'une manière générale, l'analyse de cycles bien précis tels que l'effet saisonnier ou les cycles circadiens nécessitent d'exprimer le temps dans une unité qui correspond exactement au cycle étudié. Ainsi, les fonctions de décomposition des séries en composantes saisonnières (**decloess()** par exemple, voir chapitre décomposition des séries spatio-temporelles) imposent d'exprimer le temps en unité **"years"**. De même, il est fortement conseillé d'adopté l'unité **"days"** pour l'étude de cycles circadiens.
+```{block2, type = 'note'}
+A noter que, d'une manière générale, l'analyse de cycles bien précis tels que l'effet saisonnier ou les cycles circadiens nécessitent dans {pastecs} d'exprimer le temps dans une unité qui correspond exactement au cycle étudié. Ainsi, les fonctions de décomposition des séries en composantes saisonnières (`decloess()` par exemple) imposent d'exprimer le temps en unité `"years"`. De même, il est fortement conseillé d'adopté l'unité `"days"` pour l'étude de cycles circadiens.
+```
 
-La fonction ***regul()*** offre encore une autre particularité. Elle permet de ne pas interpoler des données qui seraient présentes dans la série de départ, ***avec une fenêtre de tolérance******** réglable***. Ainsi par exemple, si une mesure est présente au jour 123, mais aucune au jour 124 dans la série initiale, et qu’il faut calculer une valeur dans la série régularisée au jour 124 (pas d’une semaine ou plus), on peut décider que la valeur échantillonnée au jour 123 est une très bonne estimation de la valeur au jour 124 et ne pas effectuer d’interpolation. La fenêtre dans laquelle il faut aller voir si une valeur mesurée existe est réglable par le paramètre **tol** de ***regul()***. De plus, on peut décider d’aller voir de chaque côté, uniquement à gauche, ou seulement à droite (voir paramètre **tol.type**). Ainsi, on peut accroître sensiblement le nombre de valeurs non interpolées dans la série régularisée, en considérant une certaine "souplesse" dans les dates entre les séries échantillonnées et régularisées. Si cela n'est pas simple, un exemple concret va clarifier les choses…
+Un autre argument est aussi important ici, il s'agit de `tol =`. C'est la fenêtre de tolérance à gauche ou et à droite de la date requise dans la série régulière pour aller chercher une observation *sans l'interpoler*. Avec un pas de temps de 20 jours, on peut considérer que si nous avons à disposition une mesure la veille ou le lendemain, cela ne fera pas une grande différence. Peut-être même aussi l'avant-veille ou le surlendemain. Donc, nous prendrons une tolérance de 2 jours. Mais pour être certain de prendre les observations 2 jours avant ou aprsè, on rajoute 10% à la valeur, donc, une `tol = 2.2` jours. Nous avons à présent (presque) tout ce qu'il faut pour régulariser notre série.
 
-##### Exemple {-}
+```{r}
+navi_reg <- regul(releve$Day, releve$Navi, n = length(releve$Day),
+ units = "daystoyears", frequency = 18, tol = 2.2, methods = "linear",
+ datemin = "21/03/1989", dateformat = "d/m/Y")
+```
 
-Chargeons le jeu de données ***releve*** à partir de la librairie PASTECS. Etant donné que cette série est très irrégulière comme on peut le voir ci-dessous, il est très difficile de décider quel est le meilleur pas de temps (**deltat**), le meilleur temps initial (**xmin**), ainsi que le nombre de mesures optimal (**n**) pour interpoler le moins de valeurs possibles:
+Le programme nous avertit que, puisque nous avons transformé l'échelle temporelle de `"days"` en `"years"`, la valeur de `tol = 2.2` qui était exprimée en jours devient 0.0602 en années, et est de plus ajustée à une valeur de 0.006179 afin que ce soit une fraction entière de 1/`frequency` (c'est-à-dire de `deltat`, voir `?regul`). Comme `releve$Day` contient un décompte des jours depuis une date précise, nous devons indiquer cette date dans `datemin =`, et son format dans `dateformat =`. Nous obtenons alors ceci\ :
 
-&gt; data(releve)\# Dans R uniquement
-&gt; releve$Day
-\[1\] 1 51 108 163 176 206 248 315 339 356 389 449
-\[13\] 480 493 501 508 522 554 568 597 613 624 639 676
-\[25\] 697 723 751 786 814 842 863 877 891 906 922 940
-\[37\] 954 971 983 999 1010 1027 1038 1054 1069 1081 1094 1110
-\[49\] 1129 1143 1156 1173 1186 1207 1226 1235 1249 1271 1290 1314
-\[61\] 1325
-&gt; length(releve$Day)
-\[1\] 61
-&gt; ecarts &lt;- releve$Day\[2:61\]-releve$Day\[1:60\]
+```{r}
+navi_reg
+```
 
-&gt; ecarts
-\[1\] 50 57 55 13 30 42 67 24 17 33 60 31 13 8 7 14 32 14 29 16
-\[21\] 11 15 37 21 26 28 35 28 28 21 14 14 15 16 18 14 17 12 16 11
-\[41\] 17 11 16 15 12 13 16 19 14 13 17 13 21 19 9 14 22 19 24 11
-&gt; range(ecarts)
-\[1\] 7 67
-&gt; mean(ecarts)
-\[1\] 22.06667
+Il y a beaucoup d'information dans tout ceci. Nous vous renvoyons au manuel de {pastecs} pour les explications. Passons tout de suite à la représentation graphique\ :
 
-Nous choisirions *a priori* **xmin = 1** (la première valeur), **deltat = 22** (l'écart moyen arroundi à l'entier le plus proche) et **n = 61** (le nombre de valeurs observées dans la série initiale), mais est-ce la meilleure combinaison pour obtenir un maximum de valeurs qui coïncident entre la série de départ mesurée et la série régulière finale calculée? Sachant que l’on est prêt à accepter une fenêtre de tolérance de 1 jour dans le temps de part et d’autre de la valeur régularisée (prendre un peu plus, car les fenêtres de tolérance n’incluent pas les bornes), il est possible de "screener" différentes combinaisons de **xmin** et de **deltat** autour de ces premières approximations à l’aide de la fonction ***regul.screen()*******:
+```{r}
+plot(navi_reg, main = "Régularisation de Navicula sp")
+```
 
-&gt; regul.screen(releve$Day, xmin=0:11, deltat=16:27, tol=1.05)
+Le travail n'est pas trop mauvais, ... sauf que nous avons tronqué notre série à la fin. En effet, nous avons pris le même nombre d'observations que la série de départ. Comme le pas de temps de la série finale régularisée est plus court de presque deux jours que la moyenne du pas de temps dans la série irrégulière, nous perdons à droite. Il suffit de donner une valeur plus élevée pour `n =`, sans toutefois dépasser la date finale de la série de départ pour corriger ce léger problème\ :
 
-$tol
-d=16 d=17 d=18 d=19 d=20 d=21 d=22 d=23 d=24 d=25 d=26 d=27
-1.07 1.06 1.06 1.05 1.05 1.05 1.05 1.04 1.04 1.04 1.04 1.04
-$n
- d=16 d=17 d=18 d=19 d=20 d=21 d=22 d=23 d=24 d=25 d=26 d=27
-x=0 83 78 74 70 67 64 61 58 56 54 51 50
-x=1 83 78 74 70 67 64 61 58 56 53 51 50
-x=2 83 78 74 70 67 64 61 58 56 53 51 50
-x=3 83 78 74 70 67 63 61 58 56 53 51 49
-x=4 83 78 74 70 67 63 61 58 56 53 51 49
-x=5 83 78 74 70 67 63 61 58 56 53 51 49
-x=6 83 78 74 70 66 63 60 58 55 53 51 49
-x=7 83 78 74 70 66 63 60 58 55 53 51 49
-x=8 83 78 74 70 66 63 60 58 55 53 51 49
-x=9 83 78 74 70 66 63 60 58 55 53 51 49
-x=10 83 78 74 70 66 63 60 58 55 53 51 49
-x=11 83 78 74 70 66 63 60 58 55 53 51 49
-$nbr.match
- d=16 d=17 d=18 d=19 d=20 d=21 d=22 d=23 d=24 d=25 d=26 d=27
-x=0 9 12 13 6 8 5 5 5 10 12 10 12
-x=1 10 15 12 6 8 9 5 9 11 9 7 12
-x=2 13 9 11 10 11 11 8 11 14 9 8 13
-x=3 13 10 10 7 9 12 10 11 13 6 8 7
-x=4 14 9 8 10 7 9 11 7 11 5 7 9
-x=5 10 11 6 6 7 6 8 6 8 10 5 5
-x=6 12 13 4 7 7 1 7 8 5 7 6 5
-x=7 9 11 5 8 11 4 9 6 6 9 7 2
-x=8 10 11 9 11 11 14 12 6 4 4 7 5
-x=9 13 11 9 13 12 19 9 6 4 6 4 3
-x=10 14 10 13 13 13 17 7 10 4 5 5 7
-x=11 14 9 14 12 8 9 3 9 5 5 7 6
-$nbr.exact.match
- d=16 d=17 d=18 d=19 d=20 d=21 d=22 d=23 d=24 d=25 d=26 d=27
-x=0 3 7 4 1 2 1 2 2 2 1 2 3
-x=1 3 3 6 4 3 3 2 1 5 7 3 7
-x=2 4 5 2 1 3 5 1 6 4 2 2 2
-x=3 6 1 3 5 5 3 5 4 5 0 3 4
-x=4 3 4 5 1 1 5 4 1 4 4 3 2
-x=5 5 4 0 4 1 1 2 2 2 1 1 3
-x=6 2 3 1 1 5 0 2 3 2 5 1 0
-x=7 5 6 3 2 2 0 4 3 2 1 4 2
-x=8 2 2 1 5 4 4 3 0 2 3 2 0
-x=9 3 3 5 4 5 10 5 3 0 0 1 3
-x=10 8 6 3 4 3 5 1 3 2 3 1 0
-x=11 3 1 5 5 5 2 1 4 2 2 3 4
+```{r}
+navi_reg <- regul(releve$Day, releve$Navi, n = 66,
+ units = "daystoyears", frequency = 18, tol = 2.2, methods = "linear",
+ datemin = "21/03/1989", dateformat = "d/m/Y")
+plot(navi_reg, main = "Régularisation de Navicula sp")
+```
 
-Le premier tableau ***$tol*** renvoie la tolérance pour chaque deltat *d*. Le second tableau indique pour chaque combinaison de deltat *d* et de xmin *x*, quelle est la valeur maximale acceptable pour *n* sans devoir faire d’extrapolation. Les deux tableaux suivants renvoient, pour les mêmes combinaisons *d* *versus* *x*, respectivement le nombre d’observations qui coïncident dans la fenêtre de tolérance, et le nombre d’observation qui coïncident exactement. Nous cherchons à optimiser ces deux critères. Clairement, la combinaison **xmin = 9**, **deltat = 21**, **n = 63**, avec **tol = 1.05** renvoie le meilleur résultat puisque 10 observations coïncident parfaitement et 19 sont incluses dans la fenêtre de tolérance. Cela signifie que nous n’aurons pas à interpoler 19/63, soit un peu plus de 30% des valeurs dans la série régulière. Nous pouvons ensuite visualiser l’effet d’une modification de la fenêtre de tolérance dans le nombre d’observations qu’il ne faudra pas interpoler à l’aide de ***regul.adj()*******:
+Les pics et les creux dans la série régularisée (en rouge) sont assez bien représentatifs de ceux dans la série de départ (en noir), même si les gros pics éphémères sont légèrement tronqués. Les crois entourées d'un cercle indiquent les points qui ne sont *pas* interpolés parce qu'une valeur existe dans la fenêtre de tolérance de ± 2,2 jours. Par contre, les croix seules sont des valeurs interpolées linéairement entre les deux observations réalisées de part et d'autre de la date cible. Les traits verticaux pointilles indiquent le début et la fin de la série de départ (en noir) et régularisée (en rouge). Nous ne perdons presque rien sur l'axe temporel, tout en n'extrapolant aucune valeur en dehors de l'intervalle de temps de la série initiale. C'est donc parfait.
 
-&gt; regul.adj(releve$Day, xmin=9, deltat=21)
-$params
-xmin n deltat tol
- 9 63 21 21
-$match
-\[1\] 59
+L'extraction de la série régularisée à partir de l"objet `regul()` se fait exactement comme pour `tsd()` avec `tseries()`, ou alors avec `extract()` dans le cas où plusieurs séries auraient été régularisées simultanéments, mais que nous ne voulons convertir qu'une partie d'entre elles en objet **ts** ou **mts**.
 
-$exact.match
-\[1\] 10
-$match.counts
-0 1 2 3 4 5 6 7 8 9 10 12 13 14 15 16 19 20 Inf
-10 19 21 23 24 29 32 41 46 48 49 51 53 55 56 57 58 59 63
+```{r}
+navi <- tseries(navi_reg)
+class(navi)
+tsp(navi)
+plot(navi)
+```
 
-Cette fonction, par défaut, retourne des résultats chiffrés et dessine un histogramme de la distribution des valeurs non interpolées en fonction d’une fenêtre de tolérance croissante. La première barre en bleu foncé représente le nombre de valeurs qui coïncident exactement, et la dernière barre rouge représente le nombre de valeurs qui doivent être interpolées quelle que soit la taille de la fenêtre de tolérance au maximum égale à **deltat** (c'est-à-dire, les trous dans la série) On voit que dans le cas présent, il n’est effectivement pas utile d’augmenter la fenêtre de tolérance d’un jour ou deux, car seul un petit nombre de valeurs seraient rajoutées. Il faudrait ouvrir cette fenêtre à 5-7 jours de part et d’autre de la date de mesure pour augmenter significativement le nombre de valeurs qui coïncident, mais nous pouvons considérer qu’une telle fenêtre est trop large par rapport à un pas de temps de 21 jours (cela dépend en fait de la nature des données traitées!).
+Comme nous pouvons le constater, nous avons à présent une série régulière que nous pouvons travailler avec les outils habituels\ !
 
-> Il faut noter que comme les fonctions **regul.screen()** et **regul.adj()** ne manipulent que le vecteur temps, elles ne tiennent pas compte d’éventuelles valeurs manquantes dans la/les série(s) à régulariser. Si ces valeurs manquantes correspondent aux valeurs qui coïncident, on perd l’intérêt de ce "screening". Ces fonctions sont donc plutôt adaptées aux séries très irrégulières, mais avec peu de trous. De toute manière, elles sont totalement superflues pour des séries régulières à trous (le pas de temps est déjà fixé et connu!), et…on est bien mal embarqué si l’on possède des séries irrégulières à trous au départ!!!
-
-Maintenant que l’on a déterminé les paramètres temporels optimaux, il ne nous reste plus qu’à effectuer la régularisation de ***releve*** (dans notre exemple, les 6 premières séries qui suivent les premières colonnes ***releve$Day*** et ***releve$Date***, donc, les colonnes 3 à 8). Pour cela, nous devons choisir une éventuelle transformation des données (***log()***, ou autre…), une méthode de régularisation (éventuellement différente pour chaque série), ainsi que les paramètres de régularisation (tel que la taille de la fenêtre pour la méthode des aires, ou la valeur de **f **pour la régularisation constante). Une fois notre choix effectué, nous lançons la régularisation par ***regul()******* avec tous les paramètres choisis:
-
-&gt; rel.reg &lt;- regul(releve$Day, releve\[3:8\], xmin=9, n=63,
-+ deltat=21, tol=1.05, methods=c("s","c","l","a","s","a"),
-+ window=21)
-&gt; rel.reg
-
-Regulation of, by "method" :
- Astegla Chae Dity Gymn Melosul Navi
-"spline" "constant" "linear" "area" "spline" "area"
-Arguments for "methods" :
-tol.type tol rule f periodic window split
-"both" "1.05" "1" "0" "FALSE" "21" "100"
-44 interpolated values on 63 ( 0 NAs padded at ends )
-Time scale :
- start deltat frequency
-9.00000000 21.00000000 0.04761905
-Time units : days
-call : regul(x = releve$Time, y = releve\[3:8\], xmin = 9, n = 63, deltat = 21, tol = 1.05, methods = c("s", "c", "l", "a", "s", "a"), window = 21)
-
-Ainsi, 44 valeurs sont interpolées pour chaque série à l’aide de sa méthode respective, mais cela nous le savions déjà puisque les paramètres de temps pour les séries régulières ont été déterminés précédemment afin que 19 valeurs coïncident dans la fenêtre de tolérance choisie. De même, aucune valeur n’a été extrapolée (aucun **NA** n’a dû être ajouté si **rule = 1** comme ici) puisque **n** a été choisi judicieusement pour ne pas déborder de la série initiale. Il est possible d’avoir également la liste des points interpolés et leur valeur pour chaque série à l’aide de summary(rel.reg). La représentation graphique de n’importe laquelle de ces séries, superposée à la série de départ correspondante est simplement obtenue par ***plot()******* en précisant le numéro de la série à représenter:
-
-&gt; plot(rel.reg, 5)
-
-Les points interpolés sont représentés par une croix et les points qui coïncident à la série initiale (dans la fenêtre de tolérance) sont indiqués par une croix entourée d’un cercle. Les limites inférieures et supérieures des deux séries sont indiquées par des traits pointillés verticaux de couleur correspondante.
-
-Il y a encore deux critères que nous n’avons pas considérés ici: (1) les autres séries (il faut qu’une base de temps commune soit apte à représenter correctement TOUTES les séries, pas seulement une seule), et (2) des contraintes sur le pas de temps d’un point de vue pratique (par exemple, on veut conserver un pas de temps bi-mensuel ou mensuel au lieu de 17 ou 21 jours parce qu’on cherche à mettre en évidence des fluctuations saisonnières et que l’on ne veut pas de décalages du pas de temps d’une année à l’autre).
-
-En particulier, nous n’avons pas respecté la dernière contrainte. Avec une série pluriannuelle comme celle-ci, nous voudrions certainement étudier d’éventuelles variations saisonnières sur la série régularisée. Or, beaucoup de fonctions de R utilisables dans ce but nécessitent que l’unité de temps corresponde à la durée du cycle, c'est-à-dire, **"years"** ici. Bien entendu, il faut au moins 3 ou 4 mesures par unité de temps pour pouvoir étudier le cycle. R impose aussi que l’intervalle de temps soit un multiple exact de l’unité. Nous avons vu plus haut que, à plus ou moins un jour près, nous pouvons considérer qu’une année dure 365.25 jours. Toujours à un ou deux jours près dans la coupure à gauche et/ou à droite des mois, on peut considérer qu’un mois est équivalent à 1/12 d’une année, soit 365.25/12 = 30.44 jours. Si l’on veut s’en tenir à des valeurs bimensuelles ou "quinzaines", on doit donc considérer des intervalles **deltat** de 15.22 jours. L’utilisation de **tol** supérieur ou égale à 1 jour prend ici tout son sens! Ainsi, au lieu de 17 jours, nous serions contraints de prendre 15.22 jours comme intervalle pour pouvoir transposer le temps en **"years"**, avec une fréquence entière **frequency = 24** (24 "quinzaines" par an). Nous n’avons donc plus qu’un paramètre temporel libre pour ajuster au mieux la série régularisée afin d’interpoler le moins de points possibles. Les fonctions ***regul.screen()******* et ***regul.adj()******* nous renseignent toujours sur la valeur optimale de **xmin** dans ce cas précis (les résultats renvoyés ne sont pas imprimés):
-
-&gt; regul.screen(releve$Day, weight, xmin=-1:14, deltat=365.25/24,
-+ tol=2.2)
-…
-&gt; regul.adj(releve$Day, xmin=6, deltat=365.25/24)
-…
-
-Nous retiendrons ainsi: **xmin = 6**, **n = 87** et **tol  2.2**. Avec ces valeurs, 24 observations sur les 87 dans la série régulière ne devront pas être interpolées, soit environ 27%. Nous préférons préciser **frequency = 24** à **deltat** (qui serait une fraction puisqu’il vaut 1/24  0.0416667). La régularisation de la série ***Melosul***, avec une fréquence de 24 mesures par an exactement est donc obtenue par:
-
-&gt; melo.regy &lt;- regul(releve$Day, releve$Melosul, xmin=6, n=87,
-+ units="daystoyears", frequency=24, tol=2.2, methods="linear",
-+ datemin="21/03/1989", dateformat="d/m/Y")
-
-A 'tol' of 2.2 in 'days' is 0.00602327173169062 in 'years'
-'tol' was adjusted to 0.00595238095238083
-
-Le programme nous avertit que, puisque nous avons transformé l'échelle temporelle de **"days"** en **"years"** (argument **units="daystoyears"**), la valeur de **tol=2.2** qui était exprimée en jours devient 0.0602… lorsqu'elle est exprimée dans l'unité **"years"**. D'autre part, **tol** doit aussi être une fraction entière de 1/**frequency** (c'est-à-dire de **deltat**, voir ?regul). Or ce n'est pas le cas actuellement. La seconde ligne nous prévient donc que la valeur de **tol** a dû être ajustée à 0.00595 ans, soit 1/168 d'année, soit encore 1/168\*365.25 jours, c'est-à-dire 2.174 jours. Nous savions que **tol** allait être ajustée, puisque nous n’avons fourni qu’une valeur indicative. On précisera **datemin = "21/03/1989"** ou **datemin = releve$Date\[1\]** afin de caler l’axe temporel correctement. Nous obtenons le résultat suivant:
-
-&gt; melo.regy
-Regulation of, by "method" :
- Series
-"linear"
-Arguments for "methods" :
-tol.type tol rule f periodic window split
-"both" "0.00595” "1" "0" "FALSE" "15.3953488372093" "100"
-63 interpolated values on 87 ( 0 NAs padded at ends )
-Time scale :
- start deltat frequency
-2.109000e+03 4.166667e-02 24
-Time units : years
-call : regul(x = releve$Time, y = releve$Melosul, xmin = 6, n = 87, units = "daystoyears", frequency = 24, datemin = releve$Date\[1\], tol = 2.2, methods = "linear")
-
-&gt; plot(melo.regy, main="Regulation of Melosul")
-
-On fait un tout petit peu moins bien qu’avec notre pas de temps de 17 jours dans la "capture" des pics et des creux, mais cette fois-ci, on obtient une échelle temporelle utilisable pour étudier les variations saisonnières. En fin de compte, la régularisation retenue sera un compromis entre les meilleures représentations pour les différentes séries et les contraintes imposées. Une fois que l’on est satisfait du résultat obtenu, il est extrêmement facile de convertir l’objet *‘regul’* issu de la régularisation en ‘time series’ régulière(s), c’est à dire, soit en objet *‘rts’* sous S+, soit en objet *‘ts’* sous R à l'aide de la fonction ***tseries()*******:
-
-&gt; melo.ts &lt;- tseries(melo.regy)
-&gt; is.tseries(melo.ts)
-\[1\] TRUE
-
-On peut aussi décider de n’extraire qu’une seule ou quelques séries régularisées contenues dans un objet *‘regul’* qui en contient plusieurs à l’aide de la méthode ***extract()*******:
-
-&gt; melo.ts2 &lt;- extract(rel.reg, series="Melosul")
-
-A partir d’ici, nous disposons de tous les outils de traitement de séries spatio-temporelles de R, ainsi que des routines spécialisées de PASTECS pour continuer l’analyse: analyse spectrale, lissage, filtrage, décomposition, tendance générale ou saisonnière, etc. (voir chapitres suivants).
-
-> Les quatre fonctions suivantes (**regconst()**, **reglin()**, **regspline()** et **regarea()**) sont utilisées par **regul()**, mais sont aussi fournies séparément pour permettre à l’utilisateur avancé de réaliser ses propres routines de régularisation indépendamment de la fonction **regul()** et de l’objet ‘regul’ correspondant.
-
-### Régularisation par valeur constante
-
-Il s’agit de la méthode la plus simple de régularisation (mais aussi la moins puissante). Les valeurs interpolées *X*<sub>*j*</sub> aux temps *T*<sub>*j*</sub>* *sont calculées comme suit, si les valeurs mesurées qui encadrent *X*<sub>*j*</sub> dans la série irrégulière initiale sont *x*<sub>*i*-1</sub> et *x*<sub>*i*</sub> aux temps *t*<sub>*i*-1</sub> et *t*<sub>*i*</sub> (*i* est choisi tel que *t*<sub>*i*-1</sub> &lt; *T*<sub>*j*</sub>  *t*<sub>*i*</sub>).
-
-avec *f* une constante comprise entre 0 et 1 et qui donne plus de poids à la valeur mesurée à gauche (*f* &lt; 0.5), ou à droite (*f* &gt; 0.5) de la valeur à interpoler. Avec *f* = 1 on a une fonction d’interpolation continue à gauche, avec *f* = 0 on a une fonction continue à droite et avec *f* = 0.5 on obtient la moyenne des deux valeurs encadrantes comme interpolation sur tout l’intervalle. Cette méthode est surtout utile avec *f* = 0, si la série de départ a été compressée avec un algorithme de type *RLE* ("Run-Length Encoding") qui reprend chaque valeur et l’intervalle sur lequel elle reste constante, au lieu de considérer un pas de temps constant.
-
-<span id="anchor-5"></span>Exemple:
-
-La série ***Melosul***** **du jeu de données ***releve*** est régularisée avec la méthode de valeur constante comme suit:
-
-&gt; data(releve)
-&gt; reg &lt;- regconst(releve$Day, releve$Melosul)
-
-On peut tracer un graphique de la série de départ et de la série régularisée pour comparaison visuelle:
-
-&gt; plot(releve$Day, releve$Melosul, type="l")
-&gt; lines(reg$x, reg$y, col = 2)
-
-La série de départ apparaît en noir, et la série régularisée en rouge. Lorsqu’une interpolation est nécessaire, la valeur immédiatement à gauche dans la série de départ est utilisée. A noter toutefois que cette méthode est incluse dans ***regul()*** qui offre plus de facilités pour le diagnostic et l’extraction des séries temporelles après régularisation. On peut visualiser les points de la série de départ superposés à la fonction continue calculée qui sert à la régularisation comme suit:
-
-&gt; plot(releve$Day, releve$Melosul, type="p")
-&gt; lines(regconst(releve$Day, releve$Melosul,
-+ n=length(releve$Day)\*10), col=2, lty=2)
-
-### Régularisation linéaire
-
-Les points mesurés sont reliés par des segments de droite, et les valeurs interpolées sont obtenues à partir de la ligne brisée ainsi construite. L’équation qui donne les valeurs interpolées *X*<sub>*j*</sub> au temps *T*<sub>*j*</sub> à partir des valeurs encadrantes *x*<sub>*i*-1</sub>, *x*<sub>*i*</sub> aux temps respectifs *t*<sub>*i*-1</sub>, *t*<sub>*i*</sub> de la série irrégulière initiale est:
-
-avec, pour tout *j* = 1…*p*, *i* est choisi tel que *t*<sub>*i*-1</sub> &lt; *T*<sub>*j*</sub>  *t*<sub>*i*</sub>.
-
-<span id="anchor-6"></span>Exemple:
-
-La série ***Melosul***** **du jeu de données** *****releve***** **est régularisée avec la méthode linéaire comme suit:
-
-&gt; data(releve)\# Dans R uniquement
-&gt; reg &lt;- reglin(releve$Day, releve$Melosul)
-
-On peut tracer un graphique de la série de départ et de la série régularisée pour comparaison visuelle:
-
-&gt; plot(releve$Day, releve$Melosul, type="l")
-&gt; lines(reg$x, reg$y, col=4)
-
-La série de départ apparaît en noir, et la série régularisée en bleu. L’interpolation est réalisée le long de la droite qui relie les deux valeurs encadrantes. Cette méthode est incluse dans ***regul()*** qui offre plus de facilités pour le diagnostic et l’extraction des séries temporelles après régularisation. On peut visualiser les points de la série de départ superposés à la fonction continue calculée qui sert à la régularisation comme suit:
-
-&gt; plot(releve$Day, releve$Melosul, type="p")
-&gt; lines(reglin(releve$Day, releve$Melosul,
-+ n=length(releve$Day)\*10), col=4, lty=2)
-
-### Régularisation par courbes splines
-
-L’ajustement par des fonctions splines consiste à définir un polynôme dont les valeurs aux points d’observation coïncident avec les valeurs de l’échantillon. Le problème d’interpolation entre *p* points, donnés par une fonction *g*(*x*) dont les dérivées d’ordre 1 à *k* (avec 1  *k*) sont continues, peut être résolu en minimisant des fonctions du type:
-
-avec: *a* &lt; *x*<sub>1</sub> &lt; … &lt; *x*<sub>*p*</sub> &lt; *b*
-
-Plus on est exigeant sur l’ordre *k* des dérivées que l’on souhaite continues ainsi que sur le degré du polynôme *g*(*x*) choisi et plus l’expression de la fonction spline devient complexe. Nous considérerons des fonctions splines cubiques, c’est-à-dire constituées de polynômes du troisième degré dont les deux premières dérivées sont continues.
-
-Soit *n* valeurs temporelles successives *t*<sub>1</sub>, *t*<sub>2</sub>, …, *t*<sub>*n*</sub> ainsi que les observations correspondantes *x*<sub>1</sub>, *x*<sub>2</sub>, …, *x*<sub>*n*</sub> de la série irrégulière initiale. L’algorithme de calcul est le suivant:
-
--   On calcule les écarts entre les abscisses temporelles: *H*<sub>*i*</sub> = *t*<sub>*i*</sub> – *t*<sub>*i*-1.</sub>
--   On construit un vecteur colonne des différences *V * tel que:
-
-et une matrice carrée *M* telle que:
-
--   On calcule les dérivées secondes aux points expérimentaux. Pour cela il faut résoudre le système *M* . *DS* = *V* ou encore *DS* = *M*<sup>-1</sup> . *V*. On obtient ainsi dans le vecteur *DS* les dérivées secondes aux points d’origine. On attribue des dérivées secondes nulles aux points extrêmes de la courbe (argument **method = "fmm"** de ***regspline()***), ou on considère que la courbe forme une boucle (dernière valeur = première valeur, argument **method = "periodic"**).
--   On calcule la fonction spline pour chaque valeur de temps *T*<sub>*j*</sub> de la série régularisée selon un pas préalablement choisi. En appelant *X*<sub>*j*</sub>, les ordonnées calculées de la série régularisée correspondant à ces temps *T*<sub>*j*</sub>, on a:
-
-avec *i* choisi tel que *t*<sub>*i-1*\\ </sub> &lt; *T*<sub>*j*</sub>* *  *t*<sub>*i*</sub> pour chaque valeur de *j *= 1…*p*.
-
-> Etant donné que les courbes splines peuvent dans certains cas produire des valeurs plus grandes ou plus petites que les valeurs extrêmes de la série initiale, la méthode utilisée dans PASTECS recadre ces extrémas pour éviter qu’ils ne soient plus grands ou plus petits que les valeurs extrêmes de la série de départ. Cela évite, par exemple, d’obtenir des valeurs négatives pour des comptages dans certains cas.
-
-##### Exemple {-}
-
-La série ***Melosul***** **du jeu de données ***releve*** est régularisée avec des splines comme suit:
-
-&gt; data(releve)\# Dans R uniquement
-&gt; reg &lt;- regspline(releve$Day, releve$Melosul)
-
-On peut tracer un graphique de la série de départ et de la série régularisée pour comparaison visuelle:
-
-&gt; plot(releve$Day, releve$Melosul, type="l")
-&gt; lines(reg$x, reg$y, col=3)
-
-La série de départ apparaît en noir, et la série régularisée en vert. Les valeurs interpolées le sont le long de segments de courbes appelés splines. A noter toutefois que cette méthode est incluse dans ***regul()*** qui offre plus de facilités pour le diagnostic et l’extraction des séries temporelles après régularisation. On peut visualiser les points de la série de départ superposés à la fonction continue calculée qui sert à la régularisation comme suit:
-
-&gt; plot(releve$Day, releve$Melosul, type="p")
-&gt; lines(regspline(releve$Day, releve$Melosul,
-+ n=length(releve$Day)\*10), col=3, lty=2)
-
-### Régularisation par la méthode des aires
-
-Une autre méthode d’interpolation linéaire correspond à l'interpolation par les aires décrites par Fox (1972). Cette méthode permet d'estimer les valeurs manquantes, mais plus généralement de substituer à une série irrégulière, des valeurs régulièrement espacées dans le temps en prenant en compte toutes les valeurs mesurées dans un intervalle constant à gauche et à droite de la valeur interpolée. Contrairement aux autres méthodes de régularisation, la courbe obtenue ne passe pas nécessairement par les points observés intiaux, c’est-à-dire qu’un lissage est effectué simultanément à l’interpolation. Ce lissage est d’autant plus important que la fenêtre d’interpolation est grande.
-
-Soit une série d’observations *x*<sub>1</sub>, *x*<sub>2</sub>, ..., *x*<sub>*n*</sub> aux temps *t*<sub>1</sub>, *t*<sub>2</sub>,..., *t*<sub>*n*</sub>. On considère que chaque valeur *x*<sub>*i*</sub> représente une estimation des valeurs comprises dans l'intervalle de longueur , c’est-à-dire que l’on considère en fait des **aires** successives rectangulaires, plutôt que des observations ponctuelles discontinues dans le temps.
-
-Un intervalle de temps *U* (une fenêtre), est choisi de préférence plus grand que la moyenne des durées minimums séparant les observations successives sur l'ensemble des séries initiales traitées. Considérons des fenêtres *U*<sub>*j*</sub> centrées autour des valeurs *T*<sub>*j*</sub> choisies pour la série régulière calculée. Ces fenêtres *U*<sub>*j*</sub> sont limitées par les dates *U*<sub>-*j*</sub> = *T*<sub>*j*</sub> – *U*/2 et *U*<sub>+*j*</sub> = *T*<sub>*j*</sub> + *U*/2. Le cas le plus simple correspond à la coïncidence entre le point au centre de la fenêtre et la date d'observation. Dans ce cas il n'est pas effectué de régularisation et la valeur observée reste inchangée (on peut aussi décider d’effectuer le calcul sur ce point à l’aide de l’option `interp = TRUE`, voir description de la fonction ***regarea()***). Dans les autres cas, l'interpolation prend en compte tous les intervalles *f*<sub>*i*</sub> inclus dans la fenêtre. Soit la fraction de *F*<sub>*i*</sub> appartenant à la fenêtre *U*<sub>*j*</sub>. Pour chaque observation, trois cas peuvent apparaître:
-
-1.  les observations telles que (aire complètement inclue dans la fenêtre),
-2.  les observations telles que (aire totalement en dehors de la fenêtre),
-3.  les observations telles que (intervalle coupant un bord de la fenêtre).
-
-On a: . La valeur interpolée est donnée par .
-
-La figure illustre ce procédé. Il faut estimer la valeur *X*<sub>*j*</sub> au temps *T*<sub>*j*</sub>. Les points *x*<sub>*i*-2</sub>, *x*<sub>*i*-1</sub> et *x*<sub>*i*</sub> sont inclus dans la fenêtre. Les points *x*<sub>*i*-3</sub> et *x*<sub>*i*+1</sub> sont les proches à l'extérieur. Les valeurs réelles observées sont: *x*<sub>*i*-3</sub> = 10, *x*<sub>*i*-2</sub> = 5, *x*<sub>*i*-1</sub> = 9, *x*<sub>*i*</sub> = 3, *x*<sub>*i*+1</sub> = 6, et les correspondants: 0, 4, 6, 7, 1.
-
-On a: .
-
-D'où: *X*<sub>*j*</sub> = (10 . 0 + 5 . 4 + 9 . 6 + 3 . 7 + 6 . 1) / 18 = 5,6
-
-Notons qu'une valeur nulle interpolée correspond soit:
-
--   au cas où toutes les observations *x*<sub>*i*</sub> satisfaisant sont égales à 0,
--   à la coïncidence de dates entre un 0 observé et le milieu de la fenêtre: *T*<sub>*j*</sub> = *t*<sub>*i*</sub> avec *x*<sub>*i*</sub> = 0 lorsque les données qui coïncident ne sont pas interpolées (argument `interp = FALSE` de ***regarea()***).
-
-L’algorithme utilisé dans l'ancien PASSTEC 2000 correspond à peu de choses près à cette description. Le code se caractérise par des boucles (sur toutes les valeurs extrapolées) et de nombreux tests de conditions. L’algorithme a dû donc être totalement réécrit en calcul matriciel pour la librairie PASTECS. Quatre vecteurs sont créés: *t*<sub>-</sub>, *t*<sub>+</sub> et *U*<sub>-</sub>, *U*<sub>+</sub>. Les vecteurs *t*<sub>-</sub> et *t*<sub>+</sub> contiennent respectivement les bornes inférieures et supérieures de chaque aire correspondant aux points *x*<sub>*i*</sub> mesurés. Leur dimension est donc *n*, le nombre de points dans la série initiale. De même, les vecteurs *U*<sub>-</sub> et *U*<sub>+</sub> contiennent les bornes inférieures et supérieures des fenêtres entourant chaque point *X*<sub>*j*</sub> à extrapoler au temps *T*<sub>*j*</sub>. Leur dimension est *p*, le nombre de points à obtenir dans la série régularisée. Les vecteurs *t*<sub>-</sub> et *t*<sub>+</sub> sont recopiés *p* fois en colonnes, de manière à former deux matrices *n*  *p* (lignes  colonnes). De même, les vecteurs *U*<sub>-</sub> et *U*<sub>+</sub> sont recopiés *n* fois en lignes pour former également deux matrices de dimension *n * *p*. On peut montrer que les pour toutes les valeurs à extrapoler sont obtenus dans les colonnes respectives de *F* calculé comme suit:
-
-Et ce, à condition que:
-
--   toutes les valeurs contenues dans les vecteurs *t*<sub>-</sub>, *t*<sub>+</sub>, *U*<sub>-</sub>, *U*<sub>+</sub> soient positives (il suffit de soustraire la plus petite valeur de temps rencontrée à chaque vecteur, si cette valeur est inférieures à 0, pour obtenir cette condition),
--   toutes les valeurs négatives obtenues pour les *F*<sub>*ij*</sub> soient remplacées par des zéros (elles correspondent à des plages totalement en dehors de la fenêtre *U*<sub>*j*</sub>).
-
-Par conséquent, les valeurs interpolées sont obtenues dans le vecteur *X*<sub>*j*</sub> par:
-
-où *i* est l’indice des lignes et *j* est l’indice des colonnes pour la matrice *F* (somme par colonne du produit *x*<sub>*i*</sub>.*F*<sub>*ij*</sub> divisé par la taille de fenêtre *U*).
-
-L’inconvénient de cette méthode est de produire 4 matrices de très grandes tailles *n*  *p* pour des séries longues. De plus, comme la plupart des *F*<sub>*ij*</sub> sont nuls (en dehors de *U*) pour de très longues séries de taille nettement supérieure à la taille de la fenêtre *U*, cette méthode utilise une grande quantité de mémoire vive et de calcul dans pareil cas. La solution est de diviser la série en sous-unités plus petites et d’effectuer l’extrapolation sur chaque sous-unité indépendamment le long de la "diagonale" *j*  *i*. Nous avons déterminé empiriquement que, sous S+ comme sous R, la taille de sous-unité qui optimise la vitesse de calcul est d’environ 100 valeurs interpolées calculées à la fois. Cette taille de sous-unité est toutefois ajustable par l’argument **split** de la fonction ***regarea()***. Si le nombre de valeurs dans la série initiale est sensiblement égal au nombre de valeurs extrapolées, les matrices ont une taille d’environ 100  100, soit 10000 éléments. Notre machine de référence (Pentium II 500 Mhz avec 128 Mo de mémoire vive) est capable de régulariser la série ***Melosul*** de la matrice exemple ***releve*** (200 valeurs extrapolées, et fenêtre de 50 jours) en 0.175 sec avec `split = 100`, contre 2.68 sec avec `split = 1` (correspondant à peu près à la méthode de l'ancien PASSTEC 2000 de calcul valeur par valeur).
-
-##### Exemple {-}
-
-La série ***Melosul***** **du jeu de données ***releve*** est régularisée avec la méthode des aires, en utilisant une fenêtre de 25, puis de 50 jours) comme suit:
-
-&gt; data(releve)
-&gt; reg &lt;- regarea(releve$Day, releve$Melosul, window=25)
-&gt; reg2 &lt;- regarea(releve$Day, releve$Melosul, window=50)
-
-On peut tracer un graphique de la série de départ et des deux séries régularisées pour comparaison visuelle:
-
-&gt; plot(releve$Day, releve$Melosul, type="l")
-&gt; lines(reg$x, reg$y, col=2)
-&gt; lines(reg2$x, reg2$y, col=4)
-
-La série de départ apparaît en noir, la série régularisée avec une fenêtre de 25 jours est tracée en rouge, et celle régularisée avec une fenêtre de 50 jours, en bleu. Lorsqu’une interpolation est nécessaire, une moyenne des aires incluses dans la fenêtre est réalisée. Plus cette fenêtre est large, plus les valeurs interpolées seront "lissée" par rapport à la série de départ. A noter toutefois que cette méthode est incluse dans ***regul()*** qui offre plus de facilités pour le diagnostic et l’extraction des séries temporelles après régularisation. Les deux graphiques suivants montrent les fonctions continues calculées qui servent à la régularisation de l'exemple précédent pour respectivement un fenêtre de 25 jours (en rouge) et de 50 jours (en bleu):
-
-&gt; plot(releve$Day, releve$Melosul, type="p")
-&gt; lines(regarea(releve$Day, releve$Melosul, window=25,
-+ n=length(releve$Day)\*10), col=2, lty=2)
-&gt; plot(releve$Day, releve$Melosul, type="p")
-&gt; lines(regarea(releve$Day, releve$Melosul, window=50,
-+ n=length(releve$Day)\*10), col=4, lty=2)
-
-### Conversion en séries régulières
-
-Comme nous l'avons vu au paragraphe présentant les fonctions générales de régularisation, la fonction ***tseries()******* permet de convertir un objet *‘regul’* issu d’une régularisation (de même d’ailleurs qu’un objet *‘tsd’* issu d’une décomposition, voir plus loin) en objets *‘ts’* contenant **toutes** les séries. Pour extraire **une partie** des séries présentes dans l’objet *‘regul’*, utiliser plutôt la méthode ***extract()******* de l’objet. Enfin, la fonction ***is.tseries()******* est utile pour tester si un objet est une série régulière. Elle est équivalent à la fonction ***is.ts()******* proposées en standard dans R.
+</details>
 
 ## Récapitulatif des exercices
 
