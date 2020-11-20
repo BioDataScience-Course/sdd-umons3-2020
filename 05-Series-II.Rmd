@@ -214,7 +214,7 @@ Un autre phénomène qu'il faut connaître est l'**effet Slusky-Yule**. L'applic
 
 ##### Exemple {-}
 
-Nous avons déjà réalisé une désaisonnalisation sur `co2`précédemment dans ce module. Voyons à présent comment ce filtre se comporte sur un signal cyclique complexe comme `lynx`.
+Nous avons déjà réalisé une désaisonnalisation sur `co2` précédemment dans ce module. Voyons à présent comment ce filtre se comporte sur un signal cyclique complexe comme `lynx`.
 
 ```{r}
 data("lynx", package = "datasets")
@@ -339,6 +339,8 @@ Comme nous pouvons le voir, la tendance a bien été éliminée, mais malheureus
 
 Le filtrage par les valeurs propres (*eigenvector filtering* en anglais, ou EVF en abrégé) consiste à décomposer le signal original de la série via une analyse en composantes principales.
 
+TODO: doit encore être rédigé!
+
 ## Régressions et séries
 
 Les régressions linéaires et non linéaires, surtout s'il s'agit de modèles ajustés par les moindres carrés, ne sont *a priori* pas compatibles avec les séries spatio-temporelles puisqu'elles nécessitent une indépendance des observation, une distribution Normale des résidus, etc. Mais en fait toutes ces conditions s'appliquent aux **tests d'hypothèses** autour de le régression. Si nous nous contentons d'utiliser la régression pour estimer la forme d'une composante, et ensuite que nous l'extrayons sans utiliser le tableau de l'ANOVA, les tests de Student sur les paramètres, etc., alors notre usage de cet outil sera approprié ici.
@@ -347,9 +349,100 @@ Les régressions linéaires et non linéaires, surtout s'il s'agit de modèles a
 
 Les méthodes de filtrage présentées ci-dessus permettent d’extraire ou d’éliminer une tendance de forme quelconque (on n’a pas d’idée *a priori* de sa forme\ ; on ne cherche pas à la modéliser). Les méthodes d’estimation par régression, au contraire, font appel à des hypothèses très fortes quant à sa nature\ : on cherche à ajuster une ou plusieurs équations fonctionnelles à la tendance de la série.
 
+#### Tendance générale
+
 L’idée simple pour estimer une tendance générale est de vérifier son ajustement par une droite, une parabole, un polynôme d’ordre plus élevé simulant un mouvement pseudo-cyclique de forte période. Ces techniques reposent sur l’algorithme des moindres carrés\ : on minimise les carrés d’écarts entre les données observées et un polynôme de degré fixé à l’avance. 
 
 On pourrait imaginer bien d’autres formes de tendance générale (exponentielle, logistique, etc.). Certains de ces modèles prennent même en compte une autocorrélation entre les observations, aspect fondamental dans le cadre de l’analyse de séries spatio-temporelles. Ces modèles autorégressifs sont très importants dans le domaine, mais ils sont plutôt appliqués en économie, en physique, ... et moins en biologie. Nous ne les étudierons donc pas ici.
+
+##### Exemple {-}
+
+Nous reprenons ici l'exemple du manuel de {pastecs} qui illustre bien l'utilisation de différents modèles (linéaire, polynomial, non linéaire) pour estimer la tendance générale de la densité de l'eau le long du transect Nice - Calvi pour le jeu de données `marphy` (comme c'est un excès de densité par rapport à 1000 g/L qui est enregistrée dans le jeu de données, nous rajoutons 1000 pour rétablir la valeur).
+
+```{r}
+data("marphy", package = "pastecs")
+density <- ts(marphy$Density + 1000)
+plot(density, xlab = "Transect Nice - Calvi (stations)",
+  ylab = "Densité [g/L]")
+```
+
+Nous voyons très bien ici une nette tendance à l'augmentation. Ajustons tout d'abord une simple droite pour estimer (et extraire) la tendance générale\ :
+
+```{r}
+library(pastecs)
+t <- time(density) # Extraction du vecteur temps de l'objet ts
+density_lin <- lm(density ~ t) # Ajustement
+coef(density_lin) # Paramètres du modèle ajusté
+```
+
+Remarquons que nous avons appelé `lm()` ici **sans** préciser `data =`. Dans ce cas, la fonction va rechercher ses variables comme vecteurs numériques directement dans l'environnement de travail. Nous avions déjà `density` qui est un objet **ts**, mais nous savons par ailleurs que ce **ts** est aussi, et avant tout, un vecteur numérique (auquel un attribut `tsp` a été ajouté, attribut inconnu et donc ignoré de `lm()`). Nous avons créé notre second vecteur numérique `t` en extrayant la variable de temps de l'objet **ts** en utilisant `time()`. Ainsi, nous pouvons travailer avec `lm()` directement.
+
+L'objet `density_lin` est un objet **lm** tout-à-fait classique. Nous pouvons donc afficher le tableau `summary()`, effectuer l'analyse des résidus, etc. et ... **stop\ ! Gardez à l'esprit que l'application de `lm()` à une série temporelle tord le système car la non indépendance des observations entre elles peut être problématique. Nous n'utiliserons donc ici que l'ajustement du modèle sans en analyser les résidus.**
+
+```{r}
+summary(density_lin)
+```
+
+L'ANOVA, et les tests de Student sur les paramètres ne peuvent être utilisés ici, même si nous pouvons les calculer à partir de `summary()` ou `anova()`. Afin d'utiliser ce modèle linéaire pour décomposer la série, nous utilisons `predict()` pour récupérer les valeurs prédites par le modèle pour la tendance, et nous les utilisons dans `decreg()` ou `tsd(methode = "reg")`\ :
+
+```{r}
+trend_lin <- predict(density_lin)
+density_lindec <- tsd(density, method = "reg", xreg = trend_lin)
+plot(density_lindec, col = c(1, 3, 2), xlab = "Stations")
+```
+
+ou mieux, nous représentons la série de départ et la tendance générale superposée en utilisant `stack = FALSE`\ :
+
+```{r}
+plot(density_lindec, stack = FALSE, resid = FALSE, col = c(1, 3),
+  xlab = "Stations", ylab = "Densité [g/L]", main = "Tendance linéaire")
+```
+
+Nous voyons bien que la droite n'est qu'une mauvaise approximation de la tendance générale. Nous pourrions essayer une courbe à la place. Commençons avec un polynôme d'ordre deux.
+
+```{r}
+density_poly2 <- lm(density ~ t + I(t^2))
+coef(density_poly2)
+density_poly2dec <- tsd(density, method = "reg", xreg = predict(density_poly2))
+plot(density_poly2dec, stack = FALSE, resid = FALSE, col = c(1, 2),
+  xlab = "Stations", ylab = "Densité [g/L]",
+  main = "Tendance polynomiale d'ordre 2")
+```
+
+N'oubliez pas d'utiliser `I()` dans la formule pour indiquer un calcul, sinon, `lm()` recherchera une variable qui s'appellerait `t^2` et ne la trouverait pas bien sûr. C'est déjà nettement mieux. Et que donne un polynôme d'ordre trois\ ?
+
+```{r}
+density_poly3 <- lm(density ~ t + I(t^2) + I(t^3))
+coef(density_poly3)
+density_poly3dec <- tsd(density, method = "reg", xreg = predict(density_poly3))
+plot(density_poly3dec, stack = FALSE, resid = FALSE, col = c(1, 4),
+  xlab = "Stations", ylab = "Densité [g/L]",
+  main = "Tendance polynomiale d'ordre 3")
+```
+
+In ne semble pas que le gain soit flagrant ici. Testons à présent une modèle non linéaire. Par exemple, une courbe logistique. Le principe est le même, si ce n'est que nous utilisons ici la fonction `nls()` à la place de `lm()` et le modèle `SSfpl(..., A, B, xmid, scal)` pour le modèle logistique à quatre paramètres (voyez le module 4 du cours SDD II).
+
+```{r}
+density_logis <- nls(density ~ SSfpl(t, A, B, xmid, scal))
+coef(density_logis)
+density_logisdec <- tsd(density, method = "reg", xreg = predict(density_logis))
+plot(density_logisdec, stack = FALSE, resid = FALSE, col = c(1, 5),
+  xlab = "Stations", ylab = "Densité [g/L]",
+  main = "Tendance logistique à 4 paramètres")
+```
+
+Ce dernier modèle est particulièrement intéressant parce qu'il exprime un changement de densité progressif entre la densité côtière vers Nice plus basse et celle plus élevée rencontrée en Corse. Les paramètres `A` et `B` sont les estimations de ces deux densités. Nous avons donc ici choisi un modèle qui exprime aussi un phénomène physique bien réel au travers de l'équation du modèle. C'est évidemment un gros plus. D'autant plus que ce modèle s'ajuste très bien dans les données\ !
+
+Nous pouvons à présent extraire la composante résiduelle pour observer les anomalies de densité par rapport à cette tendance générale\ :
+
+```{r}
+density_ano <- extract(density_logisdec, components = "residuals")
+plot(density_ano)
+```
+
+A partir de là, nous pouvons analyser classiquement cette nouvelle série. Notez la diminution importante de densité au niveau du front vers la station 28 qui est clairement mise en évidence maintenant.
+
+#### Tendance cyclique
 
 La tendance générale est parfois liée à l’évidence à un cycle (annuel, lunaire, etc.). La régression sinusoïdale permet de tester statistiquement, et de définir un modèle de variation rigoureusement périodique. Naturellement, ce modèle doit être utilisé avec discernement. Ainsi, même si la variabilité saisonnière existe pour des abondances d’espèces, elle ne s’ajuste pas forcément à une sinusoïde si les amplitudes maximums sont décalées d’une année à l’autre, d’un mois ou plus. Et si alors on étudie les écarts entre les valeurs observés et le modèle, ceux-ci ne correspondent plus à une variabilité indépendante de la variation saisonnière. Ils ne représentent que l’inadéquation du modèle choisi, qui lui, est strictement périodique.
 
@@ -367,83 +460,31 @@ $$\beta_1 \cdot T_1 + \beta_2 \cdot T_2$$
 
 Cette dernière forme est assimilable à un polygone d'ordre deux dont l'ordonnée à l'origine vaut zéro, et que nous pouvons ajuster par régression polynomiale à l'aide de la fonction `lm()`.
 
-##### Exemples {-}
+##### Exemple {-}
 
-### Tendance linéaire
-
-On peut effectuer une régression linéaire sur la série ***Density*** du jeu de données ***marphy*** afin de l'utiliser comme estimation de la tendance générale dans une décomposition de cette série spatio-temporelle. La variable indépendante (x) est le temps que l'on reconstitue à partir de la série spatio-temporelle à l'aide de la fonction ***time()***. Ensuite, on effectue la régression linéaire à l'aide de la fonction ***lm()******* qui demande de spécifier le modèle sous forme **Y ~ X**, avec **Y** étant la variable dépendante et **X** étant la variable indépendante. La méthode ***summary()******* retourne un rapport détaillé sur cette régression:
-
-&gt; data(marphy)
-&gt; density &lt;- ts(marphy\[, "Density"\])
-&gt; Time &lt;- time(density)
-&gt; density.lin &lt;- lm(density ~ Time)
-&gt; summary(density.lin)
-
-Call:
-lm(formula = density ~ Time)
-
-Residuals:
- Min 1Q Median 3Q Max
--0.052226 -0.018014 0.001945 0.017672 0.058895
-
-Coefficients:
- Estimate Std. Error t value Pr(&gt;|t|)
-(Intercept) 2.884e+01 6.585e-03 4379.27 &lt;2e-16 \*\*\*
-Time 3.605e-03 1.659e-04 21.73 &lt;2e-16 \*\*\*
----
-Signif. codes: 0 \`\*\*\*' 0.001 \`\*\*' 0.01 \`\*' 0.05 \`.' 0.1 \` ' 1
-
-Residual standard error: 0.02685 on 66 degrees of freedom
-Multiple R-Squared: 0.8774, Adjusted R-squared: 0.8755
-F-statistic: 472.3 on 1 and 66 DF, p-value: 0
-
- Notons que le tableau de l'ANOVA indique qu'aussi bien la pente **Time** que l'ordonnée à l'origine **(Intercept)** sont très hautement significatifs. Mais rappelons que nous violons ici une hypothèse de base de la régression linéaire puisque les termes d'erreurs présentent très probablement une certaine autocorrélation et ne sont donc pas totalement indépendants entre eux! On peut cependant considérer les résultats de l'ANOVA comme indicatifs, tout en gardant à l'esprit qu'ils sont biaisés. Les valeurs de densité correspondant à ce modèle sont récupérées à l'aide de la méthode ***predict()*******, et nous pouvons maintenant superposer le modèle au graphe de la série originale.
-
-&gt; xreg &lt;- predict(density.lin)
-&gt; plot(density)
-&gt; lines(xreg, col=3)
-&gt; title("Linear model for trend in 'density'")
-
-La décomposition de la série ***density*** est réalisée grâce à ***decreg()******* comme suit. Nous obtenons un objet *'tsd'* qui nous est maintenant familier, ainsi que le type de représentation graphique à l'aide de la méthode ***plot() ***qui lui est associé:
-
-&gt; density.dec &lt;- decreg(density, xreg)
-&gt; plot(density.dec, col=c(1, 3, 2), xlab="stations")
-
-### Tendance polynomiale
-
-Nous pouvons bien entendu nous demander si une droite est le meilleur modèle qui soit pour représenter la tendance générale dans cette série. Ainsi, par exemple, on aurait pu également choisir un polynôme d'ordre 2 pour représenter cette tendance, ce qui donne\ :
-
-
-
-C'est effectivement beaucoup mieux que le modèle linéaire. La décomposition de la série à l'aide de ***decreg()******* se fait comme précédemment:
-
-&gt; density.dec2 &lt;- decreg(density, xreg2)
-&gt; plot(density.dec2, col=c(1, 3, 2), xlab="stations")
-
-### Tendance non linéaire
-
-Nous pourrions bien entendu tester également des polynômes d'ordre 3, 4,…, mais nous nous arrêterons-là dans notre exemple pour tester une autres possibilité\ : l'utilisation d'un modèle non linéaire pour représenter la tendance générale dans cette série, par exemple, une courbe logistique\ :
+Nous avons déjà ajusté un tel modèle dans le jeu de données `co2` plus haut, mais sans l'expliquer complètement. A présent que nous avons vu l'astuce de la substitution de variable dans la forme sinus/cosinus de l'équation de la courbe sinusoïdale, nous comprenons mieux comment nous avons procédé. Utilisons maintenant un modèle sinusoïdal pour estimer la variation de la température au château de Nottingham pendant 20 ans au 20^ème^siècle. Comme les temératures sont enregistrées en °F, nous nous empressons de les convertir en °C (°C = (°F - 32) / 1.8).
 
 ```{r}
-#dens_logis <- nls(density ~ SSlogis(Time, Asym, xmid, scal))
-#summary(dens_logis)
+data("nottem", package = "datasets")
+nottem <- (nottem - 32) / 1.8 # °F -> °C
+tsp(nottem) # Données mensuelles, unité: 1 an
+plot(nottem)
 ```
 
-Nous utilisons maintenant la fonction ***nls()******* en lieu et place de la fonction ***lm()***. La définition du modèle est quelque peu différente: **Y ~ model(X, params,…)**, avec **model()**, une fonction non linéaire. Lorsque la fonction est capable de calculer elle-même ses paramètres de départ, ces derniers ne doivent pas êtres fournis et l'utilisation de la fonction ***nls()*** est alors presque aussi simple que celle de ***lm()***, mais il n'en va pas toujours ainsi. Voyez l'aide en ligne de ***nls()*** pour plus de renseignements sur l'utilisation de la régression non linéaire dans S+ ou R. Nous observons que, ici encore tous les paramètres semblent très hautement significatifs dans le modèle. Nous ne commenterons pas plus loin les résultats renvoyés par la méthode *** summary()*******. L'extraction des valeurs prédites par le modèle, le graphe superposé de la fonction de départ et la décomposition de la série s'obtiennent comme avec un modèle linéaire:
+Comme l'unité de temps choisie ici est l'année, et que cela correspond à la la fréquence du signal voulu, nous avons dons $\omega = 1$.
 
-&gt; xregl &lt;- predict(density.logis)
-&gt; plot(density)
-&gt; lines(xregl, col=3)
-&gt; title("Logistic model for trend in 'density'")
+```{r}
+t <- time(nottem)
+omega <- 1 # Fréquence fixée à 1 an pour le signal sinusoïdal
+nottem_sin <- lm(nottem ~ I(cos(2*pi*omega*t)) + I(sin(2*pi*omega*t)))
+coef(nottem_sin)
+nottem_sindec <- tsd( nottem, method = "reg", xreg = predict(nottem_sin))
+plot(nottem_sindec, stack = FALSE, resid = FALSE, col = 1:2,
+  xlab = "Temps [années]", ylab = "Température [°F]",
+  main = "Variations saisonnière sinusoïdales")
+```
 
-&gt; density.decl &lt;- decreg(density, xregl)
-&gt; plot(density.decl, col=c(1, 3, 2), xlab="stations")
-
-###### Modèle sinusoïdal
-
-Nous avons déjà ajusté un tel modèle dans le jeu de données `co2` plus haut, mais sans l'expliquer complètement. A présent que nous avons vu l'astuce de la substitution de variable dans la forme sinus/cosinus de l'équation de la courbe sinusoïdale, nous comprenons mieux comment nous avons procédé.
-
-TODO: reprendre l'exemple ici et l'expliciter.
+Notre modèle sinusoïdal semble s'adapter relativement bien pour représenter les températures. Nous voyons immédiatement où se situent les années à étés plus chauds, et les hivers plus ou moins rigoureux. Nous pouvons naturellement extraire les composantes et les analyser plus avant (nous vous laissons cela comme exercice). Les résidus ici sont appelés anomalies de température par rapport au modèle choisi. Mais les météorologues préfèrent généralement utiliser dans ce cas les moyennes mensuelles des températures sur une longue période, par exemple 10 ans, ou même un siècle.
 
 ## Décomposition par LOESS
 
