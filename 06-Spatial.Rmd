@@ -1,3 +1,134 @@
 # Statistiques spatiales {#spatial}
 
-...
+```{r setup, results='hide', warning=FALSE, include=FALSE}
+SciViews::R
+```
+
+##### Objectifs {-}
+
+**Cette section est en cours d'édition**
+
+- Comprendre les notions élémentaires des systèmes de coordonnées.
+
+- être capable de construire une carte et d'y ajouter de éléments tels des points, des formes, des colorations spécifiques en fonction d'une variable quantitative/qualitative.
+
+- être capable de réaliser des mesures des distance, de la modélisation spatiale et de l'interpolation spatiale.
+
+
+## Réalisation cartes
+
+**Cette section est en cours d'édition**
+
+Les cartes sont des outils de présentations des données très utiles et très puissants. Il existe plusieurs programmes spécialisés pour réaliser des cartes dont le plus connu est sans aucun doute [ArcGIS](https://www.esri.com/en-us/arcgis/about-arcgis/overview). Malheureusement, ces outils de cartographie sont souvent payants. Une alternative gratuite est de réaliser des cartes directement dans R. L'avantage de réaliser une carte avec R est de pouvoir associer les outils de représentation graphiques avec les outils d'analyses statistiques. R étant gratuit, cela peut être une solution intéressante pour réaliser des cartes.
+
+Il existe de très nombreux packages pour réaliser des cartes. Le package `sf` est un package datant de 2017 qui regroupe et optimise plusieurs packages plus anciens que sont `sp`, `rgdal`, `rgeos` destinée à la production et l'analyse statistiques de carte. 
+
+```{r}
+library(sf)
+World <- read("World", package = "tmap") # importation de mon tableau de données
+class(World)
+world <- sf::st_as_sf(World) # conversion de mon tableau en objet sf
+class(world)
+```
+
+Un objet sf est tout simplement un tableau de données classique de type cas par variables que vous avez l'habitude de manipuler auquel on ajoute une colonne particulière sur la zone géographique d'intérêt. Cette colonne a une type particulier sfc. Il est intéressant de noter que les objets sf sont compatible avec l'environnement tidyverse. Vous pouvez donc utiliser des fonctions utiles comme select(), filter(), *_join(),...
+
+```{r}
+# Première ligne du tableau réduit avec uniquement 4 variables.
+world %>.%
+  select(., name, pop_est, economy, geometry) %>.%
+  head(.)
+```
+
+Pour réaliser une carte, on va tout simplement associer la fonction ggplot() et geom_sf().
+
+```{r}
+ggplot(world) +
+  geom_sf()
+```
+Il vous suffit ensuite d'utiliser la syntaxe de ggplot2 pour ajouter des éléments sur le graphique. Nous pouvons par exemple représenter le niveau économique de chaque pays. Nous reviendrons plus en détails sur la coloration de zones spécifiques dans la suite de ce module.
+
+```{r}
+ggplot(world, aes(fill=economy)) +
+  geom_sf() +
+  scale_fill_viridis_d()
+```
+
+Nous pouvons donc résumer que pour présenter de l'information à l'aide d'une carte nous aurons besoin d'une ou plusieurs variables qualitatives ou quantitatives associées à des coordonnées spatiales. Ces informations seront dans la majorité des cas séparer et vous devrez les combiner avant de pouvoir réaliser la carte voulue.
+
+### Cartes et systèmes de coordonnées
+
+Les donnés spatiales sont principalement retrouvé dans des fichiers au format shapefiles. Il est aussi possible d'en retrouver dans des packages R mais cela reste assez rare. Votre première tache sera donc de trouver des données spatiales qui correspondent à votre question de recherche. Cette première étape n'est pas simple, ne la sous-estimez pas. Vous pouvez par exemple retrouver des données sur 
+
+- [Géoportail des institutions fédérales belges](https://www.geo.be/home?l=fr)
+- [GEODATA sur eurostat](https://ec.europa.eu/eurostat/web/gisco/geodata)
+
+La fonction st_read() permet de lire de nombreux fichiers dont les fichiers la plus utilisé les fichiers au format shapefile de ESRI . Attention, les fichiers au format shapefile (dont l'extension est .shp) sont associé à trois autres fichiers indispensable  à la réalisation de votre carte (dont les extension sont shx, dbf et prj).
+
+```{r, eval FALSE}
+map <- st_read(...)
+# TODO
+```
+
+
+```{block2, type = 'note'}
+Les fichiers au format shapefiles sont souvent assez volumineux. La précision de la carte aura une très grande importance sur la taille du fichier. La tableau ci-dessous met en avant la différence de la taille du fichier en fonction de l'échelle de la carte des pays d'Europe <https://ec.europa.eu/eurostat/web/gisco/geodata/reference-data/administrative-units-statistical-units/countries#countries20> 
+
+La carte de l'europe au format shapefiles en fonction 
+
+|Echelle | Taille du fichier (Mo) |
+|--------------|--------------|
+| 1:1 million  | 168 |
+| 1:3 million  |  42.3 |
+| 1:10 million |  9.6  |
+| 1:20 million |  4.5 |
+| 1:60 million | 0.566 |
+
+```
+
+
+La terre n'est pas plate, vous le savez (elle n'est pas tout à fait ronde non plus). Son axe de rotation n'est pas fixe. La gravité y est variable. Nous devons donc projeter un objet en 3 dimensions en 2 dimensions en tenant compte de toutes les particularités de la terre. Une projection va inévitablement plus ou moins déformer notre visualisation en 2 dimensions. Il existe plusieurs projection sinon cela serait trop simple. 
+
+La fonction st_crs() vous renvoie toutes les informations lié aux système géodésique (*Coordinate Reference System, CRS*). Ces notions sont très complexe. **Elle sorte du cadre de ce cours.** Nous pouvons néanmoins citer le WGS84 qui est le système utilisé par le GPS que nous connaissons tous. 
+
+Il faut savoir que chaque pays à un système qui lui est propre et qui a évolué au cours du temps. Le tout rend le traitement des données spatiales encore plus complexe. Afin de clarifier les nombreux systèmes spatiale qui co-existent un code est attribué à chaque système grâce au standard **EPSG**. Par exemple, le EPSG 4326 correspond selon le standard EPSG au système WGS84 utilisé pour le GPS. Lors de la combinaison de différentes données spatiales, il sera indispensable de vous assurer que ces données sont compatible et obtenu via le même CRS. 
+
+Ce site vous permet d'en apprendre plus sur chaque système spatiale et de réaliser des transformations de positions en fonction du système <http://epsg.io/?q=>. La Belgique a employé et continue d'employer plusieurs système en même temps. Le site [epsg.io](http://epsg.io/?q=belgium) en recense 8 systèmes.
+
+La carte du monde présenté précédemment suit les conventions de la norme EPSG:4326.
+
+```{r}
+st_crs(world)
+```
+
+La fonction qui permet de modifier les CRS est tout simplement str_transform(). Nous pouvons simplement comparer les mêmes données spatiales avec deux systèmes spatiale différents. Le premier graphique utile la convention EPSG:4326 et le second avec la convention EPSG:3341 qui est centré sur la République Démocratique du Congo. 
+
+```{r}
+world %>%
+  filter(., continent == "Africa") -> africa
+
+africa %>.%
+  st_transform(., 3341) -> africa_congo
+
+ggplot(africa) +
+  geom_sf()
+
+ggplot(africa_congo) +
+  geom_sf()
+```
+
+
+- Ajout de points sur la carte et de labels,
+- Importation d'objets carto (points et formes) depuis les formats standards + représentation sur les cartes,
+- Coloration des cartes en fonction d'une variable quantitative
+
+# Statistiques spatiales
+
+**Cette section est en cours d'édition**
+
+Principales sections à écrire
+
+- Encodage, importation, exportation de données spatialisées (mais redondant avec ci-dessus?),
+- Mesure de distances,
+- Modélisation spatiale,
+- Interpolation spatiale (Krigeage).
