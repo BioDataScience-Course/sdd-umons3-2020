@@ -633,7 +633,7 @@ Nous pouvons visualiser la distribution en ces 5 stades comme ceci\ :
 
 ```{r}
 chart(data = oysters, ~ maturity) +
-  geom_histogram(bins = 5, center = 0, fill = "cornsilk", col = "black") +
+  geom_bar(width = 1, fill = "cornsilk", col = "black") +
   coord_polar(start = 0) +
   scale_x_continuous(breaks = c(1, 2, 3, 4, 5)) +
   theme_minimal() +

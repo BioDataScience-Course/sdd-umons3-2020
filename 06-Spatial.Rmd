@@ -15,6 +15,8 @@ SciViews::R
 
 ## Réalisation cartes
 
+**Cette section est en cours d'édition**
+
 Les cartes sont des outils de présentations des données très utiles et très puissants. Il existe plusieurs programmes spécialisés pour réaliser des cartes dont le plus connu est sans aucun doute [ArcGIS](https://www.esri.com/en-us/arcgis/about-arcgis/overview). Malheureusement, ces outils de cartographie sont souvent payants. Une alternative gratuite est de réaliser des cartes directement dans R. L'avantage de réaliser une carte avec R est de pouvoir associer les outils de représentations graphiques avec les outils d'analyses statistiques. R étant gratuit, cela peut être une solution intéressante pour réaliser des cartes.
 
 Il existe de très nombreux packages pour réaliser des cartes. Le package `sf` est un package datant de 2017 qui regroupe et optimise plusieurs packages plus anciens que sont `sp`, `rgdal`, `rgeos` destinée à la production et l'analyse statistiques de carte. 
