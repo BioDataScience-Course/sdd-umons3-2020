@@ -59,7 +59,7 @@ Les données spatiales sont principalement retrouvées dans des fichiers au form
 - [Géoportail des institutions fédérales belges](https://www.geo.be/home?l=fr)
 - [GEODATA sur eurostat](https://ec.europa.eu/eurostat/web/gisco/geodata)
 
-La fonction st_read() permet de lire de nombreux fichiers dont les fichiers la plus utilisé les fichiers au format shapefile de ESRI. Attention, les fichiers au format shapefile (dont l'extension est .shp) sont associé à trois autres fichiers indispensable  à la réalisation de votre carte (dont les extensions sont shx, dbf et prj).
+La fonction `st_read()` permet de lire de nombreux fichiers dont les fichiers la plus utilisé les fichiers au format shapefile de ESRI. Attention, les fichiers au format shapefile (dont l'extension est .shp) sont associé à trois autres fichiers indispensable  à la réalisation de votre carte (dont les extensions sont shx, dbf et prj).
 
 ```{r, eval = FALSE}
 map <- st_read("data/europ.shp")
@@ -115,7 +115,7 @@ Ce second graphique utilise la convention EPSG:22235 qui est centrée sur l'Afri
 
 ```{r}
 africa %>.%
-  st_transform(.,22235) -> africa_sa
+  st_transform(., 22235) -> africa_sa
 
 ggplot(africa_sa) +
   geom_sf()
@@ -190,17 +190,17 @@ Il existe de très nombreux packages dans R qui permettent de réaliser des cart
 ```{r}
 library(cartography)
 plot(st_geometry(africa_sa), col="grey", 
-     border="grey3", bg = "lightblue1")
+  border="grey3", bg = "lightblue1")
 plot(st_geometry(s_africa), add=TRUE, cex=1.2, col= "darkseagreen3", pch= 20)
 layoutLayer(title = "Afrique", tabtitle = TRUE, north =TRUE, 
-            frame = TRUE, posscale = "bottomleft", scale = 1000)
+  frame = TRUE, posscale = "bottomleft", scale = 1000)
 ```
 
-Le package mapview est très utile pour visualiser ce que contient un objet sf. Il utilise comme fond de carte OpenStreetMap et leaflet (leaflet est également un package intéressant pour réaliser des cartes sur R). Il suffit de sélectionner un pays pour avoir une série d'informations présentes dans l'objet `sf`.
+Le package {mapview} est très utile pour visualiser ce que contient un objet sf. Il utilise comme fond de carte OpenStreetMap et leaflet ({leaflet} est également un package intéressant pour réaliser des cartes sur R). Il suffit de sélectionner un pays pour avoir une série d'informations présentes dans l'objet `sf`.
 
 ```{r}
 library(mapview)
-mapview(africa_sa)
+#mapview(africa_sa)
 ```
 
 <!----
@@ -243,7 +243,7 @@ Il existe de très nombreuses ressources afin de réaliser des cartes sur R. Les
 
 
 
-# Statistiques spatiales
+## Interpolation spatiale
 
 **Cette section est en cours d'édition**
 
