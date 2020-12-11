@@ -108,6 +108,29 @@ Ces instructions vous montrent plusieurs possibilités pour exclure certains fic
 
 Cela est très utile lorsque l'on a des données brutes trop lourde et qui ne peuvent pas être placées dans le gestionnaire de version. 
 
+### Gestion de la bilbiographie
+
+La réalisation d'une bonne bibliographie est indispensable pour mener à bien un projet de recherche. Il est indispensable d'être à jour sur les dernières recherches proche du sujet de notre recherche. Il faut également veiller à rester à jour. 
+
+Partons de de l'article [Zooplankton dynamics in a changing environment: A 13-year survey in the northwestern Mediterranean Sea](https://www.sciencedirect.com/science/article/abs/pii/S0141113619307901) disponible sur le site ScienceDirect.
+
+![](images/08-projets/science_direct.png)
+
+Il existe plusieurs outils pour gérer sa bibliographie comme [Mendeley](https://www.mendeley.com/), [EndNote](https://endnote.com/) ou encore [Zotero](https://www.zotero.org/). Nous allons utiliser Mendeley pour cette exemple. Comme le montre la figure ci-dessus, il est possible d'exporter directement la citation de l'article dans Mendeley. Il est également possible d'extraire la citation sur l'onglet Cite. L'onglet cite permet d'exporter une fichier au format .bib, .ris ou encore txt. Ce fichier peut être par la suite ajouté à Mendeley desktop qui est l'application de Mendeley.
+
+
+![](images/08-projets/mendeley01.png)
+
+Toutes les informations nécessaires sont facilement ajoutées. On est de ce fait sur que les informations sont correctes. Il est également possible d'ajouter le pdf d'un article scientifique. Dans ce cas, l'application va analyser le fichier pour extraire les informations pertinentes pour le citer. Il faut cependant vérifier les informations que l'on peut modifier facilement à droite de l'image présentée ci-dessus.
+
+```{block2, type = 'note'}
+Mendeley propose une veille automatique pour vous. Sur base des artciles que vous avez ajouté à votre gestionnaire de bibliographie, Mendeley propose de nouveau article en lien avec les articles présents dans votre gestionnaire.
+``` 
+
+Il est possible de faire le lien entre le gestionnaire de bibliographie et les documents Rmarkdown. Dans Mendeley desktop, il est possible d'extraire vos citations en cliquant sur `File > Export...`. Un fichier au format .bib peut être exporté. 
+
+TODO...
+
 
 ## Récapitulatif des exercices
 
