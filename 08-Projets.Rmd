@@ -79,6 +79,34 @@ assignation("D08Ga_project", part = NULL,
   toc = "Réalisation d'un projet de recherche")
 ```
 
+## Astuces
+
+Cette section va comprendre quelques astuces pour améliorer la qualité de vos projets
+
+### Gestion du dépôt Git
+
+Vous l'avez certainement remarqué mais vos projets lié au gestionnaire de version Git ont un fichier qui se nomme `.gitignore`. Jusqu'à présent vous n'avez jamais eu à la modifier. Ce fichier permet d'exclure certains fichiers ou dossiers du gestionnaire de version. 
+
+L'example ci-dessous représente une série d'instruction présente dans un fichier .gitihnore
+
+```
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+README.html
+
+docs/**.html
+docs/**.pdf
+docs/**.docx
+
+data/raw
+```
+
+Ces instructions vous montrent plusieurs possibilités pour exclure certains fichiers. Les 3 premières instructions permettent d'exclure les fichiers se terminant par ses extensions. Une seconde possibilité est de spécifier un fichier spécifique comme `README.html`. Les trois dernières instructions sont similaires aux trois premières. On va spécifier des extensions à exclure uniquement dans le dossier docs/. Une quatrième solution est d'ignorer le dossier raw complet.
+
+Cela est très utile lorsque l'on a des données brutes trop lourde et qui ne peuvent pas être placées dans le gestionnaire de version. 
 
 
 ## Récapitulatif des exercices
