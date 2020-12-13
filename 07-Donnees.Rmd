@@ -6,6 +6,11 @@
 SciViews::R
 ```
 
+Le cours SDD IV, comme son nom l'indique, est essentiellement axé sur la pratique. Le plus gros de votre travail consistera donc à réaliser votre premier gros projet d'analyse de données biologiques. Celui-ci consistera en l'analyse de vos données du travail de fin d'études, ou des données similaires selon le cas.
+
+À part cette partie pratique majoritaire, nous abordons tout de même deux modules supplémentaires. Le premier (celui-ci) s'intéresse aux données particulières\ : dates, données textuelles, données circulaires que vous rencontrerez certainement, si pas dans votre projet pratique, en tous cas plus tard durant votre carrière de biologiste. Le second module du cours (module 8) vous préparera à l'élaboration d'un gros projet scientifique qui diffère des projets que vous avez traités jusqu'ici par le nombre d'étapes et de fichiers plus importants.
+
+
 ##### Objectifs {-}
 
 - Gérer des données autres que numériques et facteurs
@@ -15,6 +20,11 @@ SciViews::R
 - Manipuler des informations textuelles, y compris à l'aide d'expressions régulières
 
 - Comprendre, visualiser et analyser des données circulaires
+
+##### Prérequis {-}
+
+Si ce n'est déjà fait, vous devez installer et vous familiariser avec la 'SciViews Box' nouvelle mouture. RStudio et (R) Markdown ne doivent plus avoir de secrets pour vous. Vous devez aussi maîtriser les bases de Git et de GitHub (avoir un compte GitHub, savoir cloner un dépôt localement, travailler avec GitHub Desktop pour faire ses "commits", "push" et "pull"). L'ensemble de ces outils a été abordé dans les cours précédents [SDD I](`r paste(learndown$baseurl, "sdd-umons", sep = "/")`), [SDD II](`r paste(learndown$baseurl, "sdd-umons2", sep = "/")`) et SDD III (les six premiers modules du présent cours) que vous devez avoir réalisé avant d'entamer la matière du cours SDD IV\ : pratique.
+
 
 ## Dates
 

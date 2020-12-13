@@ -1,88 +1,177 @@
 # Projets {#projets}
 
-**Cette section est en cours d'édition**
+Ce second et dernier module du cours **SDD IV\ : pratique** vous prépare à la plus grosse partie du travail que vous allez réaliser durant ce cours\ : l'analyse des données d'un gros projet de recherche, qu'il soit basé sur les résultats de votre travail de fin d'études ou sur des données similaires. Les gros projets ne diffèrent pas tellement de ceux que vous avez réalisés jusqu'ici dans les différents cours de science des données, si ce n'est que la quantité de données, le nombre d'étapes (importation - préparation - description - analyse) et les éléments discutés sont plus nombreux, et par conséquent, le nombre de fichiers l'est également. Cela nécessite une organisation et une discipline soignées afin que le projet reste compréhensible et utilisable par vous-même bien sûr, mais aussi par d'autres... y compris votre futur vous^[Revenir dans un projet que vous avez écrit il y a plusieurs mois ou années ne vous différencie plus tellement d'un étranger\ : souvent vous avez oublié de quoi il s'agit et vous redécouvrez son contenu... donc, autant le rendre compréhensible pour les autres, c'est-à-dire, pour votre futur vous également.]\ !
 
-La réalisation d'un projet scientifique de qualité n'est pas facile. Un projet de qualité n'est pas obligatoirement un projet qui amène à des résultats incroyables, novateurs ou encore révolutionnaires.
+##### Objectifs {-}
 
-Il s'agit d'un projet scientifique qui répond à une question de recherche précise. Il sera composé des éléments suivants :
+- Structurer un projet de recherche pour sa partie analyse des données
 
-- des données de qualité avec des métadonnées riches et un protocole d'acquisition clair,
-- des carnets de notes (notebook) détaillant les analyses et reproductibles,
-- des documents de synthèse pour transmettre les résultats du projet au format le plus approprié (présention, manuscrit, dashboard,...).
+- Importer et retravailler les données de manière claire et reproductible
 
-Si vous avez travaillé et suivi l'ensemble des cours de sciences de données, vous ne devriez pas être étonné par les 3 éléments cités ci-dessus. Les cours ont été pensé et mis en place pour vous préparer à ce moment. Vous avez toutes les clés pour réaliser un projet de recherche scientifique reproductible de très haute qualité. 
+- Utiliser un carnet de notes à bon escient pour explorer différentes pistes dans l'analyse
 
-```{block2, type = 'note'}
-Ce module ne s'attarde pas sur la pertinence de la question de recherche qui sort du cadre de ce cours. Néanmoins, nous vous proposons une astuce pour gérer votre bibliographie en fin de module.
+- Rédiger un ou plusieurs documents de synthèse qui reprennent les éléments importants de l'analyse et les communiquent clairement et de manière reproductible à la communauté scientifique
+
+##### Prérequis {-}
+
+Dans ce module, nous traiterons de RStudio et des projets RStudio, de R Markdown, de Git et GitHub, ainsi que de divers outils de R pour importer, remanier, décrire et analyser des données biologiques. Toutes ces notions doivent être parfaitement connues avant d'aborder le présent module qui va vous emmener un niveau plus loin, vers un gros projet constitué de plusieurs étapes successives dans l'analyse. Toutes ces notions ont été utilisées en routine dans les trois cours précédents [SDD I](`r paste(learndown$baseurl, "sdd-umons", sep = "/")`), [SDD II](`r paste(learndown$baseurl, "sdd-umons2", sep = "/")`) et SDD III (les six premiers modules du présent cours). Ainsi, si vous avez bien suivi ces trois cours-là, vous êtes en principe parfaitement préparé pour aborder cette matière.
+
+## Structurer un projet
+
+Un **projet dans RStudio** est un dossier particulier contenant un fichier `.Rproj` de paramétrage du projet, ainsi qu'un ou plusieurs sous-dossiers et fichiers. Il coïncide également avec un dépôt Git pour la gestion de version si vous avez activé cette option, et peut aussi correspondre à un dépôt GitHub pour sa sauvegarde dans le cloud et pour collaborer à plusieurs dans le projet.
+
+Un **projet scientifique** est essentiellement centré autour d'une question qu'on se pose. Nous avons **planifié des mesures ou des expériences** pour avancer dans les connaissance scientifiques après avoir consulté la littérature scientifique sur le sujet pour en cerner les limites de nos connaissances actuelles. A l'issue de notre travail, nous avons **généré des données** et nous allons ensuite les **analyser** et enfin **discuter les résultats et tirer des conclusions**. La dernière étape consiste à **communiquer** ces résultats à l'équipe, aux collègues et plus généralement, à la communauté scientifique toute entière par l'intermédiaire d'un ou plusieurs rapports, de publications, de posters ou de présentations à des colloques scientifiques, voire en utilisant des outils plus récents comme le "dashboard" pour permettre à d'autres d'explorer de manière interactive l'univers que l'on aura construit dans notre projet. 
+
+Si ces deux projets (RStudio *versus* scientifique) n'ont rien à voir l'un avec l'autre en apparence, ils sont étroitement liés en science des données, du moins si vous avez choisi RStudio, R, Git et GitHub pour travailler (il existe bien sûr d'autres outils similaires, comme [Jupyter](https://jupyter.org), [Python](https://jupyter.org), [Matlab](https://fr.mathworks.com/products/matlab.html), [GitLab](https://about.gitlab.com), [Bitbucket](https://bitbucket.org), ...). En effet, un *projet RStudio* sera le contenant informatique idéal pour votre *projet scientifique* quelle qu'en soit la taille et la complexité. Par la suite, lorsque nous parlerons de **projet**, il s'agira donc d'un projet RStudio qui lui-même contient le matériel relatif à votre projet scientifique, le tout ne formant donc plus qu'une seule entité.
+
+### Qualités d'un bon projet
+
+Pour que votre projet soit **compréhensible**, **maintenable**, **reproductible** et **cohérent**, vous allez devoir le structurer et le construire en respectant certaines règles. Nous en avons déjà abordé plusieurs dans les modules et cours précédents\ :
+
+- Structurer clairement sbn projet en sous-dossiers (`data`, `R`, `reports`, ...)
+- Utiliser des noms de sous-dossiers et de fichiers cours mais représentatifs du contenu
+- Séparer les données des analyses
+- Utiliser des chemins relatifs pour les liens entre fichiers, et ne jamais sortir du dossier de base du projet afin que celui-ci reste cohérent dans un autre contexte (sur GitHub, ou cloné sur un autre ordinateur)
+- Inclure les analyses directement dans les carnets de notes et les rapports via l'utilisation de R Markdown
+- Gérer les versions du projet avec Git
+- Partager le projet avec GitHub, qu'il soit privé ou public
+- Indiquer clairement comment le matériel contenu dans le projet peut être (ré)utilisé an lui associant une licence, y compris pour les données
+
+Il n'est pas si facile que cela d'élaborer un projet qui présente les trois qualités d'être\ : 
+
+- **compréhensible** (nous retrouvons facilement les différents éléments du projet),
+- **maintenable** (pas de scripts à rallonge ou répétitifs, documents bien structurés et pas trop longs non plus, avec un système de gestion des versions correctement employé) et
+- **reproductible** (toutes les analyses peuvent être réexécutées et les documents regénérés sans erreurs et en obtenant à chaque fois les mêmes résultats et rendus de documents finaux). Un projet de qualité n'est pas obligatoirement un projet qui amène à des résultats incroyables, novateurs ou encore révolutionnaires.
+
+Mais en respectant quelques règles, nous pouvons y arriver.
+
+Du point de vue du contenu, un projet est également centré sur **une question scientifique**, et toutes les analyses sont réalisées dans l'intention d'y répondre. Et effectivement, la discussion et les conclusions reviennent sur cette question. Cela ajoute une quatrième qualité au projet\ : sa **cohérence**.
+
+Cela peut sembler évident, mais une erreur fréquente du débutant est de se perdre dans les données, les analyses ou la bibliographie, ... pour au final discuter de tout autre chose et **ne pas** répondre à la question de départ. C'est pour cela que la section **but** est très importante\ : elle exprime de manière concise et claire cette fameuse question qui est, et doit rester centrale pour que le projet soit cohérent.
+
+```{block2, type = 'warning'}
+Rédigez méticuleusement la section "but" de votre travail et gardez cela à l'esprit à chaque instant pour éviter de vous perdres dans les méandres des possibilités que l'étude d'un sujet biologique permet. C'est la meilleure façon de rester centré sur ses objectifs... et au final d'y répondre. La cohérence du projet est cruciale.
 ``` 
 
-## Données de qualité
+### Structure conseillée
 
-Nous avons à plusieurs reprises déjà abordé la notion de données de qualité. Avant d'aller plus loin, relisez attentivement les sections suivantes :
+Pour les gros projets, une structure bien pensée dès le départ est *indispensable*. Nous vous en proposons une ici, sachant que des variations sur ce thème (sous-dossiers différents) seront possibles plus tard en fonction de vos goûts personnels. Mais pour l'instant, imprégnez-vous de cette structure et attachez-vous à comprendre en quoi elle permet d'atteindre les trois qualités de clarté, maintainabilité et reproductibilité du projet. Notre projet sera composé des éléments suivants\ :
+
+- des **données** avec des métadonnées complètes (pensez au dictionnaire des donnes\ !), ainsi qu'un **protocole** d'acquisition de ces données détaillé (description des expériences et autres actions entreprises pour obtenir ces données),
+- des **carnets de notes** (notebooks) détaillant les analyses de manière reproductible,
+- des **documents** de synthèse pour transmettre les résultats du projet dans le format le plus approprié (rapport, présentation, poster, manuscrit plus conséquent, dashboard,...).
+
+Si vous avez suivi l'ensemble des cours de sciences de données, vous êtes déjà familier avec la plupart de ces éléments. Dans les cours précédents, nous n'avons pas insisté sur les protocoles car nous partions la plupart du temps sur des données préexistantes. De même, les projets étant plus restreints, nous n'avons pas encore abordé un outil comme {bookdown} pour rédiger des gros manuscrits, mais nous avons abondamment utilisé diverses formes de documents R Markdown, ainsi que les notebooks. En fait, les cours précédents ont été structurés pour vous amener progressivement à utiliser correctement les projets et pour vous préparer à ceci\ : **la gestion d'un gros projet présentant les quatre qualités décrites plus haut autour de votre travail de mémoire de fin d'études qui est l'élément principal du cours SDD IV.**
+
+```{block2, type = 'note'}
+Ce module ne s'attarde pas sur le contenu en dehors de sa cohérence. La pertinence de la question de recherche n'est pas abordée ici, par exemple. Néanmoins, nous vous proposons quand même quelques astuces pour gérer au mieux le contenu, et en particulier votre bibliographie en fin de module.
+``` 
+
+La suite reprend et détaille les trois éléments principaux de votre projet\ : ses données, ses carnets de notes et ses documents de synthèse. Enfin, ce module se clôturera sur quelques astuces et vous aurez une assignation qui vous permettra de mettre en pratique toute cette théorie et d'initier votre gros projet personnel.
+
+## Données
+
+Nous avons à plusieurs reprises déjà abordé les points importants à prendre en compte pour représenter ses données sous un format informatique exploitable ensuite. Avant d'aller plus loin, relisez attentivement les sections suivantes\ :
 
 - [Acquisition de données](https://wp.sciviews.org/sdd-umons-2020/acquisition-de-donn%C3%A9es.html)
 
 - [Encodage des données dans un tableau cas par variables](https://wp.sciviews.org/sdd-umons-2020/tableaux-de-donn%C3%A9es.html#tableaux-cas-par-variables)
 
-- [Ajout de métadonnées](https://wp.sciviews.org/sdd-umons-2020/tableaux-de-donn%C3%A9es.html#m%C3%A9tadonn%C3%A9es) avec l'utilisation par exemple d'un [dictionnaire des données](https://wp.sciviews.org/sdd-umons-2020/tableaux-de-donn%C3%A9es.html#dictionnaire-des-donn%C3%A9es). 
+- [Ajout de métadonnées](https://wp.sciviews.org/sdd-umons-2020/tableaux-de-donn%C3%A9es.html#m%C3%A9tadonn%C3%A9es) avec utilisation d'un [dictionnaire des données](https://wp.sciviews.org/sdd-umons-2020/tableaux-de-donn%C3%A9es.html#dictionnaire-des-donn%C3%A9es)
 
-Il serait de plus très intéressant de pouvoir rendre les données de sa recherche accessible en respectant les normes et les règles de l'[Open Data](https://wp.sciviews.org/sdd-umons2/?iframe=wp.sciviews.org/sdd-umons2-2020/open-data.html). 
+Il est de plus très intéressant de pouvoir rendre les données de sa recherche accessible en respectant les normes et les règles de l'[Open Data](https://wp.sciviews.org/sdd-umons2/?iframe=wp.sciviews.org/sdd-umons2-2020/open-data.html). 
 
-Comme vous le voyez, toutes les grandes règles ont déjà été expliquée dans le cadre des cours de sciences de données. La documentation précise et riche des données est une étape longue et fastidieuse. En pratique, elle est très souvent bâclée. 
+Comme vous le voyez, toutes les grandes règles ont déjà été abordées dans le cadre des cours de sciences de données. La documentation précise et riche des données est une étape longue et fastidieuse. En pratique, elle est très souvent bâclée... et c'est dommage car c'est leur **réutilisabilité** est est impactée au final. 
 
 ```{block2, type = 'note'}
-En résumé, des données sans documentation sont des données inutilisables.  Elles seront perdues avec le temps. Vous aurez perdu votre temps. Votre objectif sera donc de permettre à une personne externe de comprendre vos données.
-```
+En résumé, des données sans documentation sont des données inutilisables.  Elles seront perdues avec le temps. Vous aurez donc perdu votre temps. Votre objectif sera de permettre à une personne externe de comprendre vos données, et si possible, de pouvoir les réutiliser dans son propre contexte (en respect des droits de la licence que vous leurs associerez, bien entendu).
 
+Ne perdez jamais de vue l'importance de données qualitatives. Cette importance est à placer au même niveau qu'une bonne publication scientifique. Malheureusement, l'évaluation du curriculum d'un scientifique ne mets pas encore assez l'accent sur les données, et c'est dommage, car cela n'insite pas à les rendre réutilisables. Mais la mouvance de science ouverte, et dans son sillage, de données ouvertes (Open Data) est en train de recentrer l'intérêt sur les jeux de données qualitatifs. A noter d'ailleurs que la même remarque peut être faite pour les logiciels et codes informatiques qualitatifs qui mériteraient aussi d'être mieux valorisés dans une carrière scientifique.
+```
 
 ### Données brutes
 
-Lorsque qu'une expérience est réalisée, les données collectées sont les données brutes. Ces données vont devoir être retravaillés afin d'être exploitable dans les carnets de notes par la suite. 
+Lorsque qu'une expérience est réalisée, les données collectées sont les données brutes. Ces données vont devoir être retravaillées afin d'être exploitable dans les carnets de notes et les documents de synthèse par la suite. Voici une liste d'étapes à réaliser pour passer des données brutes aux données remaniées\ : 
 
-Voici une petite liste d'étapes à valider pour passer des données brutes à retravaillées : 
-
-- importation des données brutes
-- validation des données brutes
-    + vérification des types de variables (caractères, facteur, numérique,...)
+- Importation des données brutes
+- Validation des données brutes
+    + vérification des types de variables (caractère, facteur, numérique, date, ...)
     + vérification des valeurs obtenues
-- calcul de nouvelles variables
-- changement du noms des variables (si cela est nécessaire)    
-- ajout des labels et unités à chaque variable du jeu de données
-- sauvegarde des données retravaillées
+    + encodage des valeurs manquantes
+- Calcul de nouvelles variables dérivées
+- Élimination des variables et/ou individus inutiles pour le projet, le cas échéant
+- Changement du noms des variables (si cela est nécessaire)
+- Ajout des labels et unités à chaque variable du jeu de données
+- Sauvegarde des données remaniées (voir section suivante)
 
-## Carnet de notes détaillé
+Ce travail doit être réalisé de manière reproductible et doit être correctement documenté de manière concise (explication de la raison d'être de chaque étape). Deux possibilités s'offrent à vous\ :
 
-Après avoir collecté vos données, l'étape suivant est d'analyser ces données afin d'en extraire les informations les pertinentes en fonction de la question de recherches. Il s'agit à nouveau d'une étape longue et fastidieuse. 
+1. Utiliser un script R. C'est l'approche conseillée car ce type de document se concentre sur le code et les commentaires sont plus accessoires, ce qui est le cas ici. De plus, dans RStudio, l'éditeur offre plus d'outils pour exécuter et déboger du code R dans un script que dans un document R Markdown.
 
-Vous avez à nouveau déjà eu toutes les clés en main pour mener à bien cette tâche. L'outil le plus efficace est le carnet de notes. Vous utilisez le carnet de notes dans l'ensemble des cours de sciences de données. L'utilisation du Rmarkdown et de git permet d'associer le code et le texte avec un gestionnaire de version. 
+2. Utiliser un notebook. Cette option est surtout intéressante si le remaniement des données n'est pas évident et nécessite de longues explications textuelles ou la présentations de graphiques qui montrent pourquoi les données sont remaniées de cette façon. Dans ce cas, la partie Markdown du document, et sa compilation en page HTML, fourniront une présentation plus adéquate.
 
-Votre objectif sera donc de permettre à une personne externe de comprendre vos analyses grâces à la documentation et au code de votre carnet de notes.
+### Données retravaillées
+
+Vous partirez systématiquement des données retravaillées pour tous vos carnets de notes et documents de synthèse. Ces données retravaillées seront stockées dans le sous-dossier `data` de votre projet dans le format le plus pratique et compact possible. Si les analyses sont réalisées dans R uniquement, le format de données natif `.rds` est idéal car il préserve tous les attributs des objets R et il permet aussi de stocker des objets spécifiques, comme des tables de contingence ou des séries spatio-temporelles par exemple. De plus, vous pouvez compresser les données afin qu'elles occupent le moins de place possible dans le fichier (rappelez-vous que Git et GitHub n'aiment pas les fichiers volumineux\ !) Enfin, la vitesse d'importation de ces données est relativement bonne, généralement.
+
+Si les données doivent être exploitée à l'aide d'autres logiciels que R, choisissez alors un format plus universel. Le format [CSV](https://fr.sendinblue.com/blog/fichiers-csv/) que vous avez déjà beaucoup utilisé est l'un des plus utilisés et il est reconnu par *tous* les logiciels. Le format Excel est fréquemment utilisé. C'est une option, mais préférez CSV. Des formats spécifiques, par exemple pour les données spatiales, existent et peuvent aussi être utilisés. Pour les données semi-structurées (donc, pas des tableaux rectangulaires), le [XML](https://www.papergeek.fr/ficher-au-format-xml-quest-ce-que-cest-et-comment-louvrir-407309) et le format [JSON](https://www.json.org/json-fr.html) sont aujourd'hui universellement compris. Enfin, des projets voient le jour pour proposer des formats de données réutilisables comme [netCDF](https://pro.arcgis.com/fr/pro-app/help/data/multidimensional/what-is-netcdf-data.htm) plus ancien, ou encore le nouveau format [feather](https://pro.arcgis.com/fr/pro-app/help/data/multidimensional/what-is-netcdf-data.htm) poussé par le projet [Apache Arrow](https://arrow.apache.org) qui est très prometteur. 
+
+Si vous devez plus tard récupérer systématiquement des sous-ensembles de vos données, un format qui vous permet de récupérer ces sous-tableaux sans devoir passer par l'ouverture du tableau complet est appréciable. Dans ce cas, vous pourrez stocker vos données dans une base de données. En particulier, SQLite est un moteur de base de données permettant de faire des requêtes pour récupérer des sous-tableaux et qui encapsule toute la base de données dans un fichier unique. Cela peut être une solution intéressante.
+
+```{block2, type = 'note'}
+Lors du choix du format de stockage de vos données retravaillées, vous devez sélectionner le format qui convient le mieux à vos données (taille du fichier de stockage, vitesse d'importation, interopérabilité et requêtes sous-tableaux possibles ou non). Préférez les formats les plus universels aux formats spécifiques. Gardez toujours à l'esprit que des logiciels de niche avec des formats propriétaires peuvent être problématiques dans quelques années s'ils ne fonctionnement plus sur des systèmes informatiques plus récents. Par contre, R, Python, ou Java, par exemple, sont des langages qui ont toutes les chances de perdurer et sont donc sains comme choix.
+
+Pour les données brutes, la question d'interopérabilité est encore plus cruciale si vous voulez ouvrir vos données au maximum. Actuellement, le CSV est le format le plus universel, et donc, le plus sûr pour assurer une réutilisabilité maximale de vos données brutes.
+```
+
+## Carnet de notes
+
+Après avoir collecté et remanié vos données, l'étape suivante consiste à explorer et décrire vos données. Ensuite, vous envisagerez diverses pistes d'analyses probablement, et vous serez amené à adopter un processus itératif où vous explorez une idée, celle-ci vous livre des nouvelles informations, ce qui vous conduit à une nouvelle idée, que vous étudiez, et ainsi de suite. 
+
+```{block2, type = 'warning'}
+Ne négligez jamais le temps nécessaire pour explorer et analyser vos données. Cela peut très facilement vous occuper la moitié du temps de l'ensemble de votre travail\ ! Une erreur fréquente est de passer tout son temps à la paillasse, en espérant que la quantité de données acquise sera ensuite digérée et analysée en quelques jours seulement.
+```
+
+Vous avez à nouveau déjà toutes les clés en main pour mener à bien cette tâche avec tout ce que vous avez appris dans les trois cours précédent de science des données. L'outil le plus efficace est le document R Notebook dans RStudio. Vous avez utilisé ce document notebook dans l'ensemble des cours de sciences de données. L'utilisation du R Markdown et de Git permet d'associer le code (R, Python, SQL, ou autre) et le texte narratif avec un gestionnaire de version. Tout est en place pour analyser vos données confortablement et de manière reproductible. 
+
+Votre objectif sera donc de permettre à une personne externe de comprendre vos analyses grâces à l'intégration de la documentation et du code dans vos carnets de notes. Dans un gros projet, il est tout-à-fait habituel d'avoir plusieurs carnets de notes différents. Ceux-ci constituent des étapes successives de l'analyse des données et/ou explorent des facettes différentes de ces données. Rassemblez vos carnets de notes dans un sous-dossier (dans la structure proposée pour l'assignation, ce sera dans le sous-dossier `results`).
+
+Nommez vos différents fichiers de manière concise mais explicite quant au contenu. Cela facilite grandement la clarté de l'ensemble. Enfin, si une succession logique existe entre ces différents fichiers (étapes successives de l'analyse), pensez à les nommer de manière à ce qu'ils apparaissent correctement rangés lorsque les fichiers sont présentés par ordre alphabétique. Le plus simple étant d'utiliser un préfixe numérique correspondant à l'étape de l'analyse, par exemple, `01_description.Rmd`, `02_first_exploration.Rmd`, `03_model1.Rmd`, `04_model2.Rmd`. Si l'analyse est vraiment très complexe, n'hésitez pas à structurer à l'aide de sous-dossiers dans `results`.
 
 
 ```{block2, type = 'warning'}
-Tout bon chercheur doit analyser ces données avant de lancer une nouvelle expérience. 
+Tout bon chercheur doit analyser ses données de la ou des manipulations précédentes *avant* de lancer une nouvelle expérience. Sans cela, comment pourra-t-il tirer les enseignements de ses résultats passés pour améliorer ses futurs travaux\ ?
 ``` 
 
-## Document de synthèse adapté
+## Documents de synthèse
 
-Cette dernière étape est en théorie l'étape la plus courte des trois étapes clés de la recherche scientifique reproductible de qualité. Vous avez d'une part des données et des métadonnées riches. D'autre part, vous avez des carnets de notes qui ont analysé vos données. 
+Cette dernière étape s'attaque à la rédaction de documents finalisés qui servent à disséminer les résultats obtenus. C'est en théorie l'étape la plus courte des trois. Vous avez d'une part des données et des métadonnées correctement présentées (travail déjà réalisé à l'étape une). D'autre part, vous avez des carnets de notes où toutes vos analyses sont consignées (étape deux).  Vous devez à présent extraire les éléments les plus pertinents en tenant compte du format de sortie du document de synthèse qui est le plus souvent imposé.
 
-Vous devez à présent extraire les éléments les plus pertinents en tenant compte du format de sortie du document de synthèse qui est le plus souvent imposé. 
+Il est possible de réaliser \ :
 
-Il est possible de réaliser 
-- un manuscrit avec le package bookdown
-- une publication scientifique avec le package rticles
-- un poster scientifique avec la package posterdown
-- une présentation avec les packages rmarkdown, xaringan, reveal.js, 
-- un dashboard avec le package flexdashboard
+- un rapport (interne à l'équipe, et donc relativement informel, ou externe) avec un document [R Markdown](https://rmarkdown.rstudio.com) classique et le sortir en format HTML, PDF ou Word,
+- une publication scientifique avec, par exemple, le package [{rticles}](https://github.com/rstudio/rticles),
+- un poster scientifique avec la package [{posterdown}](https://github.com/brentthorne/posterdown),
+- une présentation sous forme de dias avec les packages [{rmarkdown}](https://github.com/rstudio/rmarkdown), [{xaringan}](xaringan) ou [{revealjs}](https://github.com/rstudio/revealjs), 
+- une présentation interactive sous forme de "dashboard" avec [Shiny](https://shiny.rstudio.com) et le package [{flexdashboard}](flexdashboard),
+- un site web avec les packages [{blogdown}](https://bookdown.org/yihui/blogdown/), [{distill)}](https://bookdown.org/yihui/blogdown/) ou [{packagedown}](https://github.com/r-lib/pkgdown),
+- un document plus conséquent comme un ouvrage, un manuscrit de mémoire ou de thèse de doctorat avec le package [{bookdown}](https://github.com/rstudio/bookdown).
 
-Ce qui unifie l'ensemble des formats de sortie ci-dessus est qu'ils sont tous rédigé sur la base de document Rmarkdown. Le livre [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/) regroupe un grande partie des formats de sortie possible avec Rmarkdown.
+Ce qui unifie l'ensemble des formats de sortie ci-dessus est qu'ils sont tous rédigés sur la base de documents R Markdown. Le livre [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/) donne une information détaillée sur ce format et reprend en long et en large une grande partie des formats de sortie possibles avec R Markdown. De plus, [R Markdown Cookbook](https://bookdown.org/yihui/rmarkdown-cookbook/) fournit un grand nombre d'astuces supplémentaires pour devenir expert dans l'utilisation de R Markdown.
+
+La maîtrise de R Markdown dans des projets RStudio sous versioning Git est une compétence capitale en science des données. Elle vous permettra de vous hisser facilement au dessus de vos collègues biologistes qui ne maîtrisent souvent pas cet outil.
+
+```{block2, type = 'info'}
+Au cours de la carrière d'un des auteurs, un travail de consultant a consisté à explorer de manière méthodique une grosse base de données. Pour chaque catégorie, les commanditaires voulaient un rapport détaillant différentes caractéristiques de cette catégorie. Chaque rapport individuel s'étalait facilement sur plusieurs dizaines de pages et devait présenter de nombreux graphiques. Ce travail aurait été extrêmement chronophage s'il devait être réalisé à la main dans Excel et Word. Mais avec R Markdown et quelques scripts R, le tout a pu être automatisé, et plus de 700 pages de rapports exhaustifs (répondant à la demande) ont pu être générés en quelques jours de travail seulement.
+``` 
+
+Pour des projets conséquent, le format {bookdown} est particulièrement intéressant. Vous ne l'avez pas encore utilisé, bien que vous y avez été confronté depuis le début. En effet, tout vos cours de science des données (i.e., les pages que vous êtes précisément en train de lire) sont rédigés avec cet outil. Vous allez maintenant apprendre par la pratique à utiliser ce format dans un gros projet personnel pour présenter vos résultats finaux. 
 
 ##### A vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
 assignation("D08Ga_project", part = NULL,
-  url = "https://github.com/BioDataScience-Course/DD08Ga_project",
+  url = "https://github.com/BioDataScience-Course/D08Ga_project",
   course.urls = c(
     'S-BIOG-043' = "https://classroom.github.com/a/..."),
   toc = "Réalisation d'un projet de recherche")
@@ -90,13 +179,13 @@ assignation("D08Ga_project", part = NULL,
 
 ## Astuces
 
-Cette section va comprendre quelques astuces pour améliorer la qualité de vos projets
+Cette section propose quelques astuces pour améliorer encore vos projets.
 
-### Gestion du dépôt Git
+### Exclusion du dépôt Git
 
-Vous l'avez certainement remarqué mais vos projets lié au gestionnaire de version Git ont un fichier qui se nomme `.gitignore`. Jusqu'à présent vous n'avez jamais eu à la modifier. Ce fichier permet d'exclure certains fichiers ou dossiers du gestionnaire de version. 
+Vous l'avez certainement remarqué\ : vos projets liés au gestionnaire de version Git ont dans le dossier principal un fichier qui se nomme `.gitignore`. Jusqu'à présent vous n'avez jamais eu à la modifier. Ce fichier permet d'exclure certains fichiers ou dossiers du gestionnaire de version. Il est bien utile pour éviter d'enregistrer les versions de fichiers temporaires et de ceux qui sont générés mais qu'il n'est pas utile de conserver dans le dépôt directement, comme les compilations HTML, ou PDF de vos documents R Markdown dans la plupart des cas.
 
-L'example ci-dessous représente une série d'instruction présente dans un fichier .gitihnore
+L'exemple ci-dessous représente une série d'instructions présentes dans un fichier `.gitignore` typique.
 
 ```
 .Rproj.user
@@ -106,43 +195,50 @@ L'example ci-dessous représente une série d'instruction présente dans un fich
 
 README.html
 
-docs/**.html
-docs/**.pdf
-docs/**.docx
+reports/*.html
+reports/*.pdf
+
+**.docx
+
+# Ceci est un commentaire
 
 data/raw
+data/raw/**
 ```
 
-Ces instructions vous montrent plusieurs possibilités pour exclure certains fichiers. Les 3 premières instructions permettent d'exclure les fichiers se terminant par ses extensions. Une seconde possibilité est de spécifier un fichier spécifique comme `README.html`. Les trois dernières instructions sont similaires aux trois premières. On va spécifier des extensions à exclure uniquement dans le dossier docs/. Une quatrième solution est d'ignorer le dossier raw complet.
+Ces instructions vous montrent plusieurs possibilités pour exclure certains fichiers.
 
-Cela est très utile lorsque l'on a des données brutes trop lourde et qui ne peuvent pas être placées dans le gestionnaire de version. 
+- Les quatre premières instructions permettent d'exclure les fichiers ou dossiers se terminant par ses extensions particulières.
+- Une seconde possibilité est de spécifier un fichier comme `README.html`.
+- Les deux instructions suivantes vont exclure tous les fichiers ayant une certaine extension et se situant dans un dossier particulier. Pour indiquer que le nom du fichier peut être quelconque, nous utilisons l'astérisque `*`. 
+- L'instruction suivante `**./docx` utilise deux astérisques et cela exclura *tous* les fichiers ayant une extension `.docx`, quel que soit le dossier dans lequel ils se trouvent.
+- Enfin, les deux dernières instructions vont exclure le sous-dossier `raw` de `data`, ainsi que tous les fichiers qu'il contient. Cela est très utile lorsque l'on a des données brutes trop volumineuses et qui ne peuvent pas être placées dans le gestionnaire de version. 
+- Les commentaires sont précédés par un dièse, comme dans les scripts R.
 
-### Gestion de la bilbiographie
+Pour plus de détails, voyez la documentation complète de [.gitignore](https://git-scm.com/docs/gitignore).
 
-La réalisation d'une bonne bibliographie est indispensable pour mener à bien un projet de recherche. Il est indispensable d'être à jour sur les dernières recherches proche du sujet de notre recherche. Il faut également veiller à rester à jour. 
+### Bibliographie
 
-Partons de de l'article [Zooplankton dynamics in a changing environment: A 13-year survey in the northwestern Mediterranean Sea](https://www.sciencedirect.com/science/article/abs/pii/S0141113619307901) disponible sur le site ScienceDirect.
+La réalisation d'une bonne bibliographie est indispensable pour toute recherche scientifique. Il est indispensable d'être à jour concernant les dernières publications proche du sujet de notre recherche.
+
+Partons de l'article [Zooplankton dynamics in a changing environment: A 13-year survey in the northwestern Mediterranean Sea](https://www.sciencedirect.com/science/article/abs/pii/S0141113619307901) disponible sur le site ScienceDirect.
 
 ![](images/08-projets/science_direct.png)
 
-Il existe plusieurs outils pour gérer sa bibliographie comme [Mendeley](https://www.mendeley.com/), [EndNote](https://endnote.com/) ou encore [Zotero](https://www.zotero.org/). Nous allons utiliser Mendeley pour cette exemple. Comme le montre la figure ci-dessus, il est possible d'exporter directement la citation de l'article dans Mendeley. Il est également possible d'extraire la citation sur l'onglet Cite. L'onglet cite permet d'exporter une fichier au format .bib, .ris ou encore txt. Ce fichier peut être par la suite ajouté à Mendeley desktop qui est l'application de Mendeley.
+Il existe plusieurs outils pour gérer sa bibliographie comme [Mendeley](https://www.mendeley.com/), [EndNote](https://endnote.com/) ou encore [Zotero](https://www.zotero.org/). Nous allons utiliser Mendeley pour cette exemple. Comme le montre la figure ci-dessus, il est possible d'exporter directement la citation de l'article dans Mendeley. Il est également possible d'extraire la citation via le bouton **Cite** juste en dessous du titre et des auteurs. Lorsqu'on clique sur ce bouton, un menu déroulant permet d'exporter cet article dans différents formats de citation, dont `.bib`, `.ris` ou encore `.txt`. Ce fichier peut être par la suite importé dans Mendeley Desktop qui est l'application de Mendeley.
 
 ![](images/08-projets/mendeley01.png)
 
-Toutes les informations nécessaires sont facilement ajoutées. On est de ce fait sur que les informations sont correctes. Il est également possible d'ajouter le pdf d'un article scientifique. Dans ce cas, l'application va analyser le fichier pour extraire les informations pertinentes pour le citer. Il faut cependant vérifier les informations que l'on peut modifier facilement à droite de l'image présentée ci-dessus.
+Toutes les informations nécessaires sont ainsi ajoutées dans la base de données bibliographique de Mendeley. Il est également possible d'ajouter le fichier PDF d'un article scientifique. Dans ce cas, l'application va analyser le fichier pour extraire les informations pertinentes pour le citer ensuite. Il faut cependant vérifier les informations que l'on peut modifier facilement (la partie à droite dans la copie d'écran présentée ci-dessus).
 
 ```{block2, type = 'note'}
-Mendeley propose une veille automatique pour vous. Sur base des artciles que vous avez ajouté à votre gestionnaire de bibliographie, Mendeley propose de nouveau article en lien avec les articles présents dans votre gestionnaire.
+Mendeley propose une fonction de veille automatique. Sur base des articles que vous avez déjà ajouté à votre gestionnaire de bibliographie, Mendeley propose des nouveaux articles en lien avec ceux-ci.
 ``` 
 
-Il est possible de faire le lien entre le gestionnaire de bibliographie et les documents Rmarkdown. Dans Mendeley desktop, il est possible d'extraire vos citations en cliquant sur `File > Export...`. Un fichier au format .bib peut être exporté. Ce fichier va être placée dans le projet.
-
-TODO...
-
+Il est possible d'utiliser les informations présentes dans votre bibliographie dans les documents R Markdown. Dans Mendeley Desktop, vous pouvez extraire vos citations en cliquant sur `File > Export...`. Vous choisirez alors le format `.bib`. Vous placez ce fichier dans votre projet. Enfin, dans l'entête YAML de votre document R Markdown, vous vous référez à ce même fichier `.bib` dans l'entrée `bibliography:`. Vous pourrez alors ajouter des citations issues de ce fichier dans votre texte. Le plus simple étant d'utiliser l'addin "Insert citation" du package {citr}.
 
 ## Récapitulatif des exercices
 
 Ce module vous a permis de revoir un ensemble de notions sur la gestion d'un projet scientifiques. Pour évaluer votre compréhension de cette matière vous aviez les exercices suivants à réaliser\ :
 
 `r show_ex_toc()`
-
