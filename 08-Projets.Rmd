@@ -173,8 +173,8 @@ Pour des projets conséquent, le format {bookdown} est particulièrement intére
 assignation("D08Ga_project", part = NULL,
   url = "https://github.com/BioDataScience-Course/D08Ga_project",
   course.urls = c(
-    'S-BIOG-043' = "https://classroom.github.com/a/..."),
-  toc = "Réalisation d'un projet de recherche")
+    'S-BIOG-043' = "https://classroom.github.com/a/lm5XVjQl"),
+  toc = "Découverte d'un projet de recherche")
 ```
 
 ## Astuces
