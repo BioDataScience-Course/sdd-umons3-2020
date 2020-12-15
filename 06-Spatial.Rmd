@@ -4,246 +4,359 @@
 SciViews::R
 ```
 
+Les statistiques spatiales, également en connexion avec les systèmes d'information géographique (SIG), représentent un très large sujet. Il intéresse potentiellement tout biologiste qui travaille avec des données spatialisées, qu'elles soient à 2, 3 ou 4 dimensions (écologie, environnement, épidémiologie, dynamique des populations, biodiversité, etc.) Il est impossible de l'aborder de manière exhaustive en un seul module. Il s'agit donc ici d'une première approche qui vise à vous montrer que R aussi peut être utile dans ce domaine. Voyez les liens dans les sections "pour en savoir plus", si vous voulez approfondir ce sujet.
+
 ##### Objectifs {-}
 
-- Comprendre les notions élémentaires des systèmes de coordonnées.
+- Être capable de construire une carte dans R et d'y ajouter des éléments tels des points, des formes, des colorations spécifiques en fonction d'une variable quantitative ou qualitative
 
-- être capable de construire une carte et d'y ajouter des éléments tels des points, des formes, des colorations spécifiques en fonction d'une variable quantitative ou qualitative.
+- Comprendre les principaux systèmes de coordonnées
 
-- être capable de réaliser des mesures des distance, de la modélisation spatiale et de l'interpolation spatiale.
+- Être capable de calculer des distance et des aires à partir de données spatialisées
 
+- S'initier à l'interpolation spatiale
 
-## Réalisation cartes
+##### Prérequis {-}
 
-**Cette section est en cours d'édition**
+Ce module fait suite aux modules 4 et 5 consacrés aux séries spatio-temporelles. Diverses notions, comme l'autocorrélation, sont également utiles ici. Assurez-vous d'avoir bien compris la matière des modules 4 et 5 avant d'aborder celui-ci. De plus, la section concernant la cartographie fait appel aux graphiques dans R qui constituent les modules 2 à 4 du cours SDD I.
 
-Les cartes sont des outils de présentations des données très utiles et très puissants. Il existe plusieurs programmes spécialisés pour réaliser des cartes dont le plus connu est sans aucun doute [ArcGIS](https://www.esri.com/en-us/arcgis/about-arcgis/overview). Malheureusement, ces outils de cartographie sont souvent payants. Une alternative gratuite est de réaliser des cartes directement dans R. L'avantage de réaliser une carte avec R est de pouvoir associer les outils de représentations graphiques avec les outils d'analyses statistiques. R étant gratuit, cela peut être une solution intéressante pour réaliser des cartes.
+## Réalisation de cartes
 
-Il existe de très nombreux packages pour réaliser des cartes. Le package `sf` est un package datant de 2017 qui regroupe et optimise plusieurs packages plus anciens que sont `sp`, `rgdal`, `rgeos` destinée à la production et l'analyse statistiques de carte. 
+Les cartes sont des outils de présentation très utiles dès lors que les données à représenter sont liées à des coordonnées géographiques. Des logiciels spécialisés dans le traitement de ce type de données et dans la réalisation de cartes existent\ : ce sont les logiciels de SIG (Systèmes d'Information Géographique, ou GIS en anglais). Le plus connu est sans aucun doute [ArcGIS](https://www.esri.com/en-us/arcgis/about-arcgis/overview). Des alternatives Open source existent comme [GRASS](https://grass.osgeo.org) ou [QGIS](https://www.qgis.org/en/site/). Ces outils sont assez complexes et requièrent une formation minimale non négligeable pour pouvoir les utiliser.
+
+Une alternative simple est de réaliser des cartes directement dans R. L'avantage de réaliser une carte avec R est de pouvoir associer des représentations graphiques avec les outils d'analyses statistiques. Il s'agit, à la fois, d'une option viable pour l'utilisateur occasionnel, et un choix qui se justifie dans des contextes où la carte n'est pas le seul élément important du projet (carte à intégrer dans un document R Markdown, ou à inclure dans un contenu dynamique tel un "dashboard" écrit en R et [Shiny](https://shiny.rstudio.com), par exemple). A titre d'exemple, vous pouvez explorer ces deux applications\ : [COVID-16 tracker](https://vac-lshtm.shinyapps.io/ncov_tracker/?_ga=2.222275100.56067852.1608025707-917889845.1607892304) et [ZIP explorer](https://shiny.rstudio.com/gallery/superzip-example.html) qui vous montrent que la cartographie et la gestion de données spatialisées dans R est parfaitement réalisable avec un résultat très professionnel.
+
+Il existe de très nombreux packages dans R pour réaliser des cartes, cependant, {sf} est un package relativement récent (2017) dont l'objectif est de regrouper et optimiser les fonctionnalités qui sont proposées dans divers packages plus anciens tels que {sp}, {rgdal} et {rgeos}. Nous utiliserons donc ici principalement {sf}, combiné aux fonctionnalités de cartographie de {ggplot2} par l'intermédiaire de notre fonction habituelle de création de graphiques `chart()`.
+
+D'autres packages seront nécessaires, notamment ceux qui contiennent des fonds de cartes comme {tmap}. Dans R, il existe de nombreux objets différents pour représenter des données spatialisées. {sf} propose donc toute une série de fonction pour les convertir en objets **sf** que nous privilégierons ici. Ainsi, pour avoir une carte du monde, nous pourrons fire ceci\ :
 
 ```{r}
 library(sf)
-World <- read("World", package = "tmap") # importation de mon tableau de données
-class(World)
-world <- sf::st_as_sf(World) # conversion de mon tableau en objet sf
+# Fond de carte mondial de {tmap} converti en objet sf
+world <- st_as_sf(read("World", package = "tmap"))
 class(world)
 ```
 
-Un objet sf est tout simplement un tableau de données classiques de type cas par variables que vous avez l'habitude de manipuler auquel on ajoute une colonne particulière sur la zone géographique d'intérêt. Cette colonne a un type particulier sfc. Il est intéressant de noter que les objets sf sont compatibles avec l'environnement tidyverse. Vous pouvez donc utiliser des fonctions utiles comme select(), filter(), *_join(),...
+Un objet **sf** est tout simplement un tableau de données classiques de type cas par variables que vous avez l'habitude de manipuler, mais qui contient une colonne décrivant un polygone pour la zone géographique concernée (objet **sfc_MULTIPOLYGON** ici dans la colonne `geometry`).
 
 ```{r}
-# Première ligne du tableau réduit avec uniquement 4 variables.
-world %>.%
-  select(., name, pop_est, economy, geometry) %>.%
-  head(.)
+world
 ```
 
-Pour réaliser une carte, on va tout simplement associer la fonction ggplot() et geom_sf().
+Nous voyons qu'outre les frontières des pays dans la variable `geometry`, {tmap} nous renvoie aussi une série d'autres données utiles, comme la superficie de chaque pays dans `area` (utile pour rapporter des observations par unité de surface, par exemple). De votre côté, vous pourrez donc combiner également vos données avec leur localisation dans un tableau **sf**.
+
+De plus, les objets **sf** sont compatibles avec les fonctions de manipulation de tableaux de données qui sont familières pour vous comme `select()`, `filter()`, `*_join()`,...
 
 ```{r}
-ggplot(world) +
+# Tableau réduit en éliminant des colonnes superflues
+world %>.%
+  select(., name, area, pop_est, economy, geometry) -> world2
+head(world2)
+```
+
+Pour réaliser une carte, nous utiliserons `chart()` comme d'habitude, mais en ne lui indiquant aucune "esthétique" à utiliser à l'aide de formule. Les "aesthetics" dans {ggplot2} sont les variables utilisées pour construire le graphique. Ensuite, nous utiliserons `geom_sf()` qui sait où trouver les polygones à utiliser pour créer le fond de carte.
+
+Malheureusement, la version de `chart()` dans la SciViews Box 2020 ne supporte pas encore les objets **sf**. Le code suivant remédie à cette lacune (ajoutez ce code dans chacun de vos documents avant d'utiliser `chart()` pour faire des cartes). Il sera naturellement intégré dans la prochaine version du package {chart} et donc, dans la prochaine SciViews Box.
+
+```{r}
+SciViews::R
+chart.sf <- function(data, specif = aes(), formula = NULL, mapping = aes(), type = NULL, theme = theme_svmap, env = parent.frame()) {
+  if (!missing(specif))
+    if (inherits(specif, "formula")) {
+      formula <- specif
+    } else if (inherits(specif, "uneval")) {
+      mapping <- specif
+    } else rlang::abort("'specif' must be either a formula or aes()/f_aes()")
+  if (!is.null(formula)) {
+    args <- chart:::as_list(match.call())[-1]
+    args$data <- NULL
+    args$specif <- NULL
+    args$formula <- NULL
+    args$mapping <- NULL
+    args$type <- NULL
+    args$auto.labs <- NULL
+    args$env <- NULL
+    mapping <- chart:::.rename_aes(chart:::.f_to_aes(formula, args, with.facets = TRUE))
+    # Special case ~0
+    if (is.numeric(mapping$x) && mapping$x == 0)
+      mapping$x <- NULL
+  }
+  facets <- mapping$facets
+  mapping$facets <- NULL
+  p <- ggplot(data = data, mapping = mapping, environment = env) +
+    theme()
+  if (!is_null(facets)) {
+    if (is_null(rlang::f_lhs(facets))) {
+      p <- p + facet_wrap(facets)
+    } else {
+      p <- p + facet_grid(facets)
+    }
+  }
+  if (inherits(p, "ggplot")) 
+    class(p) <- unique(c("Chart", class(p)))
+  p
+}
+```
+
+Ensuite, réaliser une carte du monde est enfantin\ :
+
+```{r}
+chart(data = world) +
   geom_sf()
 ```
-Il vous suffit ensuite d'utiliser la syntaxe de ggplot2 pour ajouter des éléments sur le graphique. Nous pouvons par exemple représenter le niveau économique de chaque pays. Nous reviendrons plus en détails sur la coloration de zones spécifiques dans la suite de ce module.
+
+Si nous ne voulons pas le fond grisé, ni les méridens, nous pouvons utiliser le thème `ggsn::blank()`. Nous verrons plus loin que le package {ggsn} permet d'autres annotations pour orienter et indiquer l'échelle sur la carte ensuite.
 
 ```{r}
-ggplot(world, aes(fill=economy)) +
+chart(data = world) +
   geom_sf() +
-  scale_fill_viridis_d()
+  ggsn::blank()
 ```
 
-Nous pouvons donc résumer que pour présenter de l'information à l'aide d'une carte nous aurons besoin d'une ou plusieurs variables qualitatives ou quantitatives associées à des coordonnées spatiales. Ces informations seront dans la majorité des cas séparer et vous devrez les combiner avant de pouvoir réaliser la carte voulue.
 
-### Cartes et systèmes de coordonnées
+Là où cela devient intéressant, c'est que nous avons la possibilité d'utiliser les autres variables contenues dans le tableau **sf** pour annoter la carte. Par exemple, nous pouvons remplir les polygones (`%fill=%`) représentant les différents pays à l'aide d'une couleur en fonction de la variable `economy`. Une petite astuce toutefois\ : une formule doit obligatoirement contenir une variable `x` après le tilde. Or ici, nous ne voulons fournir que `fill`, mais ni `x`, ni `y` dans la formule. Pour cela, nous indiquons `~ 0` qui sera compris par `chart()` comme aucun `x` et aucun `y`. Ensuite, nous pourrons rajouter toutes les autres esthétiques comprises par {ggplot2} à la suite dans la formule sous la forme `%aes=% variable`, donc ici, `%fill=% economy`.
 
-Les données spatiales sont principalement retrouvées dans des fichiers au format shapefiles. Il est aussi possible d'en retrouver dans des packages R mais cela reste assez rare. Votre première tache sera donc de trouver des données spatiales qui correspondent à votre question de recherche. Cette première étape n'est pas simple, ne la sous-estimez pas. Vous pouvez par exemple retrouver des données sur 
 
-- [Géoportail des institutions fédérales belges](https://www.geo.be/home?l=fr)
-- [GEODATA sur eurostat](https://ec.europa.eu/eurostat/web/gisco/geodata)
+```{r}
+chart(data = world, ~0 %fill=% economy) +
+  geom_sf()
+```
 
-La fonction `st_read()` permet de lire de nombreux fichiers dont les fichiers la plus utilisé les fichiers au format shapefile de ESRI. Attention, les fichiers au format shapefile (dont l'extension est .shp) sont associé à trois autres fichiers indispensable  à la réalisation de votre carte (dont les extensions sont shx, dbf et prj).
+Pour présenter de l'information sur une carte, nous aurons donc besoin d'une ou plusieurs variables qualitatives ou quantitatives associées à des coordonnées spatiales. Les données et les coordonnées spatiales seront, en pratique, souvent dans deux tableaux différents. Vous aurez donc à les combiner en un tableau unique **sf** avant de pouvoir réaliser la carte voulue.
 
-```{r, eval = FALSE}
-map <- st_read("data/europ.shp")
+Dans la suite de cette partie, nous verrons successivement comment ajouter et échelle et orienter une carte, comment importer des données géographiques et des fonds de cartes, et ce que sont les CRS ou systèmes de coordonnées géodésiques. Ces éléments sont indispensables pour tracer sa carte correctement. Dans la partie suivante, nous nous attaquerons à la partie plus intéressante qui concerne l'annotation de vos cartes.
+
+### Échelle et orientation
+
+Toute carte qui se respecte contient deux éléments importants\ : une orientation de la carte via l'indication du nord géographique, et une échelle qui permet d'avoir une idée des distances. Nous allons ajouter ces éléments à notre carte du monde grâce au package [{ggsn}](http://oswaldosantos.github.io/ggsn/).
+
+La fonction `ggsn::north()` oriente le nord sur la carte, tandis que `ggsn::scalebar()` ajoute une barre d'échelle. Ces deux fonctions prennent comme premier argument, le jeu de données utilisé. Pour `ggsn::scalebar()` il faut aussi indiquer pas mal de choses pour paramétrer l'échelle, en particulier, la distance et l'unité. Cela demande quelques essais et erreurs avant d'avoir une barre d'échelle correcte. Par exemple pour l'Italie, cela donne\ :
+
+```{r}
+world %>.%
+  filter(., name == "Italy") %>.%
+  chart(data = .) +
+    geom_sf() +
+    ggsn::north(., location = "topright", symbol = 3) +
+    ggsn::scalebar(., dist = 150, dist_unit = "km", location = "bottomleft",
+      transform = FALSE, height = 0.015,
+      st.dist = 0.02, st.size = 3, border.size = 0.5)
+```
+
+
+### Importation de "shapefiles"
+
+Les fonds de cartes sont principalement stockés dans des fichiers au format [**shapefile** de ESRI](https://doc.arcgis.com/fr/arcgis-online/reference/shapefiles.htm). Comme nous l'avons déjà vu, certains packages R comme {tmap} en proposent déjà directement intégrés à R mais souvent, vous devrez les importer vous-même. Votre première tâche sera donc de trouver des données spatiales qui correspondent à la zone géographique étudiée. Vous pouvez les trouver dans des sites spécialisés comme\ : 
+
+- [Géoportail des institutions fédérales belges](https://www.geo.be/home?l=fr) pour la Belgique
+- [GEODATA sur eurostat](https://ec.europa.eu/eurostat/web/gisco/geodata) pour l'Europe
+
+La fonction `st_read()` permet de lire ces données dans R. Attention, les fichiers au format **shapefile** (dont l'extension est `.shp`) sont associé à trois autres fichiers indispensables à la réalisation de votre carte (avec les extensions `.shx`, `.dbf` et `.prj`). Si, par exemple, vous avez placé ces fichiers dans le sous-répertoire `data` avec le nom `europe`, vous ferez\ :
+
+```{r, eval=FALSE}
+europe_map <- st_read("data/europe.shp")
 ```
 
 ```{block2, type = 'note'}
-Les fichiers au format shapefiles sont souvent assez volumineux. La précision de la carte aura une très grande importance sur la taille du fichier. Le tableau ci-dessous met en avant la différence de la taille du fichier en fonction de l'échelle de la carte des pays d'Europe <https://ec.europa.eu/eurostat/web/gisco/geodata/reference-data/administrative-units-statistical-units/countries#countries20> 
+Les fichiers au format **shapefile** sont souvent assez volumineux. La précision de la carte aura une très grande importance sur la taille du fichier. Le tableau ci-dessous met en avant la différence de la taille du fichier en fonction de l'échelle de la carte des pays d'Europe <https://ec.europa.eu/eurostat/web/gisco/geodata/reference-data/administrative-units-statistical-units/countries#countries20> 
 
-La carte de l'europe au format shapefiles en fonction de l'échelle de la carte.
+Cartes de l'Europe au format **shapefile** en fonction de l'échelle de la carte.
 
-|Echelle | Taille du fichier (Mo) |
+|Echelle | Taille du fichier  |
 |--------------|--------------|
-| 1:1 million  | 168 |
-| 1:3 million  |  42.3 |
-| 1:10 million |  9.6  |
-| 1:20 million |  4.5 |
-| 1:60 million | 0.566 |
+| 1:1 million  |    168 Mo    |
+| 1:3 million  |   42.3 Mo    |
+| 1:10 million |    9.6 Mo    |
+| 1:20 million |    4.5 Mo    |
+| 1:60 million |   0.57 Mo    |
 
 ```
 
+### Systèmes de coordonnées
 
-La terre n'est pas plate, vous le savez (elle n'est pas tout à fait ronde non plus). Son axe de rotation n'est pas fixe. La gravité y est variable. Nous devons donc projeter un objet en 3 dimensions en 2 dimensions en tenant compte de toutes les particularités de la terre. Une projection va inévitablement plus ou moins déformer notre visualisation en 2 dimensions. Il existe plusieurs projections sinon cela serait trop simple. 
+La terre n'est pas plate, vous le savez (elle n'est pas tout à fait ronde non plus). Son axe de rotation n'est pas fixe. La gravité y est variable. Nous devons donc projeter des objets tridimensionnels en deux dimensions sur notre carte. Une projection va inévitablement plus ou moins déformer notre visualisation en deux dimensions. Il existe plusieurs projections différentes avec des caractéristiques particulières (respect des distances, des volumes, etc.). Vous devrez sélectionner et utiliser celle qui convient le mieux à votre carte. 
 
-La fonction st_crs() vous renvoie toutes les informations lié aux systèmes géodésiques (*Coordinate Reference System, CRS*) utilisé. Ces notions sont très complexe. **Elle sorte du cadre de ce cours.** Nous pouvons néanmoins citer le WGS84 qui est le système utilisé par le GPS que nous connaissons tous.
+La fonction `st_crs()` vous renvoie toutes les informations lié au système géodésique (*Coordinate Reference System, CRS*) utilisé. Ces notions sont très complexes et sortent du cadre de ce cours. Nous pouvons néanmoins citer le WGS84 qui est le système utilisé par le GPS que nous connaissons tous. Chaque pays a un système qui lui est propre et qui a évolué au cours du temps. Le tout rend le traitement des données spatiales encore plus complexe.
 
-Il faut savoir que chaque pays à un système qui lui est propre et qui a évolué au cours du temps. Le tout rend le traitement des données spatiales encore plus complexe. Afin de clarifier les nombreux systèmes spatiale qui co-existent un code est attribué à chaque système grâce au standard **EPSG**. Par exemple, le EPSG 4326 correspond selon le standard EPSG au système WGS84 utilisé pour le GPS. Lors de la combinaison de différentes données spatiales, il sera indispensable de vous assurer que ces données sont compatible et obtenu via le même CRS. 
+Afin de clarifier et unifier ces différents systèmes de référence, un code est attribué à chacun d'eux dans le standard **[EPSG](https://epsg.io)**. Par exemple, le EPSG:4326 correspond au système WGS84 cité plus haut et utilisé par les GPS. Lors de la combinaison de différentes données spatiales, il sera indispensable de vous assurer que ces données sont compatible et obtenue via le même CRS. La Belgique a employé et continue d'employer plusieurs systèmes différent. Le site [epsg.io](http://epsg.io/?q=belgium) en recense huit\ ! Nous vous conseillons vivement de lire maintenant [comprendre les CRS](https://medium.com/cr%C3%A9ation-dune-app-cartographique-avec-firebase-vue/comprendre-les-coordinates-reference-system-crs-b67a88bce63c) pour tout savoir ou presque sur ces systèmes de coordonnées. 
 
-Ce site vous permet d'en apprendre plus sur chaque système spatiale et de réaliser des transformations de positions en fonction du système <http://epsg.io/?q=>. La Belgique a employé et continue d'employer plusieurs systèmes en même temps. Le site [epsg.io](http://epsg.io/?q=belgium) recense 8 systèmes.
-
-La carte du monde présenté précédemment suit les conventions de la norme EPSG:4326.
+La carte du monde présenté précédemment suit les conventions de la norme EPSG:4326, alias WGS84.
 
 ```{r}
 st_crs(world)
 ```
 
-Intéressons nous à l'Afrique Australe définit par l'ONU pour découvrir des fonctions utiles de cartographie. Il s'agit donc des pays suivants : l'Afrique du Sud, de la Namibie, de Botswana, du Lesotho et du Swaziland.
+Intéressons-nous maintenant à l'Afrique australe définie par l'ONU comme constituée des pays suivants\ : Afrique du Sud, Namibie, Botswana, Lesotho et Swaziland.
 
 ```{r}
 southern_africa <- c("Botswana", "Lesotho", "Namibia", "South Africa", "Swaziland")
 ```
 
-La fonction qui permet de modifier les CRS est tout simplement str_transform(). Nous pouvons simplement comparer les mêmes données spatiales avec deux systèmes spatiale différents. Ce premier graphique utile la convention EPSG:4326 présenté précédement.
+Nous commençons avec une carte du continent africain tout entier\ :
 
 ```{r}
 world %>.%
-  filter(., continent == "Africa") -> africa
+  filter(., continent == "Africa") %>.%
+  mutate(., austral = name %in%  southern_africa) -> africa
 
-ggplot(africa) +
+chart(data = africa, ~0 %fill=% austral) +
   geom_sf()
 ```
 
-Ce second graphique utilise la convention EPSG:22235 qui est centrée sur l'Afrique du Sud. Nous n'avons aucunement changé les données. Il s'agit simplement de deux représentation différentes.
+La fonction qui permet de transformer les coordonnées géographiques d'un CRS à un autre est tout simplement `st_transform()`. Nous pouvons simplement comparer les mêmes données spatiales avec deux CRS différents. Ce premier graphique utile la convention EPSG:4326 présenté précédemment.
+
+Ce second graphique utilise le CRS EPSG:22235 qui est centré sur l'Afrique du Sud. Nous n'avons aucunement changé les données. Il s'agit simplement de deux représentations différentes des *mêmes* données géographiques.
 
 ```{r}
 africa %>.%
   st_transform(., 22235) -> africa_sa
 
-ggplot(africa_sa) +
+chart(data = africa_sa, ~0 %fill=% austral) +
   geom_sf()
 ```
 
-On observe que la carte dont le système géodésique est adapté à la zones étudiée est plus intéressant pour la représentation de la carte.
+La carte dont le système géodésique est adapté à la zones étudiée est plus intéressante, visuellement parlant et aussi parce que les distances et les surfaces dans cette zone sont mieux respectées. En effet, cette zone est moins déformée par la projection en deux dimensions.
 
-### Personnalisation de cartes
+## Annotation de cartes
 
-Afin qu'une carte soit compréhensible, il est souvent conseillé d'ajouter des informations sous la forme de labels avec geom_sf_label() ou de texte avec geom_sf_text(). Il faut être particulièrement attentif à la taille du texte et des labels. 
+L'annotation de carte consiste à ajouter des couches d'information par dessus le fond de carte. C'est bien évidemment ces fonctions d'annotation qui font tout l'intérêt des SIG, ainsi que des cartes générées dans R.
+
+### Labels et textes
+
+Afin qu'une carte soit plus compréhensible, nous ajoutons des informations sous la forme de labels avec `geom_sf_label()` ou de texte avec `geom_sf_text()`. Il faut être particulièrement attentif à la taille du texte (contrôlable avec `size=`). Concentrons-nous maintenant sur l'Afrique australe.
 
 ```{r}
 africa_sa %>.%
-  filter(., name %in% southern_africa) -> s_africa
-  
-ggplot(s_africa) +
+  filter(., name %in% southern_africa) -> s_africa_sa
+```
+
+Pour les Européens, par exemple, cette zone du monde est difficilement reconnaissable telle quelle. L'ajout du nom des pays est donc une information utile pour la situer.
+
+```{r}
+chart(data = s_africa_sa) +
   geom_sf() +
-  geom_sf_text(aes(label = name), size = 3)
+  geom_sf_text(aes(label = name), size = 3) +
+  ggsn::north(s_africa_sa)
 ```
 
-Pour ajouter des données discrètes à votre carte comme des points pour indiquer la position des capitales de chaque pays, il va falloir proposer un objet compatible avec le format `sf`. Les capitales des pays d'Afrique australes sont proposées dans le tableau ci-dessous.
+### Couches supplémentaires **sf**
+
+Nous pouvons superposer plusieurs objets **sf** sur une même carte pour rendre l'information sous forme de couches successives. Ces objets **sf** peuvent contenir des polygones comme nous l'avons vu jusqu'ici, mais ils peuvent aussi contenir d'autres objets comme des points caractérisés par leurs coordonnées latitude et longitude.
+
+A titre d'illustration, nous allons ajouter une couche à la carte de l'Afrique du sud qui localise les capitales des différents pays. Les capitales ainsi que leurs latitudes et longitudes en coordonnées degrés décimaux^[Les coordonnées latitude et longitudes sont d'habitude exprimées en degrés minutes secondes. Par contre, sur ordinateur, la forme degrés décimaux est plus pratique. Les fractions de degrés sont représentés sous forme décimale, ce qui fait que la coordonnées peut être stockée dans un objet `numeric` classique (voir [ici](https://support.google.com/maps/answer/18539?co=GENIE.Platform%3DDesktop&hl=fr)). Des [convertisseurs en ligne](https://www.presqu-ile-de-crozon.com/conversion-des-coordonnees-gps.php) existent pour transformer les coordonnées d'un système à l'autre.] des pays d'Afrique australe sont d'abord encodées dans un tableau classique `s_capitals`.
 
 ```{r}
-capital_city <- tibble(
+s_capitals <- tibble(
   country = c("Botswana", "Lesotho", "Namibia", "South Africa", "Swaziland"),
-  capital = c("Gaborone", "Maseru", "Windhoek", "Pretoria", "Lobamba"),
-  lat = c(-24.7356, -29.3906, -22.6406,-25.8209, -26.5431),
-  lon = c(25.9113, 27.5015, 17.0782, 28.1909, 31.2012)
+  capital = c("Gaborone", "Maseru", "Windhoek",     "Pretoria",   "Lobamba"),
+  lat     = c(  -24.7356, -29.3906,   -22.6406,       -25.8209,    -26.5431),
+  lon     = c(   25.9113,  27.5015,    17.0782,        28.1909,     31.2012)
 )
+s_capitals
 ```
 
-Le tableau `capital_city` est au format tibble (donc `tbl_df`). Il faut convertir ce dernier en objet `sf`. La fonction st_as_sf() permet cette conversion.
+Le tableau `s_capitals` doit ensuite être converti en objet **sf** avec `st_as_sf()` que nous avions déjà utilisé plus haut avant de pouvoir être utilisé pour annoter la carte . Nous devons préciser ici quelles variables représentent les coordonnées des points à l'aide de `coords=` et aussi indiquer quel `crs=` nous souhaitons utiliser.
 
 ```{r}
-(capital <- st_as_sf(capital_city, coords = c("lon", "lat"), crs = 4326))
+(s_capitals_sa <- st_as_sf(s_capitals, coords = c("lon", "lat"), crs = 4326))
 ```
 
-L'ajout de ces points peut être réalisé facilement via geom_sf(). Il s'agit simplement d'un structure connue avec ggplot2 avec l'opérateur `+`.
+Nous constatons que la tableau a été transformé. Nos colonnes `lat` et `lon` ont disparu et une colonne `geometry` a été calculée. Cette colonne contient des objets `sfc_POINT` qui représentent comme leur nom le suggère, des points sur la carte. A ce stade, `geom_sf()` est capable d'utiliser l'information contenue dans l'objet **sf** pour annoter la carte.
 
 ```{r}
-ggplot(s_africa) +
+chart(data = s_africa_sa) +
   geom_sf(fill = "white") +
-  geom_sf(data = capital) 
+  geom_sf(data = s_capitals_sa) +
+  ggsn::north(s_africa_sa, symbol = 3)
 ```
-La coloration de zones d'intérêts est très utilisé en cartographie afin de faire ressortir de l'information. On va utiliser cette méthode pour comparer des zones entre elles. Le graphique ci-dessous compare les densités de population en fonction des pays du continent africain. Il faut donc associer à chaque zone une valeur soit qualitative ou soit quantitative. Nous pouvons observer que le pays le plus peuplé est le Nigeria. 
+
+Et bien sûr, nous pouvons aussi ajouter le nom de ces capitales sur la carte.
 
 ```{r}
-# variable quantitative 
-ggplot(africa_sa) +
+chart(data = s_africa_sa) +
+  geom_sf(fill = "white") +
+  geom_sf(data = s_capitals_sa) +
+  geom_sf_label(data = s_capitals_sa, aes(label = capital),
+    size = 3, fill = "lightgray", hjust = 1, vjust = 0.5) +
+  ggsn::north(s_africa_sa, symbol = 3)
+```
+
+Notez que, à chaque addition d'une couche sur le graphique à l'aide de l'opérateur `+`, vous êtes libres de redéfinir les données (`data=`), ou des esthétiques tels que `fill=`. Les données et les esthétiques fournies via la formule dans `chart()` constituent des valeurs par défaut utilisées si elles ne sont pas redéfinies explicitement à chaque appel des fonctions `geom_xxx()`. Donc ici nous utilisons deux fois `geom_sf()` successivement, mais l'effet est très différent car pour la première, nous utilisons les données par défaut définies dans `chart()` (`s_africa_sa`), alors qu'au second appel, nous redéfinissons les données comme étant `s_capitals_sa`. De même, pour `geom_sf_label()` nous sommes obligés de repréciser `data = s_capitals_sa` sinon la fonction utilise à nouveau les données par défaut `s_africa_sa`. Vous imaginez aisément l'immense flexibilité que ce système autorise, en particulier pour la superposition de couches d'information complémentaires via divers objets **sf** sur vos cartes.
+
+### Variables supplémentaires
+
+La coloration de zones d'intérêts est très utilisé en cartographie afin de faire ressortir de l'information. C'est très facile à faire avec R. Il suffit d'avoir ajouté des variables supplémentaires dans notre tableau **sf** et de les utiliser pour le remplissage ou la couleur du trait des polygones. On va utiliser cette méthode pour comparer des zones entre elles. Le graphique ci-dessous compare les densités de population en fonction des pays du continent africain. Il faut donc associer à chaque zone une valeur soit qualitative, soit quantitative. Nous pouvons, par exemple, observer que le pays le plus peuplé est le Nigeria si nous colorons les pays par la variable quantitative `pop_est`. 
+
+```{r}
+chart(data = africa_sa, ~ 0 %fill=% pop_est) +
+  geom_sf()
+```
+
+Dans la version précédente, nous indiquions tous les esthétiques directement dans la formule fournie à `chart()`. Mais nous pouvons également les fournir individuellement à chaque appel de `geom_sf()`. Il faut alors les fournir via `aes()`. Cette méthode est même beaucoup plus compréhensible lorsque nous allons superposer différentes couches sur la carte. AZinsi, le code suivant donne exactement le même résultat.
+
+```{r}
+chart(data = africa_sa) +
   geom_sf(aes(fill = pop_est))
 ```
 
-Ce second graphique s'intéresse au niveau économique des différents pays. Cette variable se divise en 7 niveaux 
+Nous pouvons naturellement aussi utiliser des variables qualitatives pour colorer nos polygones. Si nous nous intéressons au niveau de développement économique des pays africains, nous utiliserons la variable `economy` à sept modalités. 
 
 ```{r}
 levels(africa_sa$economy)
 ```
 
-On observe que l'Afrique du Sud, le Zimbabwe, le Kenya, le Nigeria et l'Egypte sont les pays les plus développés du continent.
+Sur la carte suivante, nous observons que l'Afrique du Sud, le Zimbabwe, le Kenya, le Nigeria et l'Egypte sont les pays les plus développés du continent africain. Notez que nous avons changé l'échelle de couleur à l'aide de `scale_fill_viridis_d()` ici.
 
 ```{r}
-# variable qualitative
-ggplot(africa_sa) +
+chart(data = africa_sa) +
   geom_sf(aes(fill = economy)) +
   scale_fill_viridis_d()
 ```
 
-##### Pour aller plus loin {-}
+## Autres présentations de cartes
 
-Il existe de très nombreux packages dans R qui permettent de réaliser des cartes. Nous avons utilisé jusqu'à présent ggplot2 pour visualiser nos objets `sf`. Il est également possible d'utiliser le package cartography qui permet d'obtenir très simplement.
+De nombreux packages R permettent de réaliser des cartes. Nous avons utilisé jusqu'à présent {ggplot2} pour visualiser nos objets **sf**. Mais d'autres moteurs graphiques peuvent aussi être employés pour générer des cartes statique ou dynamiques et interactives.
+
+### Graphiques de base R
+
+Le package {cartography} permet de réaliser des cartes avec le système graphique de base de R. Son interface (les fonctions et leurs arguments à utiliser) est totalement différente de {ggplot2}, de même que le rendu final.
 
 ```{r}
 library(cartography)
-plot(st_geometry(africa_sa), col="grey", 
-  border="grey3", bg = "lightblue1")
-plot(st_geometry(s_africa), add=TRUE, cex=1.2, col= "darkseagreen3", pch= 20)
-layoutLayer(title = "Afrique", tabtitle = TRUE, north =TRUE, 
+plot(st_geometry(africa_sa),
+  col = "grey", border = "grey3", bg = "lightblue1")
+plot(st_geometry(s_africa_sa),
+  add = TRUE, cex = 1.2, col = "darkseagreen3", pch = 20)
+layoutLayer(title = "Afrique", tabtitle = TRUE, north = TRUE, 
   frame = TRUE, posscale = "bottomleft", scale = 1000)
 ```
 
-Le package {mapview} est très utile pour visualiser ce que contient un objet sf. Il utilise comme fond de carte OpenStreetMap et leaflet ({leaflet} est également un package intéressant pour réaliser des cartes sur R). Il suffit de sélectionner un pays pour avoir une série d'informations présentes dans l'objet `sf`.
+### Cartes interactives
 
-```{r}
-library(mapview)
-#mapview(africa_sa)
-```
-
-<!----
+La librairie JavaScript [leaflet](https://leafletjs.com) est l'une des plus utilisées pour générer des cartes interactives dans un browser web. [OpenStreetMap](https://www.openstreetmap.org) sert de fond de carte ici. Le package R du même nom permet d'utiliser cette librairie dans R et Rstudio. Le package {mapview} offre une surcouche pour faciliter la création de ces cartes interactives, y compris dans des documents R Markdown. C'est très utile pour visualiser ce que contient un objet **sf**.
 
 ```{r, eval=FALSE}
-# centroid
-africa_test <- st_centroid(africa_congo)
-
-ggplot(africa_congo) +
-  geom_sf() +
-  geom_sf(data = africa_test)
-
-# union, surface
-africa_test1 <- st_union(africa_congo)
-
-ggplot(africa_test1) +
-  geom_sf(color = "red", size = 1.5) +
-  geom_sf(data = africa_congo)
-
-# buffer
-africa_test2 <- st_buffer(x = africa_test1, dist = 150000)
-
-ggplot(africa_test2) +
-  geom_sf(color = "blue", size = 1.5) +
-  geom_sf(data = africa_test1, color = "red", size = 1.5) +
-  geom_sf(data =africa_congo)
+SciViews::R
+library(sf)
+read("World", package = "tmap") %>.%
+  st_as_sf(.) %>.%
+  filter(., continent == "Africa") %>.%
+  mapview::mapview(.)
 ```
 
----->
+A cause d'un bug dans {leaflet} la carte interactive que l'on obtient ici ne s'affiche pas dans un bookdown. Par contre, si ce code est exécuté dans RStudio (copiez-collez ce code dans la console R dans RStudio), la carte apparaîtra dans l'onglet "Viewer", et vous pourrez utiliser le bouton "Zoom" pour voir cette carte dans une fenêtre agrandie. Il est alors possible de zoomer/dézoomer (botuons + et -), changer de fond de carte (boutons juste en dessous) et visualiser les informations annexes de l'objet **sf** en cliquant sur un pays. Les fonctions de {leaflet} permettent de faire encore plus de choses, voyez [sa documentation](https://rstudio.github.io/leaflet/). C'est un outil fantastique pour explorer de manière interactive des données spatialisées\ !
+
+![](images/06-spatial/mapview.png)
 
 ##### Pour en savoir plus {-}
 
-Il existe de très nombreuses ressources afin de réaliser des cartes sur R. Les ressources ci-dessous ont été employé pour rédiger cette partie du module 6.
+De nombreuses ressources existent sur le Net pour la cartographie avec R. Celles ci-dessous ont été employées pour rédiger cette partie du module 6.
 
-- [Cartographie avec R](https://rcarto.github.io/carto_avec_r/) est un bookdown en ligne qui présente la cartographie avec R.
+- [Cartographie avec R](https://rcarto.github.io/carto_avec_r/) est un bookdown en ligne qui présente la cartographie avec R. De nombreuses techniques complémentaires non abordées dans le cours y sont présentées.
 
 - [Initiation à la cartographie avec {sf} & Co. par Sébastien Rochette](https://statnmap.com/fr/2018-07-14-initiation-a-la-cartographie-avec-sf-et-compagnie/) est un article de blog sur la cartographie dans R. Il a rédigé plusieurs article sur le sujet.
 
-- [Comprendre les CRS](https://medium.com/cr%C3%A9ation-dune-app-cartographique-avec-firebase-vue/comprendre-les-coordinates-reference-system-crs-b67a88bce63c) est un article qui tente de vulgariser simplement les notions derrière les crs. 
-
-
+- [Visualiser des cartes interactives avec {leaflet}](https://thinkr.fr/cartographie-interactive-comment-visualiser-mes-donnees-spatiales-de-maniere-dynamique-avec-leaflet/) présente quelques types de cartes interactives qui sont réalisable avec {leaflet}.
 
 ## Interpolation spatiale
 
@@ -252,6 +365,6 @@ Il existe de très nombreuses ressources afin de réaliser des cartes sur R. Les
 Principales sections à écrire
 
 - Encodage, importation, exportation de données spatialisées (mais redondant avec ci-dessus?),
-- Mesure de distances,
+- Mesure de distances et de surfaces,
 - Modélisation spatiale,
 - Interpolation spatiale (Krigeage).
