@@ -344,7 +344,7 @@ read("World", package = "tmap") %>.%
   mapview::mapview(.)
 ```
 
-A cause d'un bug dans {leaflet} la carte interactive que l'on obtient ici ne s'affiche pas dans un bookdown. Par contre, si ce code est exécuté dans RStudio (copiez-collez ce code dans la console R dans RStudio), la carte apparaîtra dans l'onglet "Viewer", et vous pourrez utiliser le bouton "Zoom" pour voir cette carte dans une fenêtre agrandie. Il est alors possible de zoomer/dézoomer (botuons + et -), changer de fond de carte (boutons juste en dessous) et visualiser les informations annexes de l'objet **sf** en cliquant sur un pays. Les fonctions de {leaflet} permettent de faire encore plus de choses, voyez [sa documentation](https://rstudio.github.io/leaflet/). C'est un outil fantastique pour explorer de manière interactive des données spatialisées\ !
+A cause d'un bug dans {leaflet} la carte interactive que l'on obtient ici ne s'affiche pas dans un bookdown. Par contre, si ce code est exécuté dans RStudio (copiez-collez ce code dans la console R dans RStudio), la carte apparaîtra dans l'onglet "Viewer", et vous pourrez utiliser le bouton "Zoom" pour voir cette carte dans une fenêtre agrandie. Il est alors possible de zoomer/dézoomer (boutons + et -), changer de fond de carte (boutons juste en dessous) et visualiser les informations annexes de l'objet **sf** en cliquant sur un pays. Les fonctions de {leaflet} permettent de faire encore plus de choses, voyez [sa documentation](https://rstudio.github.io/leaflet/). C'est un outil fantastique pour explorer de manière interactive des données spatialisées\ !
 
 ![](images/06-spatial/mapview.png)
 
@@ -368,3 +368,216 @@ Principales sections à écrire
 - Mesure de distances et de surfaces,
 - Modélisation spatiale,
 - Interpolation spatiale (Krigeage).
+
+### Interpolation avec AURELHY
+
+<details><summary>Cette section est facultative.</summary>
+
+Les météorologues ont depuis toujours dû réaliser des cartes de pluviométrie. Mais la pluie n'est bien évidemment pas mesurée partout, seulement en quelques stations. Les techniques d'interpolation spatiale vues ci-dessus ne fonctionnent pas bien dans ce cas si le relief est très vallonné. En effet, il est bien connu qu'en zone montagneuse, la pluie tombe bien plus d'un côté de la montagne que de l'autre, créant ainsi une frontière nette dans la distribution de la pluviométrie... un phénomène que la plupart des techniques d'interpolation spatiale sont incapables de reproduire correctement. De plus, d'autres variables jouent un rôle important. Par exemple, plus le site est proche de la mer, plus la pluviométrie risque d'augmenter, d'un point de vue statistique.
+
+La méthode [AURELHY](https://www.documentation.ird.fr/hor/fdi:25973) tient compte du relief pour les interpolations de données hydrométéorologiques. Pour le biologiste, une estimation correcte des conditions météorologiques sur son sdite est souvent indispensable. Mais cette technique peut aussi lui être utile à chaque fois qu'il veut interpoler une variable pour laquelle il peut établir une corrélation avec une ou plusieurs autres variables qui elles sont mieux quantifiées sur le terrain étudié.
+
+Dans R, le package {aurelhy} fait ce type d'interpolation. Il n'est **pas** installé par défaut dans la SciViews Box mais peut l'être via l'instruction suivante\ :
+
+```{r, eval=FALSE}
+remotes::install_github("phgrosjean/aurelhy")
+```
+
+Nous allons reprendre l'interpolation de la pluviométrie sur le territoire marocain qui est l'exemple proposé dans ce package {aurelhy}. Toutes les données nécessaires sont fournies. Il nous faut\ :
+
+- Un modèle terrain (le relief) avec une résolution suffisante (ici  une grille de 924x924m) **et qui s'étend un peu au delà de la zone à interpoler tout autour** afin d'avoir suffisamment d'information dans toutes les fenêtres d'interpolation utilisées.
+
+```{r}
+library(aurelhy)
+data(morocco)
+class(morocco)
+attr(morocco, "coords")
+```
+
+Nous récupérons aussi la frontière du Maroc dans `mbord` et les données de pluviométrie dans `mrain`. Nous réalisons une carte avec ces données (stations pluviométriques en rouge).
+
+```{r}
+data(mbord) # Frontières du Maroc
+data(mrain) # Données de pluviométrie
+image(morocco)
+grid()
+lines(mbord, col = "black")
+points(mrain, col = "red")
+```
+
+La même carte n'est pas réalisable avec {ggplot2}/`chart()` parce que le modèle terrain contient plus de 3,7 milliuons de points et que c'est beaucoup trop de données pour ce moteur graphique-là. Néanmoins, nous pouvons réaliser une carte en utilisant {tmap} à conditions de convertir nos objets d'abord. Pour le modèle terrain, nous faisons\ :
+
+
+```{r}
+library(raster)
+m_coords <- coords(morocco)
+mor_ras <- raster(t(unclass(morocco))[ncol(morocco):1, ],
+  xmn = m_coords["x1"], xmx = m_coords["x2"],
+  ymn = m_coords["y1"], ymx = m_coords["y2"],
+  crs = "+proj=longlat +datum=WGS84")
+class(mor_ras)
+```
+
+<!--
+CECI CORRESPOND A UN ESSAI INFRUCTUEUX DE CONVERSION EN **stars**
+Je le garde pour mémoire...
+
+L'objet `morocco` est un `geomat` propre à {aurelhy} (voir `?geomat`). C'est un objet très simple constitué d'une matrice représentant l'élévation du terrain en mètres sur une grille carrée avec un attribut `coords` qui contient `size`, la largeur d'une maille de la grille, et `x`et `y`, les latitudes et longitudes du point supérieur gauche de la grille toutes trois exprimées en degrés décimaux selon le système CRS WGS 84. Les objets **sf** ne peuvent contenir que des données vectorielles. Pour ce type de données nous devons utiliser les objects **stars** du package {stars}. Pour la conversion, devons créer une grille curviléaire car les coordonnées sont en latitude et longitude, et ensuite indiquer le type ce CRS qui est utilisé ici\ :
+
+```r
+library(stars)
+# Dimensions must be named x and y
+names(dim(morocco)) <- c("x", "y")
+m_coords <- coords(morocco)
+m_rows <- dim(morocco)["x"]
+m_cols <- dim(morocco)["y"]
+m_size <- m_coords["size"]
+# Matrices of lat and long for the centers of each grid pixel
+m_x <- m_coords["x"] + ((1:m_rows) - 0.5) * m_size
+mat_x <- matrix(m_x, nrow = m_rows, ncol = m_cols, byrow = TRUE)
+names(dim(mat_x)) <- c("x", "y")
+m_y <- m_coords["y"] + ((1:m_cols) - 0.5) * m_size
+mat_y <- matrix(m_y, nrow = m_rows, ncol = m_cols, byrow = FALSE)
+names(dim(mat_y)) <- c("x", "y")
+tm <- st_as_stars(morocco)
+# Convert into long & lat grid with WGS84 CRS
+tm <- st_as_stars(tm, curvilinear = list(x = mat_x, y = mat_y))
+# Add the CRS in use (WGS84 with lat & long positions for the grid)
+st_crs(tm) <- "+proj=longlat +ellps=WGS84 +no_defs"
+tm
+```
+-->
+
+<!--
+Nous allons maintenant combiner ce modèle terrain avec une couche indiquant les frontières du Maroc.
+
+```r
+library(tmap)
+library(spData)
+library(sf)
+world <- st_as_sf(read("world", package = "spData"))
+class(world)
+mor_bord <- filter(world, name_long == "Morocco")
+```
+
+```r
+map_mor <- tm_shape(mor_bord) + tm_polygons()
+map_mor
+```
+
+Carte avec élévations et frontières.
+
+```r
+map_mor + tm_shape(mor_ras) + tm_raster(alpha = 0.7)
+```
+
+Nous voyons bien que ces frontières ne sont pas assez détaillées. Nous utilisons des données plus précises.
+-->
+
+Nous devons convertir la frontière du Maroc en objet **sf**.
+
+```{r}
+mbord[[1]] <- mbord[[1]][-(1:28), ] # Useless adata at the beginning
+m_bord_pts <- st_as_sf(bind_rows(mbord, .id = "id"), coords = c("x", "y"))
+m_bord_poly <- st_sf(aggregate(m_bord_pts$geometry, list(m_bord_pts$id),
+  function(g) st_cast(st_combine(g), "POLYGON")))
+st_crs(m_bord_poly) <- "+proj=longlat +datum=WGS84"
+m_bord <- st_as_sf(tibble(name = "Morocco", geometry = st_combine(m_bord_poly)))
+```
+
+```{r}
+library(tmap)
+map_m <- tm_shape(m_bord) + tm_polygons()
+map_m
+```
+
+Nous devons également convertir les données ponctuelles de pluviométrie en objet **sf**.
+
+```{r}
+m_rain <- st_as_sf(mrain, coords = c("x", "y"))
+st_crs(m_rain) <- "+proj=longlat +datum=WGS84"
+m_rain
+```
+
+Et enfin, nous pouvons réaliser une représentation de la même carte avec {tmap}.
+
+```{r}
+map_m2 <- map_m + tm_shape(mor_ras) +
+  tm_raster(n = 5, alpha = 0.7, title = "Altitude [m]") +
+  tm_layout(legend.position = c("left", "top")) +
+  tm_shape(m_rain) + tm_dots(col = "red", size = 0.05)
+map_m2
+```
+
+Nous utilisons aussi un masque qui indique la zone à interpoler (`mmask`) et des données de distance à la mer dans `mseadist`.
+
+```{r}
+data(mseadist)
+data(mmask)
+# S'assurer que toutes les stations sont reprises dans le masque
+mmask2 <- add.points(mmask, mrain)
+```
+
+A présent, nous interpolons les données de pluviométrie à l'aide de la méthode AURELHY. Les nombreux paramètres de `aurelhy()` sont décrits dans l'aide de la fonction. 
+
+```{r}
+m_aurelhy <- aurelhy(morocco, mmask2, auremask(), x0 = 30, y0 = 54, step = 12,
+  scale = FALSE, nbr.pc = 10, vgmodel = gstat::vgm(100, "Gau", 1, 1),
+  add.vars = mseadist, var.name = "seadist")
+```
+
+Cet objet `m_aurelhy` peut ensuite être utilisé pour prédire la pluviométrie (que nous passons temporairement en échelle logarithmique.)
+
+```{r}
+mrain$log_rain <- log10(mrain$rain)
+pmrain <- predict(m_aurelhy, mrain, "log_rain")
+summary(pmrain) 
+```
+
+Nous voyons que quelques variables de ce modèle sont très significatives et d'autres le sont moins. Nous pourrions raffiner le modèle et le simplifier (nous vous laissons cela comme exercice). Une fois que nous sommes satisfait du résultat, nous transformons la variable prédite en objet **geomat**, et ensuite en objet **raster** pour le cartographier.
+
+```{r}
+geomrain <- as.geomat(pmrain)
+geomrain <- 10^geomrain # Revenir de l'échelle logarithmique
+```
+
+Comme il se peut que l'interpolation ait donné des valeurs très élevées ou très, très basses en quelques points, nous allons niveler un peu tout cela vers une plage de valeurs effectivement observée.
+
+```{r}
+range(geomrain, na.rm = TRUE)
+range(mrain$rain)
+```
+
+Nous atteignons près de 3500mm/an de pluie en certains endroits, ce qui est énorme. Combien de pixels sont concernés\ ?
+
+```{r}
+sum(geomrain > 1000, na.rm = TRUE)
+```
+
+Seulement quelques dizaines. Ceci est probablement lié au manque de stations pluviométriques en altitude. Nous limitons les valeurs à 1000mm/an maximum, et ensuite, nous transformons en objet **raster**
+
+```{r}
+geomrain[geomrain > 1000] <- 1000
+r_coords <- coords(geomrain)
+rain_ras <- raster(t(unclass(geomrain))[ncol(geomrain):1, ],
+  xmn = r_coords["x1"], xmx = r_coords["x2"],
+  ymn = r_coords["y1"], ymx = r_coords["y2"],
+  crs = "+proj=longlat +datum=WGS84")
+class(rain_ras)
+```
+
+Enfuin, nous réalisons une carte de la pluviométrie que nous plaçons côte à côte avec la carte du releif pour comparaison.
+
+```{r}
+map_rain <- map_m + tm_shape(rain_ras) +
+  tm_raster(n = 10, alpha = 0.7, palette = "YlGnBu",
+    title = "Pluie [mm/an]") +
+  tm_layout(legend.position = c("left", "top")) +
+  tm_shape(m_rain) + tm_dots(col = "red", size = 0.05)
+# Deux cartes côte à côte
+tmap_arrange(map_m2, map_rain)
+```
+
+Nous voyons bien, sur la carte de droite, que le relief montagneux de l'Atlas marocain à influencé l'interpolation de la pluviométrie qui est la plus abondante sur les versants orientés vers la mer. Ceci est conforme avec ce qui s'observe sur le terrain.
+
+</details>
