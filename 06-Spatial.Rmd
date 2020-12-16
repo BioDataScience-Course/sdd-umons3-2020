@@ -37,11 +37,17 @@ world <- st_as_sf(read("World", package = "tmap"))
 class(world)
 ```
 
-Un objet **sf** est tout simplement un tableau de données classiques de type cas par variables que vous avez l'habitude de manipuler, mais qui contient une colonne décrivant un polygone pour la zone géographique concernée (objet **sfc_MULTIPOLYGON** ici dans la colonne `geometry`).
+
+Un objet **sf** est tout simplement un tableau de données classiques de type cas par variables que vous avez l'habitude de manipuler, mais qui contient une colonne décrivant la zone géographique concernée. Dans notre objet world, la colonne `geometry` décrit des polygones grâce au type **sfc_MULTIPOLYGON** (le type de la variable `geometry` varie en fonction des coordonnées géographiques avec par exemple sfc_point, sfc_linestring ou encore sfc_polygon.).
+
 
 ```{r}
 world
 ```
+
+##### A vous de jouer ! {-}
+
+`r h5p(57, height = 270, toc = "Objet sf")`
 
 Nous voyons qu'outre les frontières des pays dans la variable `geometry`, {tmap} nous renvoie aussi une série d'autres données utiles, comme la superficie de chaque pays dans `area` (utile pour rapporter des observations par unité de surface, par exemple). De votre côté, vous pourrez donc combiner également vos données avec leur localisation dans un tableau **sf**.
 
@@ -113,6 +119,9 @@ chart(data = world) +
   ggsn::blank()
 ```
 
+##### A vous de jouer ! {-}
+
+`r h5p(58, height = 270, toc = "But du package ggsn")`
 
 Là où cela devient intéressant, c'est que nous avons la possibilité d'utiliser les autres variables contenues dans le tableau **sf** pour annoter la carte. Par exemple, nous pouvons remplir les polygones (`%fill=%`) représentant les différents pays à l'aide d'une couleur en fonction de la variable `economy`. Une petite astuce toutefois\ : une formule doit obligatoirement contenir une variable `x` après le tilde. Or ici, nous ne voulons fournir que `fill`, mais ni `x`, ni `y` dans la formule. Pour cela, nous indiquons `~ 0` qui sera compris par `chart()` comme aucun `x` et aucun `y`. Ensuite, nous pourrons rajouter toutes les autres esthétiques comprises par {ggplot2} à la suite dans la formule sous la forme `%aes=% variable`, donc ici, `%fill=% economy`.
 
@@ -121,6 +130,10 @@ Là où cela devient intéressant, c'est que nous avons la possibilité d'utilis
 chart(data = world, ~0 %fill=% economy) +
   geom_sf()
 ```
+
+##### A vous de jouer ! {-}
+
+`r h5p(59, height = 270, toc = "Syntaxe de chart")`
 
 Pour présenter de l'information sur une carte, nous aurons donc besoin d'une ou plusieurs variables qualitatives ou quantitatives associées à des coordonnées spatiales. Les données et les coordonnées spatiales seront, en pratique, souvent dans deux tableaux différents. Vous aurez donc à les combiner en un tableau unique **sf** avant de pouvoir réaliser la carte voulue.
 
@@ -143,13 +156,16 @@ world %>.%
       st.dist = 0.02, st.size = 3, border.size = 0.5)
 ```
 
-
 ### Importation de "shapefiles"
 
 Les fonds de cartes sont principalement stockés dans des fichiers au format [**shapefile** de ESRI](https://doc.arcgis.com/fr/arcgis-online/reference/shapefiles.htm). Comme nous l'avons déjà vu, certains packages R comme {tmap} en proposent déjà directement intégrés à R mais souvent, vous devrez les importer vous-même. Votre première tâche sera donc de trouver des données spatiales qui correspondent à la zone géographique étudiée. Vous pouvez les trouver dans des sites spécialisés comme\ : 
 
 - [Géoportail des institutions fédérales belges](https://www.geo.be/home?l=fr) pour la Belgique
 - [GEODATA sur eurostat](https://ec.europa.eu/eurostat/web/gisco/geodata) pour l'Europe
+
+##### A vous de jouer ! {-}
+
+`r h5p(60, height = 270, toc = "Fonds de cartes")`
 
 La fonction `st_read()` permet de lire ces données dans R. Attention, les fichiers au format **shapefile** (dont l'extension est `.shp`) sont associé à trois autres fichiers indispensables à la réalisation de votre carte (avec les extensions `.shx`, `.dbf` et `.prj`). Si, par exemple, vous avez placé ces fichiers dans le sous-répertoire `data` avec le nom `europe`, vous ferez\ :
 
@@ -172,6 +188,11 @@ Cartes de l'Europe au format **shapefile** en fonction de l'échelle de la carte
 
 ```
 
+##### A vous de jouer ! {-}
+
+`r h5p(61, height = 270, toc = "Echelle des cartes")`
+
+
 ### Systèmes de coordonnées
 
 La terre n'est pas plate, vous le savez (elle n'est pas tout à fait ronde non plus). Son axe de rotation n'est pas fixe. La gravité y est variable. Nous devons donc projeter des objets tridimensionnels en deux dimensions sur notre carte. Une projection va inévitablement plus ou moins déformer notre visualisation en deux dimensions. Il existe plusieurs projections différentes avec des caractéristiques particulières (respect des distances, des volumes, etc.). Vous devrez sélectionner et utiliser celle qui convient le mieux à votre carte. 
@@ -185,6 +206,11 @@ La carte du monde présenté précédemment suit les conventions de la norme EPS
 ```{r}
 st_crs(world)
 ```
+
+##### A vous de jouer ! {-}
+
+`r h5p(63, height = 270, toc = "Standard EPSG")`
+
 
 Intéressons-nous maintenant à l'Afrique australe définie par l'ONU comme constituée des pays suivants\ : Afrique du Sud, Namibie, Botswana, Lesotho et Swaziland.
 
@@ -292,7 +318,7 @@ chart(data = africa_sa, ~ 0 %fill=% pop_est) +
   geom_sf()
 ```
 
-Dans la version précédente, nous indiquions tous les esthétiques directement dans la formule fournie à `chart()`. Mais nous pouvons également les fournir individuellement à chaque appel de `geom_sf()`. Il faut alors les fournir via `aes()`. Cette méthode est même beaucoup plus compréhensible lorsque nous allons superposer différentes couches sur la carte. AZinsi, le code suivant donne exactement le même résultat.
+Dans la version précédente, nous indiquions tous les esthétiques directement dans la formule fournie à `chart()`. Mais nous pouvons également les fournir individuellement à chaque appel de `geom_sf()`. Il faut alors les fournir via `aes()`. Cette méthode est même beaucoup plus compréhensible lorsque nous allons superposer différentes couches sur la carte. Ainsi, le code suivant donne exactement le même résultat.
 
 ```{r}
 chart(data = africa_sa) +
