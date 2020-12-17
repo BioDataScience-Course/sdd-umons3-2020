@@ -600,6 +600,27 @@ Pour la même raison (bug), ce code n'est pas exécuté ici, mais s'il l'était,
 
 ![](images/06-spatial/tmap_mode_view.png)
 
+### Edition interactive
+
+Le package {mapedit} propose des fonctions qui permettent d'éditer et de créer des objets **sf**. L'exemple suivant trace un polygone sur la Zélande (province du sud des Pays-Bas) et vous permet de l'éditer et de le sauver. Exécutez ce code dans RStudio pour voir de quoi il s'agit exactement (`tmaptools::bb()` crée  une boite encadrant une zone, que vous pouvez éditer à la souris grâce à `editMap()`).
+
+```{r, eval=FALSE}
+library(mapedit)
+library(mapview)
+# Toutes les provinces des Pays-Bas
+data("NLD_prov", package = "tmap")
+# Zélande seulement
+zeeland <- NLD_prov[10, ]
+# Boite encadrant la Zélande comme point de départ d'un polygone
+zeeland_bb <- tmaptools::bb(zeeland)
+# Carte interactive permettant d'éditer ce polygone
+ editMap(mapview(zeeland_bb), targetLayerId = "zeeland_bb")
+```
+
+Les boutons à gauche permettent d'éditer des polygones existants ou d'en créer de nouveaux au dessus du fond de carte. Les modifications sont sauvegardées automatiquement quand vous cliquez sur le bouton **Done** bleu en bas à droite.
+
+![](images/06-spatial/mapedit.png)
+
 ##### A vous de jouer ! {-}
 
 `r learnr("C06La_map", title = "Réalisation de cartes avec R", toc = "Réalisation de cartes avec R")`
