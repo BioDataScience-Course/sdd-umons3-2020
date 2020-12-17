@@ -376,7 +376,7 @@ A cause d'un bug dans {leaflet} la carte interactive que l'on obtient ici ne s'a
 
 ##### Pour en savoir plus {-}
 
-De nombreuses ressources existent sur le Net pour la cartographie avec R. Celles ci-dessous ont été employées pour rédiger cette partie du module 6.
+De nombreuses ressources existent sur le Net pour la cartographie avec R. En voici quelques une intéressantes qui vous permettront d'approfondir cette vaste matière.
 
 - [Cartographie avec R](https://rcarto.github.io/carto_avec_r/) est un bookdown en ligne qui présente la cartographie avec R. De nombreuses techniques complémentaires non abordées dans le cours y sont présentées.
 
@@ -384,16 +384,44 @@ De nombreuses ressources existent sur le Net pour la cartographie avec R. Celles
 
 - [Visualiser des cartes interactives avec {leaflet}](https://thinkr.fr/cartographie-interactive-comment-visualiser-mes-donnees-spatiales-de-maniere-dynamique-avec-leaflet/) présente quelques types de cartes interactives qui sont réalisable avec {leaflet}.
 
+- Site web du [package sf](https://r-spatial.github.io/sf/index.html). Documentation officielle (en anglais).
+
+- Le [chapitre 6] de "ggplot2: elegant graphics for data analysis" est exclusivement consacré à la réalisation de cartes avec `ggplot()` (en anglais). vous pouvez sans problèmes lui substituer `chart()` et utiliser pour le reste le code présenté ici.
+
+- Introduction rapide à [tmap](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html), en anglais.
+
+- [Article originel](https://www.jstatsoft.org/article/view/v084i06) décrivant {tmap} (en anglais). Vue d'ensemble mais certaines parties ne sont plus d'actualité par rapport à la version actuelle du package.
+
+- Le [chapitre 8](https://geocompr.robinlovelace.net/adv-map.html) de "Geocomputation with R" est entièrement consacré à la réalisation de cartes à l'aide de {tmap} (en anglais).
+
+- Introduction à [{cartography}](https://cran.r-project.org/web/packages/cartography/vignettes/cartography.html), en anglais.
+
+- [Cartographie interactive\ : comment visualiser mes données spatiales de manière dynamique avec {leaflet}](https://thinkr.fr/cartographie-interactive-comment-visualiser-mes-donnees-spatiales-de-maniere-dynamique-avec-leaflet/) est une introduction rapide en français à {leaflet} dans R et Shiny.
+
 ## Interpolation spatiale
 
-**Cette section est en cours d'édition**
+Parmi les nombreuses techniques statistiques appliquées aux données géoréférencées (autocorrélation spatiale, analyse de motifs de points, modélisation spatiale et spatio-temporelle, classification et segmentation de zones géographiques, ...) nous nous attarderons sur l'une des plus utiles\ : l'**interpolation spatiale**. Son principe consiste à interpoler la variation d'une mesure quantitative dans une zone géographique donnée à partir de mesures éparses. Cette interpolation spatiale permet de construire ensuite des cartes bien plus percutantes.
 
-Principales sections à écrire
+Il est en effet plutôt rare de pouvoir avoir une couverture dense de mesures sur une grande étendue géographique. Si nous prenons l'exemple de données météorologiques, mis à part l'utilisation d'image satellites, les données sont la plupart du temps obtenue à partir d'un réseau de station météorologiques plus ou moins dense. Dans notre exemple, nous nous intéresserons à la **pluviométrie** exprimée en mm d'eau par an. Un pluviomètre est un appareil simple qui recueille l'eau tombée du ciel sur une surface donnée et qui contient un tube gradué en mm. Il suffit alors de lire la valeur -après un laps de temps donné pour connaître la quantité cumulée d'eau qui est tombée du ciel. 
 
-- Encodage, importation, exportation de données spatialisées (mais redondant avec ci-dessus?),
-- Mesure de distances et de surfaces,
-- Modélisation spatiale,
-- Interpolation spatiale (Krigeage).
+![Pluviomètre, par [Jean Wilmotte](http://www.jeanwilmotte.it/page/103/), CC-BY-SA.](images/06-spatial/pluviometre.jpg )
+
+### Où pleut-il au Maroc\ ?
+
+En Europe de l'Ouest, le réseau de station météorologiques est assez dense et l'interpolation spatiale ne pose pas de problèmes particuliers pour ces données, sauf peut être localement et à très petite échelle. Par contre, le Maroc est un exemple de pays qui pose problème de ce point de vue pour deux raisons\ :
+
+1. Le réseau de stations météorologiques y est peu dense, surtout dans les régions désertiques du sud du pays.
+
+2. La distribution de la pluviométrie y est très inégale. Elle est forte près de la mer et sur un versant de la chaîne montagneuse de l'Atlas, alors qu'elle est quasi-nulle dans la partie aride du nord ouest du Sahara.
+
+Nous allons donc nous donner comme challenge d'interpoler la puviométrie sur tout le territoire de ce pays, sur base de seulement une quarantaine de stations d'observation. Ces données sont dans le package {aurelhy} qui n'est malheureusement pas installé par défaut dans la SciViews Box. Nous allons donc commencer par l'installer.
+
+```{r, eval=FALSE}
+remotes::install_github("phgrosjean/aurelhy")
+```
+
+Nous avons les frontières du pays dans `mbord`, une cartographie détaillée du relief avec un maillage d'un peu moins d'1km * 1km dans `morocco`, les données de pluviométrie dans `mrain` et la distance à la mer dans `mseadist` (plus un marsque indiquant la région à interpoler dans `mmask`). Par contre, tous ces objets sont spécifiques à {aurelhy}. Nous devons donc commencer par les convertir en objets **sf** ou **raster** plus classiques.
+
 
 ### Interpolation avec AURELHY
 
@@ -405,9 +433,7 @@ La méthode [AURELHY](https://www.documentation.ird.fr/hor/fdi:25973) tient comp
 
 Dans R, le package {aurelhy} fait ce type d'interpolation. Il n'est **pas** installé par défaut dans la SciViews Box mais peut l'être via l'instruction suivante\ :
 
-```{r, eval=FALSE}
-remotes::install_github("phgrosjean/aurelhy")
-```
+
 
 Nous allons reprendre l'interpolation de la pluviométrie sur le territoire marocain qui est l'exemple proposé dans ce package {aurelhy}. Toutes les données nécessaires sont fournies. Il nous faut\ :
 
@@ -499,6 +525,28 @@ map_mor + tm_shape(mor_ras) + tm_raster(alpha = 0.7)
 
 Nous voyons bien que ces frontières ne sont pas assez détaillées. Nous utilisons des données plus précises.
 -->
+
+Ce modèle terrain est assez large car il contient `r length(mor_ras)` pixels. C'est beaucoup plus qu'il n'est faut pour notre carte, et celle-ci sera très lente à tracer... de manière inutile (notez que cette résolution est, par ailleurs, indispensable poiur la méthode AURELHY qui est présentée tout à la fin de la section "interpolation spatiale" à la fin de ce module). Nous pouvons réduire la résolution d'un **raster** avec la fonction `aggregate()` d'un facteur 5, ce qui réduira sa taille de 5 * 5 = 25 fois comme ceci\ :
+
+```{r}
+res(mor_ras)
+length(mor_ras)
+# Réduire la résolution d'un facteur 5
+mor_ras2 <- aggregate(mor_ras, fact = 5)
+res(mor_ras2)
+length(mor_ras2)
+```
+
+Maintenant, nous n'avons plus que `r length(mor_ras)` pixels à manipuler et à représenter sur la carte. Effectuons une carte avec `chart()` et donc, le moteur graphique {ggplot2}. Il n'est pas facile de combiner des objets **raster** dans un tel graphique. Plusieurs pistes existent, mais si nous voulons continuer à utiliser la fonction `geoml_sf()` pour tous les éléments vectoriels (frontière des pays, rivières, points sur la carte, ...), nous devons convertir notre **raster** en un autre objet **stars** et utiliser `geom_stars(, sf = TRUE)` qui est la seule option pour rester compatible avec **sf**. Cela donnerait quelque chose comme ceci\ :
+
+```{r, eval=FALSE}
+library(stars)
+chart(data = m_bord) +
+  geom_stars(data = st_as_stars(mor_ras2), sf = TRUE) +
+  geom_sf()
+```
+
+Ce code n'est **pas** évalué et aucun graphique n'est produit car, même avec la résolution réduite de `mor_ras2`, les temps de calcul explosent. Ceci montre les limitations du moteur graphique {ggplot2} qui est très flexible mais le plus lent des différents moteurs graphiques. Nous allons donc passer à un autre système de réalisation de cartes dans R qui reprend la phylosophie de {ggplot2} sans en avoir les inconvénients\ : {tmap}.
 
 Nous devons convertir la frontière du Maroc en objet **sf**.
 
@@ -607,3 +655,11 @@ tmap_arrange(map_m2, map_rain)
 Nous voyons bien, sur la carte de droite, que le relief montagneux de l'Atlas marocain à influencé l'interpolation de la pluviométrie qui est la plus abondante sur les versants orientés vers la mer. Ceci est conforme avec ce qui s'observe sur le terrain.
 
 </details>
+
+##### Pour en savoir plus {-}
+
+- [Intro to GIS and Spatial Analysis](https://mgimond.github.io/Spatial/index.html) est un ouvrage complet qui introduit toute la matière de manière claire, mais qui montre aussi comment l'implémenter dans R (en anglais).
+
+- [Geocomputation with R](https://geocompr.robinlovelace.net/adv-map.html) présente certains aspects complémentaires au précédent ouvrage (en anglais). Il montre, par exemple, comment combiner les capacités géstatistique et d'apprentissage machine dans R pour étudier des modèles spatialisés potentiellement très puissants. Des applications pratiques dans différentes disciplines (dont l'écologie) mettent tout cela en musique.
+
+- [Geospatial Health Data: modeling and visualization with R-INLA and Shiny](https://www.paulamoraga.com/book-geospatial/) insiste particulièrement sur les cartes interactives et les applications Shiny (dashboard) pour présenter des données et modèles géospatialisés de manière vivante et interactive (en anglais).
