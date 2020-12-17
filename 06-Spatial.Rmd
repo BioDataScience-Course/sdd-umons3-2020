@@ -38,7 +38,7 @@ class(world)
 ```
 
 
-Un objet **sf** est tout simplement un tableau de données classiques de type cas par variables que vous avez l'habitude de manipuler, mais qui contient une colonne décrivant la zone géographique concernée. Dans notre objet world, la colonne `geometry` décrit des polygones grâce au type **sfc_MULTIPOLYGON** (le type de la variable `geometry` varie en fonction des coordonnées géographiques avec par exemple sfc_point, sfc_linestring ou encore sfc_polygon.).
+Un objet **sf** est tout simplement un tableau de données classiques de type cas par variables que vous avez l'habitude de manipuler, mais qui contient une colonne décrivant la zone géographique concernée. Dans notre objet world, la colonne `geometry` décrit des polygones grâce au type **sfc_MULTIPOLYGON**. Le type de la variable `geometry` varie en fonction des coordonnées géographiques avec par exemple sfc_point, sfc_linestring ou encore sfc_polygon.
 
 
 ```{r}
@@ -57,6 +57,7 @@ De plus, les objets **sf** sont compatibles avec les fonctions de manipulation d
 # Tableau réduit en éliminant des colonnes superflues
 world %>.%
   select(., name, area, pop_est, economy, geometry) -> world2
+
 head(world2)
 ```
 
@@ -192,7 +193,6 @@ Cartes de l'Europe au format **shapefile** en fonction de l'échelle de la carte
 
 `r h5p(61, height = 270, toc = "Echelle des cartes")`
 
-
 ### Systèmes de coordonnées
 
 La terre n'est pas plate, vous le savez (elle n'est pas tout à fait ronde non plus). Son axe de rotation n'est pas fixe. La gravité y est variable. Nous devons donc projeter des objets tridimensionnels en deux dimensions sur notre carte. Une projection va inévitablement plus ou moins déformer notre visualisation en deux dimensions. Il existe plusieurs projections différentes avec des caractéristiques particulières (respect des distances, des volumes, etc.). Vous devrez sélectionner et utiliser celle qui convient le mieux à votre carte. 
@@ -210,7 +210,6 @@ st_crs(world)
 ##### A vous de jouer ! {-}
 
 `r h5p(63, height = 270, toc = "Standard EPSG")`
-
 
 Intéressons-nous maintenant à l'Afrique australe définie par l'ONU comme constituée des pays suivants\ : Afrique du Sud, Namibie, Botswana, Lesotho et Swaziland.
 
@@ -345,7 +344,9 @@ De nombreux packages R permettent de réaliser des cartes. Nous avons utilisé j
 
 ### Graphiques de base R
 
-Le package {cartography} permet de réaliser des cartes avec le système graphique de base de R. Son interface (les fonctions et leurs arguments à utiliser) est totalement différente de {ggplot2}, de même que le rendu final.
+Le package {sf} associé à des instructions en R de base permet de réaliser des cartes. Le R de base à l'avantage d'être très rapide dans son exécution. Le package {cartography} permet d'améliorer ces graphiques comme avec la foncion layoutLayer() pour ajouter un titre, un orientation ou encore une légende. Ce package va donc permettre d'ajouter des couches sur la carte de basepaermet aussi   cartes avec le système graphique de base de R. 
+
+Son interface (les fonctions et leurs arguments à utiliser) est totalement différente de {ggplot2}, de même que le rendu final.
 
 ```{r}
 library(cartography)
@@ -356,6 +357,25 @@ plot(st_geometry(s_africa_sa),
 layoutLayer(title = "Afrique", tabtitle = TRUE, north = TRUE, 
   frame = TRUE, posscale = "bottomleft", scale = 1000)
 ```
+### tmap
+
+Le package [{tmap}](https://mtennekes.github.io/tmap/index.html) est un package dédié à la représentation cartographique dont la syntaxe va se rapprocher de celle de ggplot2 (utilisé avec chart()) et la vitesse d'exécution du R de base. Il comprend également une série de fonction de personnalisation de cartes très intéressante. Tout d'abord ce package propose une fonction rapide qtm().
+
+```{r}
+library(tmap)
+qtm(africa_sa)
+```
+Il est possible de reproduire ce même graphique en spécifiant couche par couche ce que l'on veut tout comme le propose ggplot2. Nous avons ajouté en plus l'orientation et l'échelle sur la carte. Vous pouvez observer que c'est infiniment plus simple à paramétrer qu'avec le package {ggsn}
+
+```{r}
+tm_shape(africa_sa) +
+  tm_borders() +
+  tm_fill("austral", legend.show = F) + # mise en évidence de l'Afrique Australe
+  tm_compass(position = c("right", "top")) + # ajout de l'orientation
+  tm_scale_bar(position = c("left", "bottom")) + # ajout de l'échelle
+  tm_layout(bg.color = "skyblue") # ajout d'un fond bleu
+```
+Ce package est très intéressant et nous ne pouvons que vous conseiller à l'explorer.
 
 ### Cartes interactives
 
@@ -373,6 +393,17 @@ read("World", package = "tmap") %>.%
 A cause d'un bug dans {leaflet} la carte interactive que l'on obtient ici ne s'affiche pas dans un bookdown. Par contre, si ce code est exécuté dans RStudio (copiez-collez ce code dans la console R dans RStudio), la carte apparaîtra dans l'onglet "Viewer", et vous pourrez utiliser le bouton "Zoom" pour voir cette carte dans une fenêtre agrandie. Il est alors possible de zoomer/dézoomer (boutons + et -), changer de fond de carte (boutons juste en dessous) et visualiser les informations annexes de l'objet **sf** en cliquant sur un pays. Les fonctions de {leaflet} permettent de faire encore plus de choses, voyez [sa documentation](https://rstudio.github.io/leaflet/). C'est un outil fantastique pour explorer de manière interactive des données spatialisées\ !
 
 ![](images/06-spatial/mapview.png)
+
+Le package {tmap} propose également de convertir ces cartes en carte interactive avec leaflet.
+
+```{r, eval=FALSE}
+tmap_mode("view")
+qtm(africa_sa)
+```
+
+##### A vous de jouer ! {-}
+
+`r learnr("C06La_map", title = "Réalisation de cartes avec R", toc = "Réalisation de cartes avec R")`
 
 ##### Pour en savoir plus {-}
 
@@ -414,7 +445,7 @@ En Europe de l'Ouest, le réseau de station météorologiques est assez dense et
 
 2. La distribution de la pluviométrie y est très inégale. Elle est forte près de la mer et sur un versant de la chaîne montagneuse de l'Atlas, alors qu'elle est quasi-nulle dans la partie aride du nord ouest du Sahara.
 
-Nous allons donc nous donner comme challenge d'interpoler la puviométrie sur tout le territoire de ce pays, sur base de seulement une quarantaine de stations d'observation. Ces données sont dans le package {aurelhy} qui n'est malheureusement pas installé par défaut dans la SciViews Box. Nous allons donc commencer par l'installer.
+Nous allons donc nous donner comme challenge d'interpoler la pluviométrie sur tout le territoire de ce pays, sur base de seulement une quarantaine de stations d'observation. Ces données sont dans le package {aurelhy} qui n'est malheureusement pas installé par défaut dans la SciViews Box. Nous allons donc commencer par l'installer.
 
 ```{r, eval=FALSE}
 remotes::install_github("phgrosjean/aurelhy")
@@ -422,14 +453,13 @@ remotes::install_github("phgrosjean/aurelhy")
 
 Nous avons les frontières du pays dans `mbord`, une cartographie détaillée du relief avec un maillage d'un peu moins d'1km * 1km dans `morocco`, les données de pluviométrie dans `mrain` et la distance à la mer dans `mseadist` (plus un marsque indiquant la région à interpoler dans `mmask`). Par contre, tous ces objets sont spécifiques à {aurelhy}. Nous devons donc commencer par les convertir en objets **sf** ou **raster** plus classiques.
 
-
 ### Interpolation avec AURELHY
 
 <details><summary>Cette section est facultative.</summary>
 
 Les météorologues ont depuis toujours dû réaliser des cartes de pluviométrie. Mais la pluie n'est bien évidemment pas mesurée partout, seulement en quelques stations. Les techniques d'interpolation spatiale vues ci-dessus ne fonctionnent pas bien dans ce cas si le relief est très vallonné. En effet, il est bien connu qu'en zone montagneuse, la pluie tombe bien plus d'un côté de la montagne que de l'autre, créant ainsi une frontière nette dans la distribution de la pluviométrie... un phénomène que la plupart des techniques d'interpolation spatiale sont incapables de reproduire correctement. De plus, d'autres variables jouent un rôle important. Par exemple, plus le site est proche de la mer, plus la pluviométrie risque d'augmenter, d'un point de vue statistique.
 
-La méthode [AURELHY](https://www.documentation.ird.fr/hor/fdi:25973) tient compte du relief pour les interpolations de données hydrométéorologiques. Pour le biologiste, une estimation correcte des conditions météorologiques sur son sdite est souvent indispensable. Mais cette technique peut aussi lui être utile à chaque fois qu'il veut interpoler une variable pour laquelle il peut établir une corrélation avec une ou plusieurs autres variables qui elles sont mieux quantifiées sur le terrain étudié.
+La méthode [AURELHY](https://www.documentation.ird.fr/hor/fdi:25973) tient compte du relief pour les interpolations de données hydrométéorologiques. Pour le biologiste, une estimation correcte des conditions météorologiques sur son site est souvent indispensable. Mais cette technique peut aussi lui être utile à chaque fois qu'il veut interpoler une variable pour laquelle il peut établir une corrélation avec une ou plusieurs autres variables qui elles sont mieux quantifiées sur le terrain étudié.
 
 Dans R, le package {aurelhy} fait ce type d'interpolation. Il n'est **pas** installé par défaut dans la SciViews Box mais peut l'être via l'instruction suivante\ :
 
@@ -457,7 +487,7 @@ lines(mbord, col = "black")
 points(mrain, col = "red")
 ```
 
-La même carte n'est pas réalisable avec {ggplot2}/`chart()` parce que le modèle terrain contient plus de 3,7 milliuons de points et que c'est beaucoup trop de données pour ce moteur graphique-là. Néanmoins, nous pouvons réaliser une carte en utilisant {tmap} à conditions de convertir nos objets d'abord. Pour le modèle terrain, nous faisons\ :
+La même carte n'est pas réalisable avec {ggplot2}/`chart()` parce que le modèle terrain contient plus de 3,7 millions de points et que c'est beaucoup trop de données pour ce moteur graphique-là. Néanmoins, nous pouvons réaliser une carte en utilisant {tmap} à conditions de convertir nos objets d'abord. Pour le modèle terrain, nous faisons\ :
 
 
 ```{r}
@@ -551,7 +581,7 @@ Ce code n'est **pas** évalué et aucun graphique n'est produit car, même avec 
 Nous devons convertir la frontière du Maroc en objet **sf**.
 
 ```{r}
-mbord[[1]] <- mbord[[1]][-(1:28), ] # Useless adata at the beginning
+mbord[[1]] <- mbord[[1]][-(1:28), ] # Useless data at the beginning
 m_bord_pts <- st_as_sf(bind_rows(mbord, .id = "id"), coords = c("x", "y"))
 m_bord_poly <- st_sf(aggregate(m_bord_pts$geometry, list(m_bord_pts$id),
   function(g) st_cast(st_combine(g), "POLYGON")))
@@ -640,7 +670,7 @@ rain_ras <- raster(t(unclass(geomrain))[ncol(geomrain):1, ],
 class(rain_ras)
 ```
 
-Enfuin, nous réalisons une carte de la pluviométrie que nous plaçons côte à côte avec la carte du releif pour comparaison.
+Enfin, nous réalisons une carte de la pluviométrie que nous plaçons côte à côte avec la carte du releif pour comparaison.
 
 ```{r}
 map_rain <- map_m + tm_shape(rain_ras) +
@@ -663,3 +693,11 @@ Nous voyons bien, sur la carte de droite, que le relief montagneux de l'Atlas ma
 - [Geocomputation with R](https://geocompr.robinlovelace.net/adv-map.html) présente certains aspects complémentaires au précédent ouvrage (en anglais). Il montre, par exemple, comment combiner les capacités géstatistique et d'apprentissage machine dans R pour étudier des modèles spatialisés potentiellement très puissants. Des applications pratiques dans différentes disciplines (dont l'écologie) mettent tout cela en musique.
 
 - [Geospatial Health Data: modeling and visualization with R-INLA and Shiny](https://www.paulamoraga.com/book-geospatial/) insiste particulièrement sur les cartes interactives et les applications Shiny (dashboard) pour présenter des données et modèles géospatialisés de manière vivante et interactive (en anglais).
+
+
+## Récapitulatif des exercices
+
+Dans ce module 6, vous aviez à réaliser les exercices suivants\ :
+
+`r show_ex_toc()`
+
