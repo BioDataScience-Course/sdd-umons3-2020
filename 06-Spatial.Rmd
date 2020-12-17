@@ -207,7 +207,7 @@ st_crs(world)
 
 ##### A vous de jouer ! {-}
 
-`r h5p(63, height = 270, toc = "Standard EPSG")`
+`r h5p(62, height = 270, toc = "Standard EPSG")`
 
 Intéressons-nous maintenant à l'Afrique australe définie par l'ONU comme constituée des pays suivants\ : Afrique du Sud, Namibie, Botswana, Lesotho et Swaziland.
 
@@ -520,6 +520,7 @@ plot(st_geometry(s_africa_sa),
 layoutLayer(title = "Afrique", tabtitle = TRUE, north = TRUE, 
   frame = TRUE, posscale = "bottomleft", scale = 1000)
 ```
+
 ### Utilisation de {tmap}
 
 Le package [{tmap}](https://mtennekes.github.io/tmap/index.html) est un package dédié à la représentation cartographique dont la syntaxe va se rapprocher de celle de {ggplot2} (utilisé avec `chart()`). En effet, il superpose des couches sur le graphiques en utilisant l'opérateur `+` comme vous avez l'habitude de faire jusqu'ici pour vos graphiques en R. Mais il est beaucoup plus rapide que {ggplot2} et permet de combiner à souhait des couches vectorielles et raster. Il comprend également une série de fonctions de personnalisation de cartes très intéressantes.
@@ -536,6 +537,7 @@ tm_shape(africa_sa) +
   tm_scale_bar(position = c("left", "bottom")) + # Ajout de l'échelle
   tm_layout(bg.color = "skyblue") # Ajout d'un fond bleu
 ```
+
 Les avantages de {tmap} apparaissent clairement lorsqu'une couche raster est ajoutée au graphique. Reprenons notre carte du relief marocain que nous avions été incapable de réaliser en un temps raisonnable avec {ggplot2} sous forme entièrement convertie en objets vectoriels **sf**. Et bien avec {tmap} cette carte se réalise le plus naturellement du monde.
 
 Nous allons d'abord effectuer une carte des frontière uniquement. Nous ne sommes pas obligés de le faire, mais nous pouvons assigner une carte à un objet R. Dans ce cas, la carte n'est affiché que si l'objet est imprimé.
