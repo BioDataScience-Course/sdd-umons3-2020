@@ -209,7 +209,7 @@ st_crs(world)
 
 ##### A vous de jouer ! {-}
 
-`r h5p(63, height = 270, toc = "Standard EPSG")`
+`r h5p(62, height = 270, toc = "Standard EPSG")`
 
 Intéressons-nous maintenant à l'Afrique australe définie par l'ONU comme constituée des pays suivants\ : Afrique du Sud, Namibie, Botswana, Lesotho et Swaziland.
 
