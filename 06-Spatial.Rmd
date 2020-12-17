@@ -357,6 +357,7 @@ plot(st_geometry(s_africa_sa),
 layoutLayer(title = "Afrique", tabtitle = TRUE, north = TRUE, 
   frame = TRUE, posscale = "bottomleft", scale = 1000)
 ```
+
 ### tmap
 
 Le package [{tmap}](https://mtennekes.github.io/tmap/index.html) est un package dédié à la représentation cartographique dont la syntaxe va se rapprocher de celle de ggplot2 (utilisé avec chart()) et la vitesse d'exécution du R de base. Il comprend également une série de fonction de personnalisation de cartes très intéressante. Tout d'abord ce package propose une fonction rapide qtm().
