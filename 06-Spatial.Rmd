@@ -419,12 +419,14 @@ De nombreuses ressources existent sur le Net pour la cartographie avec R. Celles
 
 **Cette section est en cours d'édition**
 
+<!----
 Principales sections à écrire
 
 - Encodage, importation, exportation de données spatialisées (mais redondant avec ci-dessus?),
 - Mesure de distances et de surfaces,
 - Modélisation spatiale,
 - Interpolation spatiale (Krigeage).
+---->
 
 ### Interpolation avec AURELHY
 
@@ -638,3 +640,9 @@ tmap_arrange(map_m2, map_rain)
 Nous voyons bien, sur la carte de droite, que le relief montagneux de l'Atlas marocain à influencé l'interpolation de la pluviométrie qui est la plus abondante sur les versants orientés vers la mer. Ceci est conforme avec ce qui s'observe sur le terrain.
 
 </details>
+
+## Récapitulatif des exercices
+
+Dans ce module 6, vous aviez à réaliser les exercices suivants\ :
+
+`r show_ex_toc()`
