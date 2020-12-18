@@ -984,6 +984,17 @@ tmap_arrange(m_map3, m_map_rain + tm_compass() + tm_scale_bar())
 
 </details>
 
+
+##### A vous de jouer ! {-}
+
+```{r, echo=FALSE, results='asis'}
+assignation("C06Ga_map", 
+  url = "https://github.com/BioDataScience-Course/C06Ga_bees_belgium",
+  course.urls = c(
+    'S-BIOG-025' = "https://classroom.github.com/a/8MUsrDBK"),
+  toc = "Distribution des abeilles sauvages de Belgique")
+```
+
 ##### Pour en savoir plus {-}
 
 - [Intro to GIS and Spatial Analysis](https://mgimond.github.io/Spatial/index.html) est un ouvrage complet qui introduit toute la matière de manière claire, mais qui montre aussi comment l'implémenter dans R (en anglais).
