@@ -502,14 +502,13 @@ Si vous exécutez ce code, vous vous rendrez compte qu'il faut un temps **énorm
 
 **Clairement, la combinaison de rasters avec sf sur des graphiques {ggplot2}, si elle est techniquement possible, doit être strictement limitée à des rasters de très basse résolution. Dans la section suivante, nous découvrirons un moteur de cartographie dans R qui ne présente pas ces limitations et qui reste assez semblable à {ggplot2} du point de vue de son interface\ : {tmap}.
 
-
 ## Cartes avec {tmap} et autres
 
 De nombreux packages R permettent de réaliser des cartes. Nous avons utilisé jusqu'à présent {ggplot2} pour visualiser nos objets **sf**. Mais d'autres moteurs graphiques peuvent aussi être employés pour générer des cartes statique ou dynamiques et interactives.
 
 ### Graphiques de base R
 
-Le package {sf} associé à des instructions en R de base permet de réaliser des cartes. Le R de base à l'avantage d'être très rapide dans son exécution. Le package [{cartography}](http://riatelab.github.io/cartography/docs/) permet d'améliorer ces graphiques comme avec la fonction `layoutLayer()` pour ajouter un titre, une orientation ou encore une légende. Malheureusement, son interface (les fonctions et leurs arguments à utiliser) est totalement différente de {ggplot2}, de même que le rendu final. Nous en parlons car il s'agit tout de même d'une solution efficace pour réaliser cdes cartes professionnelles dans R. Voici donc, de manière illustrative, une carte réalisée avec ce package.
+Le package {sf} associé à des instructions en R de base permet de réaliser des cartes. Le R de base à l'avantage d'être très rapide dans son exécution. Le package [{cartography}](http://riatelab.github.io/cartography/docs/) permet d'améliorer ces graphiques comme avec la fonction `layoutLayer()` pour ajouter un titre, une orientation ou encore une légende. Malheureusement, son interface (les fonctions et leurs arguments à utiliser) est totalement différente de {ggplot2}, de même que le rendu final. Nous en parlons car il s'agit tout de même d'une solution efficace pour réaliser des cartes professionnelles dans R. Voici donc, de manière illustrative, une carte réalisée avec ce package.
 
 ```{r}
 library(cartography)
@@ -523,7 +522,7 @@ layoutLayer(title = "Afrique", tabtitle = TRUE, north = TRUE,
 
 ### Utilisation de {tmap}
 
-Le package [{tmap}](https://mtennekes.github.io/tmap/index.html) est un package dédié à la représentation cartographique dont la syntaxe va se rapprocher de celle de {ggplot2} (utilisé avec `chart()`). En effet, il superpose des couches sur le graphiques en utilisant l'opérateur `+` comme vous avez l'habitude de faire jusqu'ici pour vos graphiques en R. Mais il est beaucoup plus rapide que {ggplot2} et permet de combiner à souhait des couches vectorielles et raster. Il comprend également une série de fonctions de personnalisation de cartes très intéressantes.
+Le package [{tmap}](https://mtennekes.github.io/tmap/index.html) est un package dédié à la représentation cartographique dont la syntaxe va se rapprocher de celle de {ggplot2} (utilisé avec `chart()`). En effet, il superpose des couches sur le graphique en utilisant l'opérateur `+` comme vous avez l'habitude de faire jusqu'ici pour vos graphiques en R. Mais il est beaucoup plus rapide que {ggplot2} et permet de combiner à souhait des couches vectorielles et raster. Il comprend également une série de fonctions de personnalisation de cartes très intéressantes.
 
 Si nous reprenons notre carte du continent africain, cela donnera ceci en {tmap}\ : `tm_shape()` lis les données d'un objet **raster** ou **sf** et les fonctions suivantes telles que `tm_polygons` ou `tm_borders()` vont jouer le même effet que `geom_xxx()` dans {ggplot2} en matérialisant ces données sous une forme particulière (ici un polygone) sur la carte. Des fonctions comme `tm_compass()` ou `tm_scale_bar()` vont orienter la carte et lui ajouter une échelle. Enfin, `tm_layout()` propose de nombreux paramètres pour changer l'apparence de la carte et sont l'équivalent des fonctions `theme_xxx()` de {ggplot2}.
 
