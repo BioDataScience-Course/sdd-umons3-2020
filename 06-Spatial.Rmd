@@ -599,6 +599,27 @@ Pour la même raison (bug), ce code n'est pas exécuté ici, mais s'il l'était,
 
 ![](images/06-spatial/tmap_mode_view.png)
 
+### Edition interactive
+
+Le package {mapedit} propose des fonctions qui permettent d'éditer et de créer des objets **sf**. L'exemple suivant trace un polygone sur la Zélande (province du sud des Pays-Bas) et vous permet de l'éditer et de le sauver. Exécutez ce code dans RStudio pour voir de quoi il s'agit exactement (`tmaptools::bb()` crée  une boite encadrant une zone, que vous pouvez éditer à la souris grâce à `editMap()`).
+
+```{r, eval=FALSE}
+library(mapedit)
+library(mapview)
+# Toutes les provinces des Pays-Bas
+data("NLD_prov", package = "tmap")
+# Zélande seulement
+zeeland <- NLD_prov[10, ]
+# Boite encadrant la Zélande comme point de départ d'un polygone
+zeeland_bb <- tmaptools::bb(zeeland)
+# Carte interactive permettant d'éditer ce polygone
+ editMap(mapview(zeeland_bb), targetLayerId = "zeeland_bb")
+```
+
+Les boutons à gauche permettent d'éditer des polygones existants ou d'en créer de nouveaux au dessus du fond de carte. Les modifications sont sauvegardées automatiquement quand vous cliquez sur le bouton **Done** bleu en bas à droite.
+
+![](images/06-spatial/mapedit.png)
+
 ##### A vous de jouer ! {-}
 
 `r learnr("C06La_map", title = "Réalisation de cartes avec R", toc = "Réalisation de cartes avec R")`
@@ -629,53 +650,25 @@ De nombreuses ressources existent sur le Net pour la cartographie avec R. En voi
 
 ## Interpolation spatiale
 
-Parmi les nombreuses techniques statistiques appliquées aux données géoréférencées (autocorrélation spatiale, analyse de motifs de points, modélisation spatiale et spatio-temporelle, classification et segmentation de zones géographiques, ...) nous nous attarderons sur l'une des plus utiles\ : l'**interpolation spatiale**. Son principe consiste à interpoler la variation d'une mesure quantitative dans une zone géographique donnée à partir de mesures éparses. Cette interpolation spatiale permet de construire ensuite des cartes bien plus percutantes.
+Parmi les nombreuses techniques statistiques appliquées aux données géoréférencées ([autocorrélation spatiale](https://mgimond.github.io/Spatial/spatial-autocorrelation.html), [analyse de motifs de points](https://mgimond.github.io/Spatial/chp11-0.html), [modélisation spatiale et spatio-temporelle](https://www.paulamoraga.com/book-geospatial/sec-arealdataexamplespatial.html), [classification et segmentation de zones géographiques](https://www.r-bloggers.com/2020/03/analyzing-remote-sensing-data-using-image-segmentation/), ...) nous nous attarderons sur l'une des plus utiles\ : l'[**interpolation spatiale**](https://mgimond.github.io/Spatial/spatial-interpolation.html). Son principe consiste à interpoler la variation d'une mesure quantitative dans une zone géographique donnée à partir de mesures éparses. Cette interpolation spatiale permet de construire ensuite des cartes bien plus percutantes.
 
-Il est en effet plutôt rare de pouvoir avoir une couverture dense de mesures sur une grande étendue géographique. Si nous prenons l'exemple de données météorologiques, mis à part l'utilisation d'image satellites, les données sont la plupart du temps obtenue à partir d'un réseau de station météorologiques plus ou moins dense. Dans notre exemple, nous nous intéresserons à la **pluviométrie** exprimée en mm d'eau par an. Un pluviomètre est un appareil simple qui recueille l'eau tombée du ciel sur une surface donnée et qui contient un tube gradué en mm. Il suffit alors de lire la valeur -après un laps de temps donné pour connaître la quantité cumulée d'eau qui est tombée du ciel. 
+Il est en effet plutôt rare d'avoir une couverture dense de mesures sur une grande étendue géographique. Si nous prenons l'exemple de données météorologiques, mis à part l'utilisation d'image satellites, les données sont la plupart du temps obtenue à partir d'un réseau de station météorologiques plus ou moins dense. Dans notre exemple, nous nous intéresserons à la **pluviométrie** exprimée en mm d'eau par an. Un pluviomètre est un appareil simple qui recueille l'eau tombée du ciel sur une surface donnée et qui contient un tube gradué en mm. Il suffit alors de lire la valeur après un laps de temps donné pour connaître la quantité cumulée d'eau qui est tombée du ciel. 
 
-![Pluviomètre, par [Jean Wilmotte](http://www.jeanwilmotte.it/page/103/), CC-BY-SA.](images/06-spatial/pluviometre.jpg )
+![Pluviomètre, par [Jean Wilmotte](http://www.jeanwilmotte.it/page/103/), CC-BY-SA.](images/06-spatial/pluviometre.jpg)
 
+### Où pleut-il au Maroc\ ?
 
+Les données que nous allons traiter comme exemple ne sont pas dénuées d'intérêt pour le botaniste, le zoologiste, ou encore, l'éco-conseiller, qui ont tous besoin de données environnementales pour comprendre la distributions des plantes et des animaux. Bein sûr, la technique est également utilisable dans bien d'autres contextes (distrubtion des espèces et biodiversité, gradiens de pollution, progression d'une épidémie, etc.)
 
-### Interpolation avec AURELHY
-
-<details><summary>Cette section est facultative.</summary>
-
-Les météorologues ont depuis toujours dû réaliser des cartes de pluviométrie. Mais la pluie n'est bien évidemment pas mesurée partout, seulement en quelques stations. Les techniques d'interpolation spatiale vues ci-dessus ne fonctionnent pas bien dans ce cas si le relief est très vallonné. En effet, il est bien connu qu'en zone montagneuse, la pluie tombe bien plus d'un côté de la montagne que de l'autre, créant ainsi une frontière nette dans la distribution de la pluviométrie... un phénomène que la plupart des techniques d'interpolation spatiale sont incapables de reproduire correctement. De plus, d'autres variables jouent un rôle important. Par exemple, plus le site est proche de la mer, plus la pluviométrie risque d'augmenter, d'un point de vue statistique.
-
-La méthode [AURELHY](https://www.documentation.ird.fr/hor/fdi:25973) tient compte du relief pour les interpolations de données hydrométéorologiques. Pour le biologiste, une estimation correcte des conditions météorologiques sur son site est souvent indispensable. Mais cette technique peut aussi lui être utile à chaque fois qu'il veut interpoler une variable pour laquelle il peut établir une corrélation avec une ou plusieurs autres variables qui elles sont mieux quantifiées sur le terrain étudié.
-
-Dans R, le package {aurelhy} fait ce type d'interpolation. Il n'est **pas** installé par défaut dans la SciViews Box mais peut l'être via l'instruction suivante\ :
-
-
-
-Nous allons reprendre l'interpolation de la pluviométrie sur le territoire marocain qui est l'exemple proposé dans ce package {aurelhy}. Toutes les données nécessaires sont fournies. Il nous faut\ :
-
-- Un modèle terrain (le relief) avec une résolution suffisante (ici  une grille de 924x924m) **et qui s'étend un peu au delà de la zone à interpoler tout autour** afin d'avoir suffisamment d'information dans toutes les fenêtres d'interpolation utilisées.
-
-```{r, eval=FALSE}
-library(aurelhy)
-data(morocco)
-class(morocco)
-attr(morocco, "coords")
-```
-
-Nous récupérons aussi la frontière du Maroc dans `mbord` et les données de pluviométrie dans `mrain`. Nous réalisons une carte avec ces données (stations pluviométriques en rouge).
-
-La même carte n'est pas réalisable avec {ggplot2}/`chart()` parce que le modèle terrain contient plus de 3,7 millions de points et que c'est beaucoup trop de données pour ce moteur graphique-là. Néanmoins, nous pouvons réaliser une carte en utilisant {tmap} à conditions de convertir nos objets d'abord. Pour le modèle terrain, nous faisons\ :
-
-Nous devons également convertir les données ponctuelles de pluviométrie en objet **sf**.
+Sur base de nos données relative au Maroc que nous avons utilisées comme exemple jusqu'ici, nous avons également `mrain` qui propose des mesures de pluviométrie em mm/an enregistrées à une quarantaine de stations météorologiques réparties sur tout le territoire, mais de manière inégale. Cet objet **geopoints** doit être converti en **sf** comme à notre habitude.
 
 ```{r}
 data("mrain", package = "aurelhy")
-# Renommer la variable de manière plus explicite
-mrain2 <- mrain
-names(mrain2) <- c("x", "y", "Pluie [mm/an]")
-m_rain <- st_as_sf(mrain2, coords = c("x", "y"))
+m_rain <- st_as_sf(mrain, coords = c("x", "y"))
 m_rain
 ```
 
-Et enfin, nous pouvons rajouter ces données de pluviométrie sur notre carte du Maroc avec {tmap}. Si nous utilisons `tm_dots()`, nous localisons simplement les stations météorologiques pour lesquelles nous avons des données de pluviométrie annuelle\ :
+Nous pouvons rajouter ces données de pluviométrie sur notre carte du Maroc avec {tmap}. Si nous utilisons `tm_dots()`, nous localisons simplement les stations météorologiques pour lesquelles nous avons des données de pluviométrie annuelle\ :
 
 ```{r}
 m_map2 + 
@@ -688,16 +681,217 @@ Plus intéressant, avec `tm_bubbles()` nous visualisons également l'intensité 
 ```{r}
 m_map3 <- m_map2 + 
   tm_shape(m_rain) +
-  tm_bubbles(col = "darkblue", size = "Pluie [mm/an]",
-    legend.size.is.portrait = TRUE)
+  tm_bubbles(col = "darkblue", size = "rain",
+    legend.size.is.portrait = TRUE, title.size = "Pluie [mm/an]")
 m_map3
 ```
 
 Comme nous pouvons le voir, les données sont très éparses. Ce serait pourtant utile d'avoir une couverture de l'estimation de la pluviométrie sur tout le territoire marocain. Pour cela, nous devons utiliser l'**interpolation spatiale** pour créer un raster sur base de ces données.
 
+L'interpolation spatiale est possible parce que, comme pour les séries chronologiques, les données géoréférencées ont généralement une forte autocorrélation. Ainsi, la variation probable de pluviométrie entre deux stations peut, en première approximation, êtrte considérée "dans les mêmes eaux" (si je puis dire) que les valeurs mesurées aux deux stations.
 
+### Interpolation avec DIP
 
-Nous utilisons aussi un masque qui indique la zone à interpoler (`mmask`) et des données de distance à la mer dans `mseadist`.
+Nous allons utiliser le package [{gstat}](https://r-spatial.github.io/gstat/) pour interpoler la pluviométrie marocaine. Celui-ci propose [plusieurs techniques d'interpolation](http://132.72.155.230:3838/r/spatial-interpolation-of-point-data.html). La méthode de la distance inversée pondérée (DIP, *inverse weighted distance en anglais ou IDW*) est une méthode simple. Elle calcule la moyenne pondérée par l'inverse de la distance entre le point à interpoler et les points de valeurs connues au voisinage. Le calcul se fait comme suit\ :
+
+$$\hat{Z}(s_0) = \frac{\sum_{i=1}^n w(s_i) Z(s_i)}{\sum_{i=1}^n w(s_i)}$$
+
+Cette équation est simplement un calcul de moyenne, mais avec des poids variables $w(s_i)$. L'astuce consiste à faire varier ces poids **en fonction de la distance** entre le point à interpoler $Z(s_0)$ et les point connus $Z(s_i)$. Dans le cas de DIP, c'est l'inverse de la distance $d(s_0, s_i)$ exposant $p$ qui est utilisée\ :
+
+$$w(s_i) = \frac{1}{d(s_0, s_i)^p}$$ 
+
+et la valeur par défaut de $p$ est 2. Faire varier $p$ permet d'avoir un effet d'autocorrélation qui se propage plus ou moins loin dans l'espace. Notez que cet effet est le même dans toutes les directions. Cette interpolation ne nécessite que les données mesurées de pluviométrie `rain`, donc, la formule correspondante est `rain ~ 1` pour indiquer qu'à part une valeur moyenne de référence (l'équivalent de l'ordonnée à l'origine pour une régression linéaire), nous n'utiliserons pas d'autres variables prédictives. Le modèle se calcule comme suit\ :
+
+```{r}
+library(gstat)
+m_g_idw <- gstat(data = m_rain, formula = rain ~ 1)
+```
+
+Ensuite, nous effectuons une prédiction à l'aide de ce modèle en utilisant `predict()`. Par contre, les objets **raster** ne sont pas reconnus et nous devons travailler avec des objets *stars*. Donc, nous convertissons avec `st_as_stars()`.
+
+<!-- Note: I should be able to do this without converting to stars by useing:
+
+```r
+z <- interpolate(m_tm2, m_g)
+z <- mask(z, m_tm2)
+```
+
+but it says crs are different... should look a little deeper here!
+-->
+
+```{r}
+library(stars)
+m_rain_idw <- predict(m_g_idw, newdata = st_as_stars(m_tm2))
+m_rain_idw
+```
+
+Le résultat est aussi un objet **stars** avec deux composantes\ :
+- `var1.pred`, les prédictions
+- `var1.var`, la variance estimée (plus elle est grande en un point, plus la prédiction est incertaine)
+
+Dans le cas de DIP, la variance n'est pas calculée (la colonne contient uniquement des `NA`s). Cet objet est utilisable par {tmap} directement. Nous pouvons en extraire une composante à l'aide de l'opérateur `["composante",,]`. Donc, nous pouvons faire\ :
+
+```{r}
+m_map + tm_shape(m_rain_idw["var1.pred",,]) +
+  tm_raster(n = 8, alpha = 0.7, palette = "YlGnBu",
+    title = "Pluie [mm/an] - IDW") +
+  tm_layout(legend.position = c("left", "top")) +
+  tm_shape(m_rain) + tm_dots(col = "darkblue", size = 0.05)
+```
+
+Le lissage moyenné avec propagation de l'effet sur une certaine distance donne une surface d'interpolation à la forme reconnaissable. Si nous modifions la valeur de $p$, nous propagons plus ou moins loin l'effet. Avec $p = 0.5$ cela donne\ :
+
+```{r}
+m_g05 <- gstat(data = m_rain, formula = rain ~ 1, set = list(idp = .5))
+m_pred05 <- predict(m_g05, newdata = st_as_stars(m_tm2))
+m_map + tm_shape(m_pred05["var1.pred",,]) +
+  tm_raster(n = 8, alpha = 0.7, palette = "YlGnBu",
+    title = "Pluie [mm/an] - IWD") +
+  tm_layout(legend.position = c("left", "top")) +
+  tm_shape(m_rain) + tm_dots(col = "darkblue", size = 0.05)
+```
+
+La propagation se fait à bien plus grande distance. Avec $p = 10$, c'est l'inverse.
+
+```{r}
+m_g10 <- gstat(data = m_rain, formula = rain ~ 1, set = list(idp = 10))
+m_pred10 <- predict(m_g10, newdata = st_as_stars(m_tm2))
+m_map + tm_shape(m_pred10["var1.pred",,]) +
+  tm_raster(n = 8, alpha = 0.7, palette = "YlGnBu",
+    title = "Pluie [mm/an] - IWD") +
+  tm_layout(legend.position = c("left", "top")) +
+  tm_shape(m_rain) + tm_dots(col = "darkblue", size = 0.05)
+```
+
+A noter que les packages {sf}, {stars} et {raster} proposent toute une série de fonctions pour manipuler les différents objets. Voyez la documentation en ligne de ces packages car cela sort du cadre de ce module. A titre d'illustration, nous allons restreindre le raster de prédiction de la pluviométrie à l'intérieur du territoire marocain uniquement à l'aide de `st_crop()` en utilisant comme premier argument les prédictions et comme second argument le polygone qui définit les frontières du pays `m_bord`.
+
+```{r}
+m_rain_idw2 <- st_crop(m_rain_idw["var1.pred",,], m_bord)
+# Le graphique montre bien le résultat de cette opération
+m_map_idw <- m_map + tm_shape(m_rain_idw2) +
+  tm_raster(n = 8, alpha = 0.7, palette = "YlGnBu",
+    title = "Pluie [mm/an] - IWD") +
+  tm_layout(legend.position = c("left", "top")) +
+  tm_shape(m_rain) + tm_dots(col = "darkblue", size = 0.05)
+m_map_idw
+```
+
+### Krigeage ordinaire
+
+Le krigeage est une technique d'interpolation qui utilise un **modèle statistique** (par comparaison, DIP est dit modèle déterministe) de l'effet en fonction de la distance au lieu d'utiliser une pondération fixée à l'avance. Cet effet peut même varier en fonction de la direction. Cette technique étant complexe, il faudrait pratiquement lui consacrer un cours complet. Aussi, nous ne ferons que nous sensibiliser à cette technique sans rentrer dans les détails.
+
+On appelle **variogramme empirique** la représentation de la demi-variance en fonction de la distance entre les points telle qu'observés sur base du réseau de points effectivement mesurés. Nous pouvons le calculer et le visionner à l'aide de `variogram()`.
+
+```{r}
+vario_ko <- variogram(data = m_rain, rain ~ 1)
+plot(vario_ko)
+```
+
+Le but ensuite est de trouver un modèle qui s'ajuste au mieux dans ce variogramme empirique. Nous avons plusieurs modèles différents utilisables. Le package {automap} propose la fonction `autofitVariogram()` qui détermine un modèle optimal automatiquement parmi une liste de modèles classiques. Par contre, les données doivent être converties encore en un autre objet (un **SpatialPointsDataFrame**, bienvenue dans l'écosystème divers et varié de R\ !) Donc, pour vous faciliter la vie, nous construisons la fonction `auto_variogram()` qui cache ces détails techniques.
+
+```{r}
+auto_variogram <- function(data, formula, ...)
+  automap::autofitVariogram(formula, input_data = as(data, "Spatial"), ...)
+```
+
+Cette fonction s'utilise alors simplement comme ceci\ :
+
+```{r}
+m_vario_ko <- auto_variogram(data = m_rain, rain ~1)
+plot(m_vario_ko)
+```
+
+Ce modèle de variogramme (la courbe en bleue) est ensuite utilisé pour pondérer nos moyennes de façon similaire à DIP dans le **krigeage ordinaire**. En pratique, nous indiquons notre modèle à `gstat()` avec l'argument `model=`.
+
+```{r}
+# Krigeage ordinaire
+m_g_ko <- gstat(data = m_rain, formula = rain ~ 1, model = m_vario_ko$var_model)
+# Calcul de la prédiction
+m_pred_ko <- predict(m_g_ko, newdata = st_as_stars(m_tm2))
+# Restriction du calcul à l'intérieur des frontières du pays
+m_rain_ko <- st_crop(m_pred_ko["var1.pred",,], m_bord)
+# Carte
+m_map_ko <- m_map + tm_shape(m_rain_ko) +
+  tm_raster(n = 8, alpha = 0.7, palette = "YlGnBu",
+    title = "Pluie [mm/an] - KrigO") +
+  tm_layout(legend.position = c("left", "top")) +
+  tm_shape(m_rain) + tm_dots(col = "darkblue", size = 0.05)
+# Représentation côte à côte de IDW et krigeage ordinaire
+tmap_arrange(m_map_idw, m_map_ko)
+```
+
+L'interpolation du krigeage à droite est meilleure que DIP à gaucher car nous n'avons plus cet effet de halo désagréable autour des points mesurés dans le désert.
+
+### Krigeage universel
+
+Le krigeage ordinaire est ce qui se fait de mieux en matière d'interpolation spatiale si seule l'information relative à la variable à interpoler est disponible. Cependant, nous pouvons encore améliorer le travail si nous disposons de **covariables** mesurées avec une plus grande densité, à condition d'utiliser un modèle capable de les prendre en compte sous forme de **variables indépendantes** à la droite de la formule\ : le **krigeage universel**.
+
+Effectivement ici, nous savons que le relief influence la pluviométrie qui est manifestement plus abondantes dans la région montagneuse de l'Atlas. Or, il se fait que la pluie n'a pas été mesurée partout sur le relief, menant ainsi à des erreurs dans l'interpolation. Avec le krigeage universel, nous pouvons considérer le relief comme une covariable et tenter une meilleure prédiction de la pluie de cette façon-là.
+
+Les covariables doivent être connues à la fois pour les points de la grille interpolée *et* pour les points mesurés. Nous devons donc ajouter l'information de l'altitude des stations météorologiques à `m_rain` avant de pouvoir procéder. Cette opération est appelée [**extraction de raster**](https://geocompr.robinlovelace.net/geometric-operations.html#raster-extraction).
+
+```{r}
+extract(m_tm, m_rain)
+```
+
+Nous voyons qu'une station n'est pas sur le modèle terrain (son élévation est `NA`). Nous l'éliminerons donc de nos données.
+
+```{r}
+# Copie des données
+m_rain2 <- m_rain
+# Ajout de elevation
+m_rain2$elevation <- extract(m_tm, m_rain2)
+# Elimination des données manquantes
+m_rain2 <- drop_na(m_rain2)
+m_rain2
+```
+
+Nous pouvons maintenant explorer un krigegage universel avec le modèle terrain comme covariable. La formule `rain ~ 1`du krigeage ordinaire est donc remplacée ici par `rain ~ elevation`.
+
+```{r}
+m_vario_ku <- auto_variogram(data = m_rain2, rain ~ elevation)
+plot(m_vario_ku)
+```
+
+Effectuons maintenant notre krigeage.
+
+```{r}
+# Krigeage universel avec elevation comme covariable
+m_g_ku <- gstat(data = m_rain2, formula = rain ~ elevation,
+  model = m_vario_ku$var_model)
+# Calcul de la prédiction, but data must contain the covariable, so, rename it first
+m_tm_stars2 <- st_as_stars(m_tm2)
+names(m_tm_stars2) <- "elevation"
+m_pred_ku <- predict(m_g_ku, newdata = m_tm_stars2)
+# Restriction du calcul à l'intérieur des frontières du pays
+m_rain_ku <- st_crop(m_pred_ku["var1.pred",,], m_bord)
+# Carte
+m_map_ku <- m_map + tm_shape(m_rain_ku) +
+  tm_raster(n = 9, alpha = 0.7, palette = "YlGnBu",
+    title = "Pluie [mm/an] - KrigU") +
+  tm_layout(legend.position = c("left", "top")) +
+  tm_shape(m_rain) + tm_dots(col = "darkblue", size = 0.05)
+# Représentation côte à côte de IDW et krigeage ordinaire
+tmap_arrange(m_map_ko, m_map_ku)
+```
+
+Avec le krigeage universel, à droite, nous voyons maintenant clairement l'effet du relief sur l'interpolation de la pluviométrie. Notez aussi que notre krigeage a évalué des pluies encore plus fortes que les valeurs maximales réellement observées, parce qu'il a déterminé que la pluie augmente avec l'altitude et que des points plus élevés que la plus haute station météorologique existent.
+
+Est-ce que l'interpolation de droite est parfaite\ ? Disons qu'elle est meilleure, mais pas encore ce qui se fait de mieux. En effet, deux phénomènes bien connus n'ont pas pu être pris en compte ici\ :
+
+1. Les deux flancs de montages ne sont pas égaux en terme de pluviométrie. Celui exposé vers la mer reçoit les masses d'airs humides et donc les pluies, alors que l'autre versnt montagneux est plus sec.
+
+2. La distance à la mer joue un rôle également dans la pluviométrie locale.
+
+Les météorologues ont mis au point des techniques très sophistiquées pour ternir compte de ces critères, notamment la méthode AURELHY. Cependant, cette dernière technique est très difficile à mettre en œuvre et a de nombreux paramètres. Nous vous conseillons donc de rechercher plutôt un krigeage optimal de vos données et de vous perfectionner avec cette technique avant d'attaquer un niveau supérieur. Nous vous démontrons juste ci-dessous, à titre facultatif, ce que cela donne.
+
+### Interpolation avec AURELHY
+
+<details><summary>Cette section est facultative.</summary>
+
+La méthode [AURELHY](https://www.documentation.ird.fr/hor/fdi:25973) tient compte du relief de manière asymétrique en fonction du versant et d'autres variables comme la distance à la mer pour les interpolations de données hydrométéorologiques. Pour le biologiste, une estimation correcte des conditions météorologiques sur son site est souvent indispensable. Mais cette technique peut aussi lui être utile à chaque fois qu'il s'intéresse à des données étroitement dépendantes de la pluviométrie, comme les communautés végétales, ou la production de champs cultivés, par exemple.
+
+Dans R, le package {aurelhy} fait ce type d'interpolation. Nous chargeons donc ce package. Nous utilisons aussi un masque qui indique la zone à interpoler (`mmask`) et des données complémentaires qui ont été précalculées de distance à la mer dans `mseadist`. Nous travaillons aussi avec les objets **geomat**, **geoshapes** et **geopoints** propres à {aurelhy}.
 
 ```{r}
 library(aurelhy)
@@ -707,7 +901,7 @@ data(mmask)
 mmask2 <- add.points(mmask, mrain)
 ```
 
-A présent, nous interpolons les données de pluviométrie à l'aide de la méthode AURELHY. Les nombreux paramètres de `aurelhy()` sont décrits dans l'aide de la fonction. 
+A présent, nous interpolons les données de pluviométrie à l'aide de la méthode AURELHY. Les nombreux paramètres de `aurelhy()` sont décrits dans l'aide de la fonction (leur description sort du cadre de cette simple démo). 
 
 ```{r}
 m_aurelhy <- aurelhy(morocco, mmask2, auremask(), x0 = 30, y0 = 54, step = 12,
@@ -715,7 +909,7 @@ m_aurelhy <- aurelhy(morocco, mmask2, auremask(), x0 = 30, y0 = 54, step = 12,
   add.vars = mseadist, var.name = "seadist")
 ```
 
-Cet objet `m_aurelhy` peut ensuite être utilisé pour prédire la pluviométrie (que nous passons temporairement en échelle logarithmique.)
+Cet objet `m_aurelhy` peut ensuite être utilisé pour prédire la pluviométrie (que nous passons temporairement en échelle logarithmique).
 
 ```{r}
 mrain$log_rain <- log10(mrain$rain)
@@ -723,7 +917,7 @@ pmrain <- predict(m_aurelhy, mrain, "log_rain")
 summary(pmrain) 
 ```
 
-Nous voyons que quelques variables de ce modèle sont très significatives et d'autres le sont moins. Nous pourrions raffiner le modèle et le simplifier (nous vous laissons cela comme exercice). Une fois que nous sommes satisfait du résultat, nous transformons la variable prédite en objet **geomat**, et ensuite en objet **raster** pour le cartographier.
+Nous voyons que quelques variables de ce modèle sont très significatives. Une étape du calcul consiste à réaliser une ACP sur les données, d'où les variables PC1 à PC10 qui en sont les axes principaux. La variable `z` est l'élévation. Une fois que nous sommes satisfait du résultat, nous transformons la variable prédite en objet **geomat**, et ensuite en objet **raster** pour le cartographier.
 
 ```{r}
 geomrain <- as.geomat(pmrain)
@@ -740,36 +934,34 @@ range(mrain$rain)
 Nous atteignons près de 3500mm/an de pluie en certains endroits, ce qui est énorme. Combien de pixels sont concernés\ ?
 
 ```{r}
-sum(geomrain > 1000, na.rm = TRUE)
+sum(geomrain > 1200, na.rm = TRUE)
 ```
 
-Seulement quelques dizaines. Ceci est probablement lié au manque de stations pluviométriques en altitude. Nous limitons les valeurs à 1000mm/an maximum, et ensuite, nous transformons en objet **raster**
+Seulement quelques dizaines. Ceci est probablement lié au manque de stations pluviométriques en altitude. Nous limitons les valeurs à 1200mm/an maximum, et ensuite, nous transformons en objet **raster**
 
 ```{r}
-geomrain[geomrain > 1000] <- 1000
-r_coords <- coords(geomrain)
-rain_ras <- raster(t(unclass(geomrain))[ncol(geomrain):1, ],
-  xmn = r_coords["x1"], xmx = r_coords["x2"],
-  ymn = r_coords["y1"], ymx = r_coords["y2"],
-  crs = "+proj=longlat +datum=WGS84")
-class(rain_ras)
+geomrain[geomrain > 1200] <- 1200
+rain_ras <- st_as_raster(geomrain)
+rain_ras
 ```
 
-Enfin, nous réalisons une carte de la pluviométrie que nous plaçons côte à côte avec la carte du relief pour comparaison à l'aide de `tm_arrange()`.
+Enfin, nous réalisons une carte de la pluviométrie que nous plaçons côte à côte avec le meilleur krigeage pour comparaison à l'aide de `tm_arrange()`.
 
 ```{r}
 m_map_rain <- m_map + tm_shape(rain_ras) +
   tm_raster(n = 10, alpha = 0.7, palette = "YlGnBu",
-    title = "Pluie interpolée [mm/an]") +
+    title = "Pluie [mm/an] - AURELHY") +
   tm_layout(legend.position = c("left", "top")) +
-  tm_shape(m_rain) + tm_dots(col = "darkblue", size = 0.05) +
-  tm_compass() +
-  tm_scale_bar()
+  tm_shape(m_rain) + tm_dots(col = "darkblue", size = 0.05)
 # Deux cartes côte à côte
-tmap_arrange(m_map3, m_map_rain)
+tmap_arrange(m_map_ku, m_map_rain)
 ```
 
-Nous voyons bien, sur la carte de droite, que le relief montagneux de l'Atlas marocain à influencé l'interpolation de la pluviométrie qui est la plus abondante sur les versants orientés vers la mer. Ceci est conforme avec ce qui s'observe sur le terrain.
+Nous avons deux interpolations assez semblables, mais le krigeage donne une estimation un peu plus diffuse, là où AURELHY utilise réellement le relief très escarpé de l'Atlas pour prédire des pluies très contrastées sur des distances faibles. Terminons ceci en beauté avec une comparaison du relief et des pluies observées à gauche avec le résultat issu d'AURELHY à droite.
+
+```{r}
+tmap_arrange(m_map3, m_map_rain + tm_compass() + tm_scale_bar())
+```
 
 </details>
 
@@ -781,6 +973,11 @@ Nous voyons bien, sur la carte de droite, que le relief montagneux de l'Atlas ma
 
 - [Geospatial Health Data: modeling and visualization with R-INLA and Shiny](https://www.paulamoraga.com/book-geospatial/) insiste particulièrement sur les cartes interactives et les applications Shiny (dashboard) pour présenter des données et modèles géospatialisés de manière vivante et interactive (en anglais).
 
+- [Spatial Data Science with R](https://rspatial.org/raster/index.html) en anglais a tout un chapitre consacré à la modélisation de la distribution des espèces.
+
+- [CRAN Task View: Analysis of Spatial Data](https://cran.r-project.org/web/views/Spatial.html), en anglais. Répertories tous les packages de CRAN qui traitent des statistiques spatiales et de la cartographie.
+
+- [Chapitre consacré aux données spatiales de "Data Science with R: A resource compendium" ](https://bookdown.org/martin_monkman/DataScienceResources_book/spatial-data.html), en anglais. Un document qui oriente dans l'écosystème riche des packages R.
 
 ## Récapitulatif des exercices
 
