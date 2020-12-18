@@ -656,6 +656,10 @@ Il est en effet plutôt rare d'avoir une couverture dense de mesures sur une gra
 
 ![Pluviomètre, par [Jean Wilmotte](http://www.jeanwilmotte.it/page/103/), CC-BY-SA.](images/06-spatial/pluviometre.jpg)
 
+##### A vous de jouer ! {-}
+
+`r h5p(63, height = 270, toc = "Interpolation spatiale")`
+
 ### Où pleut-il au Maroc\ ?
 
 Les données que nous allons traiter comme exemple ne sont pas dénuées d'intérêt pour le botaniste, le zoologiste, ou encore, l'éco-conseiller, qui ont tous besoin de données environnementales pour comprendre la distributions des plantes et des animaux. Bein sûr, la technique est également utilisable dans bien d'autres contextes (distrubtion des espèces et biodiversité, gradiens de pollution, progression d'une épidémie, etc.)
@@ -690,6 +694,10 @@ Comme nous pouvons le voir, les données sont très éparses. Ce serait pourtant
 
 L'interpolation spatiale est possible parce que, comme pour les séries chronologiques, les données géoréférencées ont généralement une forte autocorrélation. Ainsi, la variation probable de pluviométrie entre deux stations peut, en première approximation, êtrte considérée "dans les mêmes eaux" (si je puis dire) que les valeurs mesurées aux deux stations.
 
+##### A vous de jouer ! {-}
+
+`r h5p(64, height = 270, toc = "Autocorrélation")`
+
 ### Interpolation avec DIP
 
 Nous allons utiliser le package [{gstat}](https://r-spatial.github.io/gstat/) pour interpoler la pluviométrie marocaine. Celui-ci propose [plusieurs techniques d'interpolation](http://132.72.155.230:3838/r/spatial-interpolation-of-point-data.html). La méthode de la distance inversée pondérée (DIP, *inverse weighted distance en anglais ou IDW*) est une méthode simple. Elle calcule la moyenne pondérée par l'inverse de la distance entre le point à interpoler et les points de valeurs connues au voisinage. Le calcul se fait comme suit\ :
@@ -700,7 +708,14 @@ Cette équation est simplement un calcul de moyenne, mais avec des poids variabl
 
 $$w(s_i) = \frac{1}{d(s_0, s_i)^p}$$ 
 
-et la valeur par défaut de $p$ est 2. Faire varier $p$ permet d'avoir un effet d'autocorrélation qui se propage plus ou moins loin dans l'espace. Notez que cet effet est le même dans toutes les directions. Cette interpolation ne nécessite que les données mesurées de pluviométrie `rain`, donc, la formule correspondante est `rain ~ 1` pour indiquer qu'à part une valeur moyenne de référence (l'équivalent de l'ordonnée à l'origine pour une régression linéaire), nous n'utiliserons pas d'autres variables prédictives. Le modèle se calcule comme suit\ :
+
+et la valeur par défaut de $p$ est 2. Faire varier $p$ permet d'avoir un effet d'autocorrélation qui se propage plus ou moins loin dans l'espace. Notez que cet effet est le même dans toutes les directions.
+
+##### A vous de jouer ! {-}
+
+`r h5p(65, height = 270, toc = "Méthode DIP")`
+
+Cette interpolation ne nécessite que les données mesurées de pluviométrie `rain`, donc, la formule correspondante est `rain ~ 1` pour indiquer qu'à part une valeur moyenne de référence (l'équivalent de l'ordonnée à l'origine pour une régression linéaire), nous n'utiliserons pas d'autres variables prédictives. Le modèle se calcule comme suit\ :
 
 ```{r}
 library(gstat)
@@ -779,6 +794,10 @@ m_map_idw
 ### Krigeage ordinaire
 
 Le krigeage est une technique d'interpolation qui utilise un **modèle statistique** (par comparaison, DIP est dit modèle déterministe) de l'effet en fonction de la distance au lieu d'utiliser une pondération fixée à l'avance. Cet effet peut même varier en fonction de la direction. Cette technique étant complexe, il faudrait pratiquement lui consacrer un cours complet. Aussi, nous ne ferons que nous sensibiliser à cette technique sans rentrer dans les détails.
+
+##### A vous de jouer ! {-}
+
+`r h5p(66, height = 270, toc = "Krigeage")`
 
 On appelle **variogramme empirique** la représentation de la demi-variance en fonction de la distance entre les points telle qu'observés sur base du réseau de points effectivement mesurés. Nous pouvons le calculer et le visionner à l'aide de `variogram()`.
 
