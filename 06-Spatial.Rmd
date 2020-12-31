@@ -43,7 +43,7 @@ Un objet **sf** est tout simplement un tableau de données classiques de type ca
 world
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(57, height = 270, toc = "Objet sf")`
 
@@ -118,7 +118,7 @@ chart(data = world) +
   ggsn::blank()
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(58, height = 270, toc = "Fonctions du package ggsn")`
 
@@ -130,7 +130,7 @@ chart(data = world, ~0 %fill=% economy) +
   geom_sf()
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(59, height = 270, toc = "Utiliser chart() pour la cartographie")`
 
@@ -162,7 +162,7 @@ Les fonds de cartes sont principalement stockés dans des fichiers au format [**
 - [Géoportail des institutions fédérales belges](https://www.geo.be/home?l=fr) pour la Belgique
 - [GEODATA sur eurostat](https://ec.europa.eu/eurostat/web/gisco/geodata) pour l'Europe
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(60, height = 270, toc = "Fonds de cartes")`
 
@@ -187,7 +187,7 @@ Cartes de l'Europe au format **shapefile** en fonction de l'échelle de la carte
 
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(61, height = 270, toc = "Échelles des cartes")`
 
@@ -205,7 +205,7 @@ La carte du monde présenté précédemment suit les conventions de la norme EPS
 st_crs(world)
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(62, height = 270, toc = "Standard EPSG")`
 
@@ -620,7 +620,7 @@ Les boutons à gauche permettent d'éditer des polygones existants ou d'en crée
 
 ![](images/06-spatial/mapedit.png)
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r learnr("C06La_map", title = "Réalisation de cartes avec R", toc = "Réalisation de cartes avec R")`
 
@@ -656,7 +656,7 @@ Il est en effet plutôt rare d'avoir une couverture dense de mesures sur une gra
 
 ![Pluviomètre, par [Jean Wilmotte](http://www.jeanwilmotte.it/page/103/), CC-BY-SA.](images/06-spatial/pluviometre.jpg)
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(63, height = 270, toc = "Interpolation spatiale")`
 
@@ -694,7 +694,7 @@ Comme nous pouvons le voir, les données sont très éparses. Ce serait pourtant
 
 L'interpolation spatiale est possible parce que, comme pour les séries chronologiques, les données géoréférencées ont généralement une forte autocorrélation. Ainsi, la variation probable de pluviométrie entre deux stations peut, en première approximation, êtrte considérée "dans les mêmes eaux" (si je puis dire) que les valeurs mesurées aux deux stations.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(64, height = 270, toc = "Autocorrélation spatiale")`
 
@@ -710,7 +710,7 @@ $$w(s_i) = \frac{1}{d(s_0, s_i)^p}$$
 
 et la valeur par défaut de $p$ est 2. Faire varier $p$ permet d'avoir un effet d'autocorrélation qui se propage plus ou moins loin dans l'espace. Notez que cet effet est le même dans toutes les directions.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(65, height = 270, toc = "Méthode DIP")`
 
@@ -794,7 +794,7 @@ m_map_idw
 
 Le krigeage est une technique d'interpolation qui utilise un **modèle statistique** (par comparaison, DIP est dit modèle déterministe) de l'effet en fonction de la distance au lieu d'utiliser une pondération fixée à l'avance. Cet effet peut même varier en fonction de la direction. Cette technique étant complexe, il faudrait pratiquement lui consacrer un cours complet. Aussi, nous ne ferons que nous sensibiliser à cette technique sans rentrer dans les détails.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(66, height = 270, toc = "Krigeage")`
 
@@ -983,14 +983,15 @@ tmap_arrange(m_map3, m_map_rain + tm_compass() + tm_scale_bar())
 
 </details>
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("C06Ga_map", 
-  url = "https://github.com/BioDataScience-Course/C06Ga_bees_belgium",
-  course.urls = c(
-    'S-BIOG-025' = "https://classroom.github.com/a/8MUsrDBK"),
-  toc = "Distribution des abeilles sauvages de Belgique")
+if (exists("assignation"))
+  assignation("C06Ga_map", 
+    url = "https://github.com/BioDataScience-Course/C06Ga_bees_belgium",
+    course.urls = c(
+      'S-BIOG-025' = "https://classroom.github.com/a/8MUsrDBK"),
+    toc = "Distribution des abeilles sauvages de Belgique")
 ```
 
 ##### Pour en savoir plus {-}

@@ -110,14 +110,15 @@ Nous voyons que les valeurs de rappels ne sont pas modifiées par cette correcti
 
 Si vous êtes amené à modifier les proportions des différentes classes dans votre set d'apprentissage (pratique conseillée si les proportions sont trop différentes d'une classe à l'autre), n'oubliez pas de repondérer les calculs des métriques via `prior()` afin d'avoir des valeurs plus représentatives des performances de votre classifieur en situation.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("C03Ga_cardiovascular", part = "I",
-  url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
-  course.urls = c(
-    'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
-  toc = "Réflexion sur les proportions")
+if (exists("assignation"))
+  assignation("C03Ga_cardiovascular", part = "I",
+    url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
+    course.urls = c(
+      'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
+    toc = "Réflexion sur les proportions")
 ```
 
 ## Courbes ROC
@@ -205,14 +206,15 @@ pROC::auc(pima1b_resampled$diabetes, pima1b_resampled$membership)
 
 Nous pouvons observer que notre second classifeur `pima1b` est effectivement globalement légèrement plus performant que le premier avec `pima1`, avec toutefois des précautions d'usage puisque les données utilisées ne sont pas *strictement* identiques. Seulement les proportions relatives dans les deux classes ont été alignées entre les deux courbes. Par cobntre, selon le seuil de détection choisi, le modèle établi avec `pima1` peut localement égaler, ou même dépasser légèrement les performances de celui établi à l'aide de `pima1b`. De manière générale, les courbes ROC seront parfaitement utilisables *sans ajustement nécessaire par contre,* pour comparer deux modèles différents obtenus à partir d'exactement les *mêmes* données.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("C03Ga_cardiovascular", part = "II",
-  url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
-  course.urls = c(
-    'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
-  toc = "Courbes ROC")
+if (exists("assignation"))
+  assignation("C03Ga_cardiovascular", part = "II",
+    url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
+    course.urls = c(
+      'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
+    toc = "Courbes ROC")
 ```
 
 ## Machine à vecteurs supports
@@ -370,28 +372,30 @@ Le jeu de données [MNIST](http://yann.lecun.com/exdb/mnist/) est un jeu de donn
 
 Cette [vidéo](https://www.youtube.com/watch?v=UOvPeC8WOt8&feature=youtu.be) explique dans le détail le principe de fonctionnement d'un réseau profond et l'illustre justement sur l'apprentissage de la classification de chiffres manuscrits.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("C03Ga_cardiovascular", part = "III",
-  url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
-  course.urls = c(
-    'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
-  toc = "SVM et réseaux de neurones")
+if (exists("assignation"))
+  assignation("C03Ga_cardiovascular", part = "III",
+    url = "https://github.com/BioDataScience-Course/C03G_cardiovascular",
+    course.urls = c(
+      'S-BIOG-025' = "https://classroom.github.com/a/sMSgQSEq"),
+    toc = "SVM et réseaux de neurones")
 ```
 
 ## Challenge
 
 Vous avez dû apprendre beaucoup de techniques complémentaires pour arriver à entraîner correctement votre classifieur (différents algorithmes, validation croisée, matrice de confusion, métriques, courbes ROC, ...). Nous vous proposons maintenant de mettre tout cela en application sous la forme d'un challenge. Vous allez travailler par équipes en binômes et vous tenterez de créer le meilleur classifieur pour détecter les vins excellents parmi un ensemble de vins de toutes catégories. Mais attention, l'exercice n'est pas facile. Vous allez devoir ruser pour gagner des places dans le classement, et mettre en œuvre toutes les techniques étudiées dans les modules 1 à 3 pour arriver aux meilleurs résultats\ !
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("C03Gb_challenge", part = NULL,
-  url = "https://github.com/BioDataScience-Course/C03Gb_Challenge",
-  course.urls = c(
-    'S-BIOG-025' = "https://classroom.github.com/g/zFsIcGjF"),
-  toc = "Challenge pour trouver les meilleurs vins")
+if (exists("assignation"))
+  assignation("C03Gb_challenge", part = NULL,
+    url = "https://github.com/BioDataScience-Course/C03Gb_Challenge",
+    course.urls = c(
+      'S-BIOG-025' = "https://classroom.github.com/g/zFsIcGjF"),
+    toc = "Challenge pour trouver les meilleurs vins")
 ```
 
 Vous pourrez soumettre vos résultats via le formulaire ci-dessous. Utilisez le bouton `Submit` pour tester votre soumission et le bouton `Quit & Save` pour envoyer votre solution au challenge et le faire apparaître dans le tableau de classement. Pour soumettre un autre modèle, relancez l'app de soumission avec `Reload`\ :

@@ -46,7 +46,7 @@ plot(time, trend2 * cycle2, type = "l", xlab = "Temps", ylab = "Série multiplic
 
 <!-- Ici, une ou deux apps shiny où on doit retrouver un signal complexe en mélangeant deux signaux simples parmi un liste de possibilités. Je pensais à un modèle cycle + tendance multiplicatif, et un autre où il faut mélanger deux cycles de périodes différentes. -->
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(35, height = 270, toc = "Stationnarisation d'une série")`
 
@@ -58,7 +58,7 @@ La fonction centrale qui effectue le traitement sur une ou plusieurs séries et 
 
 Une fois qu’une décomposition est réalisée, il est possible d’extraire les différentes composantes (grâce à `tseries()`) ou une partie d’entre elles (en utilisant la méthode `extract()`) et de les retransformer en objet séries régulières (objet **ts** ou **mts**). On peut ainsi appliquer de nouvelles méthodes de décomposition sur un ou plusieurs composants et approfondir l’analyse des séries par des traitements de décomposition en cascade jusqu’à ce qu’on ait extrait et analysé toute l’information pertinente contenue dans ces séries.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(34, height = 270, toc = "La fonction tsd()")`
 
@@ -205,7 +205,7 @@ Pour un effet accru, il est possible d'effectuer successivement plusieurs lissag
 
 Un autre phénomène qu'il faut connaître est l'**effet Slusky-Yule**. L'application d'un filtrage par moyenne mobile engendre une oscillation artificielle dont la période dépend à la fois de l'ordre de la fenêtre du lissage et le l'autocorrélation présente dans la série. Cette période peut se calculer (nous vous renvoyons au manuel de {pastecs} pour les détails de ce calcul).
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(33, height = 270, toc = "Méthode des moyennes mobiles")`
 
@@ -242,21 +242,22 @@ plot(lynx_mb)
 
 Mais ce faisant, nous avons *aussi* éliminé le cycle à 10 ans dans les résidus\ ! Rappelez-vous que la moyenne mobile filtre également des signaux de fréquences dont la bande de lissage est multiple, dont ici à 10 ans. Il nous reste alors une tendance générale qui diminue légèrement pour remonter ensuite.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("C05Ga_tsd", 
-  url = "https://github.com/BioDataScience-Course/C05Ga_tsd",
-  course.urls = c(
-    'S-BIOG-025' = "https://classroom.github.com/a/V8--eYkL"),
-  toc = "Décomposition d'une série spatio-teporelle")
+if (exists("assignation"))
+  assignation("C05Ga_tsd", 
+    url = "https://github.com/BioDataScience-Course/C05Ga_tsd",
+    course.urls = c(
+      'S-BIOG-025' = "https://classroom.github.com/a/V8--eYkL"),
+    toc = "Décomposition d'une série spatio-teporelle")
 ```
 
 ### Médianes mobiles
 
 Comme vous l'avez certainement deviné, les médianes mobiles fonctionnent comme les moyennes mobiles en baladant une fenêtre de largeur fixe le long de la série, mais cette fois-ci en calculant à chaque fois la médiane. Alors que la moyenne mobile s'exprime sous forme d'une somme de termes, ce qui l'associe à un modèle linéaire (on parle donc de filtrage linéaire), les médianes mobiles représentent par contre un *lissage non linéaire*. Il est possible de montrer que la répétition de cette opération conduit finalement à stabiliser le signal filtré. Cette courbe est caractérisée par une série de paliers successifs. Ainsi, la technique est utile pour *segmenter* une série, ce qui se rapproche des sommes cumulées pour détecter des transitions brusques dans la série (mais ici au lieu de les détecter, nous les mettons en évidence via le filtrage).
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(36, height = 270, toc = "Méthode des médianes mobiles")`
 
@@ -309,7 +310,7 @@ Nous allons ici récupérer l'opérateur retard $LX_t$ vu tout au début du modu
 
 A condition de ne pas avoir également un cycle important, le filtrage par différences est efficace pour **éliminer une tendance monotone croissante ou décroissante**, voire une tendance de forme quelconque, mais dont la courbure varie lentement (signal à très haute fréquence). Dans ce cas, la méthode est très efficace pour **stationnariser** une série.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(32, height = 270, toc = "Méthode des différences")`
 
@@ -544,14 +545,15 @@ plot(co2_loess, col = 1:4)
 
 Enfin, terminons en signalant que si la méthode est prévue pour traiter uniquement des modèles additifs, `decloess()` et `tsd(method = "loess")` sont également capables de traiter des modèles multiplicatifs avec `type = "multiplicative"` grâce à l'astuce de la transformation logarithmique du signal implémentée en interne dans ces fonctions, mais `stl()`, elle ne le peut pas.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("C05Gb_ts_adv", 
-  url = "https://github.com/BioDataScience-Course/C05Gb_ts_adv",
-  course.urls = c(
-    'S-BIOG-025' = "https://classroom.github.com/g/ZD6gTPvE"),
-  toc = "Analyse libre d'une série spatio-teporelle")
+if (exists("assignation"))
+  assignation("C05Gb_ts_adv", 
+    url = "https://github.com/BioDataScience-Course/C05Gb_ts_adv",
+    course.urls = c(
+      'S-BIOG-025' = "https://classroom.github.com/g/ZD6gTPvE"),
+    toc = "Analyse libre d'une série spatio-teporelle")
 ```
 
 ## Régularisation 

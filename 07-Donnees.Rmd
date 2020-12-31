@@ -97,7 +97,7 @@ ymd("2015-Jan-25")
 mdy("01/25/15")
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(19, height = 270, toc = "Fonctions de conversion en dates")`
 
@@ -116,9 +116,9 @@ ymd_hm("2010-10-01T2010")
 ymd_hms("2015-Jan-25 12:25:35")
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
-`r h5p(20, height = 270, toc = "Conversion en date (2)")`
+`r h5p(20, height = 270, toc = "Conversion en dates (2)")`
 
 Par défaut, ce package utilise le temps universel coordonné. Il est cependant possible de définir le fuseau horaire avec l'argument `tz=`.
 
@@ -176,14 +176,15 @@ df %>.%
   mutate(., date = make_date(annee, mois, jour))
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("D07Ga_data", part = "I",
-  url = "https://github.com/BioDataScience-Course/D07Ga_data",
-  course.urls = c(
-    'S-BIOG-043' = "https://classroom.github.com/a/4eN9dBmf"),
-  toc = "Données, partie I : dates")
+if (exists("assignation"))
+  assignation("D07Ga_data", part = "I",
+    url = "https://github.com/BioDataScience-Course/D07Ga_data",
+    course.urls = c(
+      'S-BIOG-043' = "https://classroom.github.com/a/4eN9dBmf"),
+    toc = "Données, partie I : dates")
 ```
 
 ### Temps biologique
@@ -394,14 +395,15 @@ Il n'est possible de véritablement comprendre les expressions régulières qu'e
 
 Dans R, le package {regexplain} propose des **addins** pour vous aider à utiliser les expressions régulières dans R. Ces expressions régulières sont souvent utilisables dans toutes les fonctions {stringr} que nous avons vu précédemment.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("D07Ga_data", part = "II",
-  url = "https://github.com/BioDataScience-Course/D07Ga_data",
-  course.urls = c(
-    'S-BIOG-043' = "https://classroom.github.com/a/4eN9dBmf"),
-  toc = "Données, partie II : textes")
+if (exists("assignation"))
+  assignation("D07Ga_data", part = "II",
+    url = "https://github.com/BioDataScience-Course/D07Ga_data",
+    course.urls = c(
+      'S-BIOG-043' = "https://classroom.github.com/a/4eN9dBmf"),
+    toc = "Données, partie II : textes")
 ```
 
 ##### Pour en savoir plus {-}
@@ -669,14 +671,15 @@ Le graphique par défaut de {circular} est moins bien que la version `chart()` d
 rose.diag(oysters$maturity_c, bins = 5, col = "cornsilk", prop = 3, radii.scale = "linear", axes = FALSE)
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("D07Ga_data", part = "III",
-  url = "https://github.com/BioDataScience-Course/D07Gb_circular",
-  course.urls = c(
-    'S-BIOG-043' = "https://classroom.github.com/a/4eN9dBmf"),
-  toc = "Données, partie III : variables circulaires")
+if (exists("assignation"))
+  assignation("D07Ga_data", part = "III",
+    url = "https://github.com/BioDataScience-Course/D07Gb_circular",
+    course.urls = c(
+      'S-BIOG-043' = "https://classroom.github.com/a/4eN9dBmf"),
+    toc = "Données, partie III : variables circulaires")
 ```
 
 ##### Pour en savoir plus {-}

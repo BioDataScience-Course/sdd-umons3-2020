@@ -87,24 +87,25 @@ summary(penguins_conf_loo)
 
 Le résultat est le même. Donc, nous venons de montrer que, dans le cas de ce jeu de données et de l'ADL, une validation croisée dix fois permet d'estimer les performances du classifieur aussi bien que l'approche bien plus coûteuse en calculs (342 classifieurs sont calculés et testés) du "leave-one-out".
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r learnr("C02La_cv", title = "Validation croisée", toc = "Validation croisée")`
 
-##### A retenir {-}
+##### À retenir {-}
 
 - Bien que plus complexe en interne, la validation croisée est très facile à utiliser avec {mlearning},
 
 - L'approche par validation croisée optimise l'utilisation des données à disposition. C'est la technique à préférer, sauf si nous disposons vraiment de données à profusion.
 
-##### A vous de jouer {-}
+##### À vous de jouer {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("C02Ga_ml2", part = "I",
-  url = "https://github.com/BioDataScience-Course/C02Ga_ml2",
-  course.urls = c(
-    'S-BIOG-025' = "https://classroom.github.com/a/CIKh1k6S"),
-  toc = "Utilisation de la validation croisée")
+if (exists("assignation"))
+  assignation("C02Ga_ml2", part = "I",
+    url = "https://github.com/BioDataScience-Course/C02Ga_ml2",
+    course.urls = c(
+      'S-BIOG-025' = "https://classroom.github.com/a/CIKh1k6S"),
+    toc = "Utilisation de la validation croisée")
 ```
 
 ## Différents algorithmes
@@ -340,14 +341,15 @@ plot(pima2_lvq_conf)
 summary(pima2_lvq_conf)
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("C02Ga_ml2", part = "II",
-  url = "https://github.com/BioDataScience-Course/C02Ga_ml2",
-  course.urls = c(
-    'S-BIOG-025' = "https://classroom.github.com/a/CIKh1k6S"),
-  toc = "Utilisation de la quantification vectorielle")
+if (exists("assignation"))
+  assignation("C02Ga_ml2", part = "II",
+    url = "https://github.com/BioDataScience-Course/C02Ga_ml2",
+    course.urls = c(
+      'S-BIOG-025' = "https://classroom.github.com/a/CIKh1k6S"),
+    toc = "Utilisation de la quantification vectorielle")
 ```
 
 ##  Partitionnement récursif
@@ -507,14 +509,15 @@ summary(pima1_rf2_conf)
 
 Effectivement, avec un petit peu plus de 21%, c'est notre meilleur score jusqu'ici, tout en réduisant le nombre d'attributs nécessaires et d'arbres à calculer. Dans le module suivant, nous étudierons encore quelques concepts autour de la classification supervisée afin de réaliser un choix éclairé du meilleur modèle.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("C02Ga_ml2", part = "III",
-  url = "https://github.com/BioDataScience-Course/C02Ga_ml2",
-  course.urls = c(
-    'S-BIOG-025' = "https://classroom.github.com/a/CIKh1k6S"),
-  toc = "Utilisation de la forêt aléatoire")
+if (exists("assignation"))
+  assignation("C02Ga_ml2", part = "III",
+    url = "https://github.com/BioDataScience-Course/C02Ga_ml2",
+    course.urls = c(
+      'S-BIOG-025' = "https://classroom.github.com/a/CIKh1k6S"),
+    toc = "Utilisation de la forêt aléatoire")
 ```
 
 ##### Trucs et astuces {-}
@@ -523,6 +526,6 @@ Pour l'instant {mlearning} utilise les fonctions du package {randomForest} qui r
 
 ## Récapitulatif des exercices
 
-Dans ce module 2, vous aviez à réaliser les exercices suivants\ :
+Dans ce second module, vous aviez à réaliser les exercices suivants\ :
 
 `r show_ex_toc()`

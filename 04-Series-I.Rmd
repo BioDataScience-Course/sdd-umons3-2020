@@ -105,7 +105,7 @@ Ici aussi la distribution du plancton le long du transect n'est pas homogène. A
 Au travers de ces quatre exemples concrets, nous constatons que les séries spatio-temporelles sont utilisées dans de nombreux domaines en biologie. Le troisième exemple en particulier (EEG) nous laisse un peu démuni. Nous réalisons à ce stade que nous avons besoin d'une toute nouvelle panoplie d'outil pour analyser ce type de données car étant des mesures successives dans le temps d'un *même* individu, nous n'avons **pas d'indépendance des observations les unes par rapport aux autres**, qui est pourtant une hypothèse de départ de pratiquement toutes les techniques statistiques que nous avons étudiées jusqu'ici.
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(26, height = 270, toc = "Représentation des séries chronologiques")`
 
@@ -227,7 +227,7 @@ colnames(marphy[, c("Temperature", "Density")])
 N'essayez pas d'utiliser la sélection à l'aide de `[,]` sur un objet **ts** contenant une série univariée. Vous génèreriez une erreur car cet objet contient un *vecteur* et non pas une *matrice*. De plus, cela n'a aucun sens de faire une sélection parmi... une seule série dans cet objet\ !
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(27, height = 270, toc = "Création d'un objet ts")`
 
@@ -245,11 +245,11 @@ Dès que le pas de temps entre les observations n'est pas constant, nous parlons
 
 De manière générale, nous avons toujours intérêt à réaliser une séries régulière, ou la plus régulière possible. Ensuite, il faut penser aux techniques de régularisation si c'est faisable pour obtenir une série régulière qui approxime suffisamment bien les données de départ. En effet, la plupart des techniques d'analyse des séries temporelles se basent sur des séries régulières, et en tous cas celles du package {pastecs}.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r h5p(28, height = 270, toc = "Type de série chronologiques")`
 
-##### A retenir {-}
+##### À retenir {-}
 
 - Nous devons nous arranger pour obtenir autant que possible des **séries régulières**. Sinon, les séries à trous, voire légèrement irrégulières, pourront être **régularisées** avant analyses (voir module suivant).
 
@@ -333,11 +333,11 @@ statsl2$x
 statsl2$xcut
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r learnr("C04La_stat_slide", title = "Statistiques glissantes", toc = "Statistiques glissantes")`
 
-### Manipulations de ts
+### Manipulations de **ts**
 
 Les jeux de données bricolés artificiellement sont parfois bien utiles pour explorer de nouvelles techniques. En effet, puisque nous les construisons nous-même nous savons dès le départ de quoi ils sont faits. Et donc, nous pouvons vérifier que le résultat obtenu est bien conforme. Par exemple, nous pouvons construre une série de données mensuelles commençant en avril 1998 (`start = c(1998, 4)`), contenant 100 valeurs et comportant une composante sinusoïdale d’une période annuelle ainsi qu’une composante aléatoire ayant une distribution normale de moyenne nulle et d’écart type 0.5\ :
 
@@ -354,7 +354,7 @@ mtser <- ts.intersect(tser, stats::lag(tser, 5))
 plot(mtser, xlab = "Temps", main = "Série tser et série décalée de 5 mois")
 ```
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r learnr("C04Lb_ts_create", title = "Création d'objet ts", toc = "Création d'objet ts")`
 
@@ -393,7 +393,7 @@ window(tser, start = c(1999, 1), end = c(2001, 12))
 
 La fonction `stats::lag()` permet de décaler la série en arrière dans le temps (ou en avant si on fournit une valeur de décalage négative)\ ; nous l'avons déjà utilisée plus haut. La fonction `diff()` calcule la différence entre une série et elle-même décalée dans le temps de *k* observations. Les fonction `ts.intersect()` et `ts.union()` permettent de réunir deux ou plusieurs séries au sein d’une même matrice multivariée, avec une échelle de temps commune. Les fréquences respectives des séries à assembler doivent être identiques. Là où `ts.intersect()` retient uniquement l’intervalle de temps commun à toutes les séries, `ts.union()` conservera l’ensemble de l’intervalle temporel, toutes séries confondues.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 `r learnr("C04Lc_ts_manip", title = "Manipulation des séries chronologiques", toc = "Manipulation des objets ts")`
 
@@ -797,14 +797,15 @@ Appliquez la technique des sommes cumulées sur les diverses séries d'exemple p
 - Pour `eeg`, malgré qu'il s'agisse d'une série univariée, elle est encodée comme une matrice. Vous devez donc utiliser `eeg[, 1]` dans `local.trend()`. Ici, la technique prend tout son sens.
 - De même pour `marbio`et `marphy` où nous savons d'emblée qu'il existe différentes phases successives correspondant aux différentes masses d'eaux traversées par le transect.
 
-##### A vous de jouer ! {-}
+##### À vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
-assignation("C04Ga_ts", part = "I",
-  url = "https://github.com/BioDataScience-Course/C04Ga_ts",
-  course.urls = c(
-    'S-BIOG-025' = "https://classroom.github.com/a/BEIb7Y8B"),
-  toc = "Analyse de séries spatio-temporelles")
+if (exists("assignation"))
+  assignation("C04Ga_ts", part = "I",
+    url = "https://github.com/BioDataScience-Course/C04Ga_ts",
+    course.urls = c(
+      'S-BIOG-025' = "https://classroom.github.com/a/BEIb7Y8B"),
+    toc = "Analyse de séries spatio-temporelles")
 ```
 
 ## Récapitulatif des exercices
