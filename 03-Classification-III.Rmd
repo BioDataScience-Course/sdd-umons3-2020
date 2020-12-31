@@ -342,7 +342,7 @@ Une version plus évoluée du réseau de neurones, avec de très nombreuses couc
 
 ### Apprentissage profond
 
-L'apprentissage profond (*deep learning* en anglais) est un domaine fascinant et plein d'avenir qui représente une forme moderne de réseaux de neurones exploitant la puissance de calcul des ordinateurs actuels. C'erst un des piliers de l'intelligence artificielle. La vidéo suivante, bien qu'étant une publicité pour un acteur majeur du secteur (NVidia pour ne pas le nommer) est très bien faite pour comprendre les enjeux réels au delà du buzz autour de l'intelligence artificielle et est même surprenante (mais vous devez la visionner pour comprendre pourquoi\ !)
+L'apprentissage profond (*deep learning* en anglais) est un domaine fascinant et plein d'avenir qui représente une forme moderne de réseaux de neurones exploitant la puissance de calcul des ordinateurs actuels. C'est un des piliers de l'intelligence artificielle. La vidéo suivante, bien qu'étant une publicité pour un acteur majeur du secteur (NVidia pour ne pas le nommer) est très bien faite pour comprendre les enjeux réels au delà du buzz autour de l'intelligence artificielle et est même surprenante (mais vous devez la visionner pour comprendre pourquoi\ !)
 
 ```{r, echo=FALSE}
 vembedr::embed_youtube("e2_hsjpTi4w", width = 770, height = 433)
@@ -382,7 +382,9 @@ assignation("C03Ga_cardiovascular", part = "III",
 
 ## Challenge
 
-Vous avez dû apprendre beaucoup de techniques complémentaires pour arriver à entraîner correctement votre classifieur (différents algorithmes, validation croisée, matrice de confusion, métriques, courbes ROC, ...). Nous vous proposons maintenant de mettre tout cela en application sous la forme d'un challenge. Vous allez travailler par équipes en binomes et vous tenterez de créer le meilleur classifieur pour détecter les vins excellents parmi un ensemble de vins de toutes catégories. Mais attention, l'exercice n'est pas facile. Vous allez devoir ruser pour gagner des places dans le classement, et mettre en œuvre toutes les techniques étudiées dans les modules 1 à 3 pour arriver aux meilleurs résultats\ !
+Vous avez dû apprendre beaucoup de techniques complémentaires pour arriver à entraîner correctement votre classifieur (différents algorithmes, validation croisée, matrice de confusion, métriques, courbes ROC, ...). Nous vous proposons maintenant de mettre tout cela en application sous la forme d'un challenge. Vous allez travailler par équipes en binômes et vous tenterez de créer le meilleur classifieur pour détecter les vins excellents parmi un ensemble de vins de toutes catégories. Mais attention, l'exercice n'est pas facile. Vous allez devoir ruser pour gagner des places dans le classement, et mettre en œuvre toutes les techniques étudiées dans les modules 1 à 3 pour arriver aux meilleurs résultats\ !
+
+##### A vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
 assignation("C03Gb_challenge", part = NULL,

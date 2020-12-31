@@ -18,7 +18,7 @@ SciViews::R
 
 ##### Prérequis {-}
 
-Si ce n'est déjà fait, vous devez installer et vous familiariser avec la 'SciViews Box' nouvelle mouture. RStudio et (R) Markdown ne doivent plus avoir de secrets pour vous. Vous devez aussi maîtriser les bases de Git et de GitHub (avoir un compte GitHub, savoir cloner un dépôt localement, travailler avec GitHub Desktop pour faire ses "commits", "push" et "pull"). L'ensemble de ces outils a été abordé dans le cours de [science des données biologiques partie 1]( `r paste(learndown$baseurl, "sdd-umons2", sep = "/")` ).
+Si ce n'est déjà fait, vous devez installer et vous familiariser avec la 'SciViews Box' nouvelle mouture. RStudio et (R) Markdown ne doivent plus avoir de secrets pour vous. Vous devez aussi maîtriser les bases de Git et de GitHub (avoir un compte GitHub, être capable de cloner un dépôt localement, travailler avec GitHub Desktop pour faire ses "commits", "push" et "pull"). L'ensemble de ces outils a été abordé dans le cours de [science des données biologiques partie 1]( `r paste(learndown$baseurl, "sdd-umons", sep = "/")` ).
 
 Nous avons déjà abordé dans le cours de [science des données biologiques partie 2]( `r paste(learndown$baseurl, "sdd-umons2", sep = "/")` ) la notion de **classification non supervisée**. De même, la modélisation (via les **régressions**) a aussi fait l'objet d'une attention particulière dans le cours précédent. Toutes ces connaissances vont servir de pilier de base pour ce que nous étudierons ensemble dans ce module, ainsi que dans les deux suivants concernant la classification supervisée.
 
@@ -94,7 +94,7 @@ La matrice de confusion est représentée sous la forme d'un *tableau de conting
 Prenons cette matrice de confusion qui s'intéresse à trois fruits.
 
 ```{r, echo=FALSE, message=FALSE}
-conf <- data.frame( "Orange" = c( 25, 0, 1), "Mandora" = c(0, 16, 9), "Mineola" = c(0,8, 18),  row.names = c("Orange", "Mandora", "Mandarine"))
+conf <- data.frame( "Orange" = c( 25, 0, 1), "Mandora" = c(0, 16, 9), "Mandarine" = c(0,8, 18),  row.names = c("Orange", "Mandora", "Mandarine"))
 
 knitr::kable(conf, col.names = c("Orange", "Mandora", "Mandarine"),caption = "Matrice de confusion dont les colonnes représentent la classification par ordinateur et les lignes la classification manuelle.")
 ```
@@ -102,12 +102,12 @@ knitr::kable(conf, col.names = c("Orange", "Mandora", "Mandarine"),caption = "Ma
 Quel que soit le nombre de classes, il est toujours possible de réduire la matrice de confusion dès lors qu'on se focalise sur *une* classe en particulier. Par exemple, si nous nous intéressons à la qualité de notre algorithme pour classer les mandoras, nous pouvons réduire notre matrice de confusion de la manière suivante (deux matrices simplifiées similaires peuvent naturellement être calculées pour les deux autres classes, orange et mandarine).
 
 ```{r, echo=FALSE, message=FALSE}
-mandora <- data.frame("Mandora" = c("16 = TP", "9 = FP"), "Pas mandora" = c("8 = FN", "44 = TN"),   row.names = c("Mandora", "Pas mandora"))
+mandora <- data.frame("Mandora" = c("TP = 16", "FP = 9"), "Pas mandora" = c("FN = 8", "TN = 44"),   row.names = c("Mandora", "Pas mandora"))
 
-knitr::kable(mandora,col.names = c("Mandora", "Pas Mandora"), caption = "Matrice de confusion dont les colonnes représentent la classification par ordinateur et les lignes la classification manuelle pour les mandoras.")
+knitr::kable(mandora,col.names = c("Mandora", "Pas mandora"), caption = "Matrice de confusion dont les colonnes représentent la classification par ordinateur et les lignes la classification manuelle pour les mandoras.")
 ```
 
-Les paramètres principaux sont
+Les paramètres principaux sont\ :
 
 - TP : Vrai positif (*True Positive*). C'est le nombre d'items du groupe d'intérêt correctement classé. Concernant nos mandoras, il s'agit du nombre d'items classé comme des mandoras par l'ordinateur et qui sont des mandoras.
 
@@ -117,7 +117,9 @@ Les paramètres principaux sont
 
 - FN : Faux négatif (*False Negative*). C'est le nombre d'items classé dans le groupe d'intérêt qui sont d'un autre groupe. Concernant nos mandoras, il s'agit du nombre d'items qui ne sont pas classé comme des mandoras par l'ordinateur mais qui en sont. 
 
-`r h5p(21, height = 270, toc = "Répondez aux questions")`
+##### A vous de jouer ! {-}
+
+`r h5p(21, height = 270, toc = "Vrais et faux positifs ou négatifs")`
 
 ### Métriques de performance
 
@@ -133,13 +135,14 @@ Partons d'un exemple fictif afin d'illustrer les calculs\ :
 
 ```{r}
 # Classification manuelle en 3 classes A, B, C (la "vérité")
-Manu <- c("A", "B", "C", "A", "A", "C", "B", "C", "B", "B")
+manu <- c("A", "B", "C", "A", "A", "C", "B", "C", "B", "B")
 # Classification automatique (par l'ordinateur)
-Auto <- c("B", "B", "C", "C", "A", "C", "B", "C", "A", "B")
+auto <- c("B", "B", "C", "C", "A", "C", "B", "C", "A", "B")
 
 # Matrice de confusion
-matconf <- table(Manuel = Manu, Automatique = Auto)
-knitr::kable(as.matrix(matconf), caption = "Données fictives de classification en trois classes A, B et C.")
+matconf <- table(Manuel = manu, Automatique = auto)
+knitr::kable(as.matrix(matconf),
+  caption = "Données fictives de classification en trois classes A, B et C.")
 ```
 
 - Taux de reconnaissance global (*Accuracy*)
@@ -154,7 +157,6 @@ acc <- (sum(diag(matconf)) / sum(matconf)) * 100
 acc
 ```
 
-
 - Erreur globale (*Error*)
 
 $$err = 100 - acc(\%) = (1-\frac{(TP+TN)}{(TP+TN+FP+FN)}) \cdot 100$$
@@ -162,7 +164,7 @@ $$err = 100 - acc(\%) = (1-\frac{(TP+TN)}{(TP+TN+FP+FN)}) \cdot 100$$
 L'erreur globale est donc, le complément du taux de reconnaissance global et la somme des deux est toujours de 100%.
 
 ```{r}
-# Taux d'erreur globale (en %)
+# Erreur globale (en %)
 100 - acc
 ```
 
@@ -235,12 +237,12 @@ Dans la littérature, vous pouvez également retrouver les noms suivants\ : *Pos
 Un calcul manuel dans R donne\ :
 
 ```{r}
-# Precision pour A (en %)
+# Précision pour A (en %)
 precA <- matconf[1, 1] / sum(matconf[, 1]) * 100
 precA
 ```
 
-Si la classification ne peut se faire sans erreurs (cas le plus fréquent), nous pouvons améliorer la précision mais au détriment du rappel, ou *vice-versa*. Selon le contexte, nous avons plutôt intérêt à favoriser l'un ou l'autre. Par exemple, pour le dépistage du COVID-19, il vaut mieux un test avec un rappel le plus élevé possible (pour ne pas déclarer des patients malades comme faussement sains), quitte à sacrifier un peu la précision (avoir une fraction un peu plus grande de faux positifs dans la fraction de la population considérée comme atteinte par le test... et qui ferait une quarantaine inutilement). 
+Si la classification ne peut se faire sans erreurs (cas le plus fréquent), nous pouvons améliorer la précision mais au détriment du rappel, ou *vice-versa*. Selon le contexte, nous avons plutôt intérêt à favoriser l'un ou l'autre. Par exemple, pour le dépistage de la COVID-19, il vaut mieux un test avec un rappel le plus élevé possible (pour ne pas déclarer des patients malades comme faussement sains), quitte à sacrifier un peu la précision (avoir une fraction un peu plus grande de faux positifs dans la fraction de la population considérée comme atteinte par le test... et qui ferait une quarantaine inutilement). 
 
 Dans d'autres situations, il vaut mieux, au contraire favoriser la précision. Si nous voulons inclure des sujets atteints d'une maladie rare dans une étude, nous n'aurons pas intérêt à échantillonner la population au hasard. En effet, notre échantillon contiendra trop d'individus sains par rapport aux rares malades. Nous pourrions alors utiliser la classification supervisée pour déterminer qui est malade ou sain, et ensuite effectuer un échantillonnage stratifié dans les deux classes (50% de chaque classe dans l'échantillon final pour notre étude). Évidemment dans ce cas, si la précision est très faible, nous aurons énormément de faux positifs dans la fraction détectée comme malade. Cela réduirait alors la représentativité des individus malades dans l'échantillon, par rapport à un classifieur qui montre une précision plus grande pour la classe des malades.
 
@@ -266,14 +268,13 @@ $$ball\ acc = \frac{(specificity + recall)}{2}$$
 (specA + recallA) / 2
 ```
 
+##### A vous de jouer ! {-}
 
-`r learnr("C01La_confusion", title = "La matrice de confusion", toc = "Tutoriel : matrice de confusion")`
-
+`r learnr("C01La_confusion", title = "Matrice de confusion", toc = Matrice de confusion")`
 
 ##### Pour en savoir plus {-}
 
-Vous pouvez retrouver des indices supplémentaires via le lien suivant\ : [Statistics calculated on confusion matrix](https://github.com/BioDataScience-Course/sdd_lesson/blob/2019-2020/sdd3_01/more/confusion_matrix.pdf)
-
+Vous pouvez retrouver des indices supplémentaires via le lien suivant\ : [Statistics calculated on confusion matrix](https://github.com/BioDataScience-Course/sdd_lessons/blob/2019-2020/sdd3_01/more/confusion_matrix.pdf)
 
 ## Analyse discriminante linéaire
 
@@ -285,7 +286,7 @@ Le principe de cet algorithme ne te rappelle rien\ ? Evidemment que oui, cet alg
 
 Il n'est pas utile ici de rentrer dans les détails mathématiques. Comme vous connaissez déjà les variances inter/intra-groupes (cf. [ANOVA](https://wp.sciviews.org/sdd-umons/?iframe=wp.sciviews.org/sdd-umons-2020/anova-%25C3%25A0-un-facteur.html)) d'une part, et le principe de rotation des axes de l'[ACP](https://wp.sciviews.org/sdd-umons2/?iframe=wp.sciviews.org/sdd-umons2-2020/analyse-en-composantes-principales.html) d'autre part, vous êtes à même de comprendre le principe de l'ADL en combinant ces deux notions. Pour **quantifier la séparation des différents classes** ou groupes, nous allons donc réutiliser encore une fois la bonne vieille séparation de la variance totale en variance inter-groupe et variance intra-groupe que nous avons déjà employée, par exemple, dans l'ANOVA. Sauf qu'ici, nous travaillons en multivarié avec des matrices ayant potentiellement un grand nombre de dimensions. Du point de vue purement mathématique, cela ne change rien, car la partition de la variable s'applique tout aussi bien à *N* > 2 dimensions. Ensuite, nous nous intéressons aux **distances inter-groupes**. Notez que, plus ces distances sont importantes, mieux nous séparons les groupes (ou si vous préférez, les classes de notre classifieur).
 
-Pour rappel, l'ACP est une technique qui effectue la **diagonalisation d'un matrice** (matrice variance-covariance, ou matrice de corrélation des données). D'un point de vue géométrique, nous avons vu que diagonaliser une matrice revient en fait à effectuer une **rotation du système d'axes** représenté par cette matrice, de sorte que les nouveaux axes ainsi obtenus correspondent à une **maximisation de la variance** sur les nouveaux axes. En ACP, on cherchait à "étaler" les données le plus possible sur les 2 ou 3 premiers axes afin de visualiser comment les points (les individus) se répartissent.
+Pour rappel, l'ACP est une technique qui effectue la **diagonalisation d'un matrice** (matrice variance-covariance, ou matrice de corrélation des données). D'un point de vue géométrique, nous avons vu que diagonaliser une matrice revient en fait à effectuer une **rotation du système d'axes** représenté par cette matrice, de sorte que les nouveaux axes ainsi obtenus correspondent à une **maximisation de la variance** sur les nouveaux axes. En ACP, on cherchait à "étaler" les données le plus possible sur les deux ou trois premiers axes afin de visualiser comment les points (les individus) se répartissent.
 
 En ADL, on réutilise le même principe, mais nous substituons la matrice inter-groupes à la matrice variance-covariance pour effectuer cette ACP. Le résultat est une *autre* rotation des axes qui va maximiser, cette fois-ci, les distances inter-groupes... et donc, étaler au mieux les différentes classes de notre classifieur selon des axes qui les *séparent* le mieux possible linéairement (entendez par là, par une division à l'aide d'hyperplans qui sont les équivalents à *N* dimension de droites de séparation dans un plan à deux dimensions, voir schéma ci-dessous). Les hyperplans de séparations sont déterminés par rapport aux barycentres des différentes classes. En d'autres termes, ils sont placés à égale distance des centres de gravité des différents nuages de points dans la représentation en composantes principales de l'ADL.
 
@@ -293,7 +294,7 @@ En ADL, on réutilise le même principe, mais nous substituons la matrice inter-
 
 ![Schéma de principe de rotation du système d'axes de l'ADL afin de maximiser la variance inter-groupe, et donc, de séparer au mieux ces groupes dans le nouveau système d'axe. La séparation du plan à l'aide d'une droite à égale distance des barycentres des groupes définit des sous-régions qui correspondent à chacune des classes.](images/01-classification1/adl.png)
 
-Cet algorithme présente l’avantage d’être simple et rapide à calculer. Par contre, l’ADL n’est généralement pas la méthode la plus performante en classification supervisée, et elle impose que les différents groupes soient décrits par des sous-espaces uniques et déliités par des hyperplans dans l’hyperespace des *p* variables initiales, soit, une hypothèse de départ très forte. Il est possible de restreindre l’outil de reconnaissance à *q* < *p* composantes discriminantes principales, afin de simplifier et d’accélérer le calcul, si cela s'avère nécessaire (les détails sortent du cadre de ce cours).
+Cet algorithme présente l’avantage d’être simple et rapide à calculer. Par contre, l’ADL n’est généralement pas la méthode la plus performante en classification supervisée, et elle impose que les différents groupes soient décrits par des sous-espaces uniques et délimités par des hyperplans dans l’hyperespace des *p* variables initiales, soit, une hypothèse de départ très forte. Il est possible de restreindre l’outil de reconnaissance à *q* < *p* composantes discriminantes principales, afin de simplifier et d’accélérer le calcul, si cela s'avère nécessaire (les détails sortent du cadre de ce cours).
 
 ### Manchots antarctiques
 
@@ -372,7 +373,7 @@ n_learning <- round(n * 2/3)
 n_learning
 ```
 
-On sépare nos observations en deux sets indépendants. On utilise cependant la fonction `set.seed()` afin de fixer le début du générateur de nombres pseudo-aléatoires, ce qui donne une série de nombres qui ont les mêmes propriétés que des nombres tirés au sort, mais ce tirage au sort est *reproductible* d'une fois à l'autre. 
+Nous séparons nos observations en deux sets indépendants. Nouys utilisons cependant la fonction `set.seed()` afin de fixer le début du générateur de nombres pseudo-aléatoires, ce qui donne une série de nombres qui ont les mêmes propriétés que des nombres tirés au sort, mais ce tirage au sort est *reproductible* d'une fois à l'autre. 
 
 ```{r}
 set.seed(324)
@@ -400,7 +401,7 @@ penguins_lda <- mlLda(data = penguins_learn,
 Cependant dans le cas particulier où **toutes** les variables du tableau sont utilisées pour l'analyse, comme c'est le cas ici, la formule peut être abrégée en `class ~ .`, ce qui signifie que la variable dépendante qualitative `class` est étudiée en fonction de **toutes** les autres variables du tableau, considérées toutes comme des attributs. En fait, ce n'est pas tout-à-fait synonyme car dans ce dernier cas, les fonction du package {mlearning} utilisent des astuces de programmation pour optimiser les calculs (autant en vitesse qu'en utilisation de la mémoire vive). Il est donc très fortement conseillé d'utiliser cette forme.
 
 ```{r}
-# on peut simplifier l'écriture de la formule condensée.
+# Utilisation de la forme condensée de notre formule
 penguins_lda <- mlLda(data = penguins_learn, species ~ .)
 penguins_lda
 ```
@@ -488,7 +489,9 @@ Notre classifieur a commis deux erreurs sur les données du set de test. Il semb
 summary(penguins_conf)
 ```
 
-`r learnr("C01Lb_lda", title = "Analyse discriminante linéaire", toc = "Tutoriel : analyse discriminante linéaire")`
+##### A vous de jouer ! {-}
+
+`r learnr("C01Lb_lda", title = "Analyse discriminante linéaire", toc = "Analyse discriminante linéaire")`
 
 ##### Pièges et astuces {-}
 
@@ -496,16 +499,17 @@ Tout comme cela avait déjà été expliqué lors de la présentation de l' [ACP
 
 #### Déploiement
 
-Notre jeu de données ne reprenait que les données du set d'apprentissage et du set de test. Néanmoins, les scientifiques qui ont utilisé ces données pourraient légitimement considérer que le classifieur est suffisamment fiable pour pouvoir classer les trois espèces de manchots sur base des quatre mesures effectuées sur n'importe quel individu. Ainsi, s'ils possèdent par ailleurs des données biométriques sur les manchots de la région pour lesquelles il manque l'identification de l'espèce, ils pourraient utiliser leur classifieur pour les prédire. Si le jeu de donnée biométrique s'appelle par exemple `palmer2data`, ils feront tout simplement `predict(penguins_lda, palmer2data)` pour obtenir une prédiction des espèces de manchots poiur les individus repris dans `palmer2data`.
+Notre jeu de données ne reprenait que les données du set d'apprentissage et du set de test. Néanmoins, les scientifiques qui ont utilisé ces données pourraient légitimement considérer que le classifieur est suffisamment fiable pour pouvoir classer les trois espèces de manchots sur base des quatre mesures effectuées sur n'importe quel individu. Ainsi, s'ils possèdent par ailleurs des données biométriques sur les manchots de la région pour lesquelles il manque l'identification de l'espèce, ils pourraient utiliser leur classifieur pour les prédire. Si le jeu de donnée biométrique s'appelle par exemple `palmer2data`, ils feront tout simplement `predict(penguins_lda, palmer2data)` pour obtenir une prédiction des espèces de manchots pour les individus repris dans `palmer2data`.
+
+##### A vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
 assignation("C01Ga_ml1", part = "I",
   url = "https://github.com/BioDataScience-Course/C01Ga_ml1",
   course.urls = c(
     'S-BIOG-025' = "https://classroom.github.com/a/-5ulh9Fw"),
-  toc = "Assignation : Utilisation de l'analyse discriminante linéaire.")
+  toc = "Utilisation de l'analyse discriminante linéaire")
 ```
-
 
 ## Récapitulatif des exercices
 

@@ -36,7 +36,7 @@ class(world)
 ```
 
 
-Un objet **sf** est tout simplement un tableau de données classiques de type cas par variables que vous avez l'habitude de manipuler, mais qui contient une colonne décrivant la zone géographique concernée. Dans notre objet world, la colonne `geometry` décrit des polygones grâce au type **sfc_MULTIPOLYGON**. Le type de la variable `geometry` varie en fonction des coordonnées géographiques avec par exemple sfc_point, sfc_linestring ou encore sfc_polygon.
+Un objet **sf** est tout simplement un tableau de données classiques de type cas par variables que vous avez l'habitude de manipuler, mais qui contient une colonne décrivant la zone géographique concernée. Dans notre objet world, la colonne `geometry` décrit des polygones grâce au type **sfc_MULTIPOLYGON**. Le type de la variable `geometry` varie en fonction des coordonnées géographiques avec par exemple **sfc_point**, **sfc_linestring** ou encore **sfc_polygon**.
 
 
 ```{r}
@@ -120,7 +120,7 @@ chart(data = world) +
 
 ##### A vous de jouer ! {-}
 
-`r h5p(58, height = 270, toc = "But du package ggsn")`
+`r h5p(58, height = 270, toc = "Fonctions du package ggsn")`
 
 Là où cela devient intéressant, c'est que nous avons la possibilité d'utiliser les autres variables contenues dans le tableau **sf** pour annoter la carte. Par exemple, nous pouvons remplir les polygones (`%fill=%`) représentant les différents pays à l'aide d'une couleur en fonction de la variable `economy`. Une petite astuce toutefois\ : une formule doit obligatoirement contenir une variable `x` après le tilde. Or ici, nous ne voulons fournir que `fill`, mais ni `x`, ni `y` dans la formule. Pour cela, nous indiquons `~ 0` qui sera compris par `chart()` comme aucun `x` et aucun `y`. Ensuite, nous pourrons rajouter toutes les autres esthétiques comprises par {ggplot2} à la suite dans la formule sous la forme `%aes=% variable`, donc ici, `%fill=% economy`.
 
@@ -132,7 +132,7 @@ chart(data = world, ~0 %fill=% economy) +
 
 ##### A vous de jouer ! {-}
 
-`r h5p(59, height = 270, toc = "Syntaxe de chart")`
+`r h5p(59, height = 270, toc = "Utiliser chart() pour la cartographie")`
 
 Pour présenter de l'information sur une carte, nous aurons donc besoin d'une ou plusieurs variables qualitatives ou quantitatives associées à des coordonnées spatiales. Les données et les coordonnées spatiales seront, en pratique, souvent dans deux tableaux différents. Vous aurez donc à les combiner en un tableau unique **sf** avant de pouvoir réaliser la carte voulue.
 
@@ -189,7 +189,7 @@ Cartes de l'Europe au format **shapefile** en fonction de l'échelle de la carte
 
 ##### A vous de jouer ! {-}
 
-`r h5p(61, height = 270, toc = "Echelle des cartes")`
+`r h5p(61, height = 270, toc = "Échelles des cartes")`
 
 ### Systèmes de coordonnées
 
@@ -662,7 +662,7 @@ Il est en effet plutôt rare d'avoir une couverture dense de mesures sur une gra
 
 ### Où pleut-il au Maroc\ ?
 
-Les données que nous allons traiter comme exemple ne sont pas dénuées d'intérêt pour le botaniste, le zoologiste, ou encore, l'éco-conseiller, qui ont tous besoin de données environnementales pour comprendre la distributions des plantes et des animaux. Bein sûr, la technique est également utilisable dans bien d'autres contextes (distrubtion des espèces et biodiversité, gradiens de pollution, progression d'une épidémie, etc.)
+Les données que nous allons traiter comme exemple ne sont pas dénuées d'intérêt pour le botaniste, le zoologiste, ou encore, l'éco-conseiller, qui ont tous besoin de données environnementales pour comprendre la distributions des plantes et des animaux. Bein sûr, la technique est également utilisable dans bien d'autres contextes (distribution des espèces et biodiversité, gradients de pollution, progression d'une épidémie, etc.)
 
 Sur base de nos données relative au Maroc que nous avons utilisées comme exemple jusqu'ici, nous avons également `mrain` qui propose des mesures de pluviométrie em mm/an enregistrées à une quarantaine de stations météorologiques réparties sur tout le territoire, mais de manière inégale. Cet objet **geopoints** doit être converti en **sf** comme à notre habitude.
 
@@ -696,7 +696,7 @@ L'interpolation spatiale est possible parce que, comme pour les séries chronolo
 
 ##### A vous de jouer ! {-}
 
-`r h5p(64, height = 270, toc = "Autocorrélation")`
+`r h5p(64, height = 270, toc = "Autocorrélation spatiale")`
 
 ### Interpolation avec DIP
 
@@ -707,7 +707,6 @@ $$\hat{Z}(s_0) = \frac{\sum_{i=1}^n w(s_i) Z(s_i)}{\sum_{i=1}^n w(s_i)}$$
 Cette équation est simplement un calcul de moyenne, mais avec des poids variables $w(s_i)$. L'astuce consiste à faire varier ces poids **en fonction de la distance** entre le point à interpoler $Z(s_0)$ et les point connus $Z(s_i)$. Dans le cas de DIP, c'est l'inverse de la distance $d(s_0, s_i)$ exposant $p$ qui est utilisée\ :
 
 $$w(s_i) = \frac{1}{d(s_0, s_i)^p}$$ 
-
 
 et la valeur par défaut de $p$ est 2. Faire varier $p$ permet d'avoir un effet d'autocorrélation qui se propage plus ou moins loin dans l'espace. Notez que cet effet est le même dans toutes les directions.
 
@@ -724,7 +723,7 @@ m_g_idw <- gstat(data = m_rain, formula = rain ~ 1)
 
 Ensuite, nous effectuons une prédiction à l'aide de ce modèle en utilisant `predict()`. Par contre, les objets **raster** ne sont pas reconnus et nous devons travailler avec des objets *stars*. Donc, nous convertissons avec `st_as_stars()`.
 
-<!-- Note: I should be able to do this without converting to stars by useing:
+<!-- Note: I should be able to do this without converting to stars by using:
 
 ```r
 z <- interpolate(m_tm2, m_g)
@@ -984,7 +983,6 @@ tmap_arrange(m_map3, m_map_rain + tm_compass() + tm_scale_bar())
 
 </details>
 
-
 ##### A vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
@@ -1014,4 +1012,3 @@ assignation("C06Ga_map",
 Dans ce module 6, vous aviez à réaliser les exercices suivants\ :
 
 `r show_ex_toc()`
-

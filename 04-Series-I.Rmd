@@ -109,7 +109,6 @@ Au travers de ces quatre exemples concrets, nous constatons que les séries spat
 
 `r h5p(26, height = 270, toc = "Représentation des séries chronologiques")`
 
-
 ## Qu'est-ce qu'une série chronologique ?
 
 Lorsque nous mesurons de manière répétée le *même* individu à des moments différents, nous parlons de **série chronologique**, de **séries temporelles**, ou de **série spatio-temporelle** (*space-time series* en anglais). Ce dernier terme "spatio-temporel" se réfère, en réalité, à un axe unidimensionnel que nous représentons toujours par convention sur l'axe des abscisses sur un graphique et le long duquel nos observations varient. Il peut s'agir du temps, ou d'une dimension spatiale linéaire (mesures le long d'un **transect**, comme nous l'avons vu pour le plancton méditerranéen), ou d'un mélange des deux c'est-à-dire que le temps se déroule alors que nous progressons dans nos mesures le long du transect. Quoi qu'il en soit, le fait de mesurer toujours le même individu ou la même entité mène à une interdépendances des observations les unes par rapport aux autres.
@@ -264,7 +263,6 @@ De manière générale, nous avons toujours intérêt à réaliser une séries r
 
 - Les séries irrégulières doivent être représentées par des objets **xts** et le package {xts} propose une large palette de fonction pour manipuler de tels objets.
 
-
 ##### Pour en savoir plus {-}
 
 - [Manuel de {pastecs} en ligne](https://github.com/phgrosjean/pastecs/blob/master/manual/pastecs_manuel_utilisateur.pdf), en français, pour tout savoir sur les nombreuses fonctions disponibles dans le package {pastecs}.
@@ -335,7 +333,6 @@ statsl2$x
 statsl2$xcut
 ```
 
-
 ##### A vous de jouer ! {-}
 
 `r learnr("C04La_stat_slide", title = "Statistiques glissantes", toc = "Statistiques glissantes")`
@@ -360,7 +357,6 @@ plot(mtser, xlab = "Temps", main = "Série tser et série décalée de 5 mois")
 ##### A vous de jouer ! {-}
 
 `r learnr("C04Lb_ts_create", title = "Création d'objet ts", toc = "Création d'objet ts")`
-
 
 #### Manipulation du temps
 
@@ -404,7 +400,6 @@ La fonction `stats::lag()` permet de décaler la série en arrière dans le temp
 ##### Exercez-vous\ ! {-}
 
 Manipulez et décrivez les différentes séries d'exemples. Notez par exemple que `EEG` est constituée de mesures effectuées à un rythme de 256 par seconde, mais que l'axe du temps reprend simplement les observations les unes après les autres (ou si vous préférez, une "unité" de temps de 1/256 sec et une fréquence de un). Comment feriez-vous pour transformer cette série avec une unité de temps de la seconde\ ? Ou de la milliseconde\ ?
-
 
 ## Analyse de séries
 
@@ -461,7 +456,6 @@ Si vous voulez affiner votre compréhension du graphique de l'autocorrélation, 
 - Aide en ligne de `?acf` et `?plot.acf` pour les différents arguments utilisables.
 
 - [Manuel de {pastecs} en ligne](https://github.com/phgrosjean/pastecs/blob/master/manual/pastecs_manuel_utilisateur.pdf), en français, outre la section concernant l'autocorrélation dont la présente partie s'inspire très largement, une section est également dévolue à l'autocorrélation multiple et à son utilisation pour la détection de transitions dans une série.
-
 
 ### Analyse spectrale
 
@@ -585,7 +579,6 @@ Ceci nous indique que la première série est *avancée* sur la seconde de 5 moi
 - [Explication du périodogramme](https://online.stat.psu.edu/stat510/lesson/6/6.1), en anglais.
 
 - Une autre présentation de l'[analyse spectrale](https://bookdown.org/rdpeng/timeseriesbook/spectral-analysis.html), théorie et application dans R, en anglais.
-
 
 ### Tendance générale
 
@@ -714,7 +707,6 @@ La distribution n'est pas très différente d'une *t* de Student, et d'autre par
 
 - [Aide en ligne de la fonction `tsboot()`](https://www.rdocumentation.org/packages/boot/versions/1.3-25/topics/tsboot) qui explique comment le bootstrap sur série chronologique est réalisé, en anglais.
 
-
 ### Tendance locale
 
 Nous pouvons être confrontés à des séries qui montrent **différentes phases d'évolution à long terme**, par exemple, une croissance, suivie d'une décroissance. Dans ce cas, la tendance générale risque de ne pas être significative, alors qu'elle le serait si les deux phases de la série sont séparées l'une de l'autre et analysées individuellement. Ceci montre qu'il est utile d'identifier les cas où des phases successives existent dans notre série, et surtout, à indiquer à quelles date(s) la ou les transitions se font.
@@ -812,9 +804,8 @@ assignation("C04Ga_ts", part = "I",
   url = "https://github.com/BioDataScience-Course/C04Ga_ts",
   course.urls = c(
     'S-BIOG-025' = "https://classroom.github.com/a/BEIb7Y8B"),
-  toc = "Analyse de séries spatio-teporelles")
+  toc = "Analyse de séries spatio-temporelles")
 ```
-
 
 ## Récapitulatif des exercices
 

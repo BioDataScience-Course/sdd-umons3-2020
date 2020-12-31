@@ -57,7 +57,7 @@ Une fois notre tableau complet correctement nettoyé et préparé, nous faisons\
 # ADL avec toutes les données
 penguins_lda <- mlLda(data = penguins, species ~ .)
 # Prédiction par validation croisée 10x
-set.seed(7567) # Pensez à varier le nobmre à chaque fois ici!
+set.seed(7567) # Pensez à varier le nombre à chaque fois ici !
 penguins_pred <- cvpredict(penguins_lda, cv.k = 10)
 # Matrice de confusion
 penguins_conf <- confusion(penguins_pred, penguins$species)
@@ -89,8 +89,7 @@ Le résultat est le même. Donc, nous venons de montrer que, dans le cas de ce j
 
 ##### A vous de jouer ! {-}
 
-`r learnr("C02La_cv", title = "Validation croisée", toc = "Tutoriel : validation croisée")`
-
+`r learnr("C02La_cv", title = "Validation croisée", toc = "Validation croisée")`
 
 ##### A retenir {-}
 
@@ -98,12 +97,14 @@ Le résultat est le même. Donc, nous venons de montrer que, dans le cas de ce j
 
 - L'approche par validation croisée optimise l'utilisation des données à disposition. C'est la technique à préférer, sauf si nous disposons vraiment de données à profusion.
 
+##### A vous de jouer {-}
+
 ```{r, echo=FALSE, results='asis'}
 assignation("C02Ga_ml2", part = "I",
   url = "https://github.com/BioDataScience-Course/C02Ga_ml2",
   course.urls = c(
     'S-BIOG-025' = "https://classroom.github.com/a/CIKh1k6S"),
-  toc = "Assignation : Utilisation de la validation croisée.")
+  toc = "Utilisation de la validation croisée")
 ```
 
 ## Différents algorithmes
@@ -120,7 +121,7 @@ Nous avons déjà abordé l'analyse discriminante linéaire dans le précédent 
 
 ### Indiens diabétiques
 
-Afin d'explorer et comparer l'utilisation de différents algorithmes de classification supervisée, nous reprendrons notre jeu de données `pima` concernant une population d'Amérindiens qui sont connus pour compter un haut taux d'obèses et de diabétiques. Nous avions déjà utilisé ces données pour [illuster l'ACP dans le cours de Science des Données Biologiques II](https://wp.sciviews.org/sdd-umons2/?iframe=wp.sciviews.org/sdd-umons2-2020/analyse-en-composantes-principales.html). Pour rappel, le jeu de données se présente comme suit\ :
+Afin d'explorer et comparer l'utilisation de différents algorithmes de classification supervisée, nous reprendrons notre jeu de données `pima` concernant une population d'Amérindiens qui sont connus pour compter un haut taux d'obèses et de diabétiques. Nous avions déjà utilisé ces données pour [illustrer l'ACP dans le cours de Science des Données Biologiques II](https://wp.sciviews.org/sdd-umons2/?iframe=wp.sciviews.org/sdd-umons2-2020/analyse-en-composantes-principales.html). Pour rappel, le jeu de données se présente comme suit\ :
 
 ```{r}
 SciViews::R
@@ -234,7 +235,6 @@ plot(pima2_lda_conf)
 summary(pima2_lda_conf)
 ```
 
-
 Nous avons 22% d'erreur avec `pima1` et 23% d'erreur avec `pima2`. Ces résultats se tiennent dans le cas présent. Ce n'est évidemment pas toujours le même résultat. Nous allons voir ce que cela donne avec d'autres algorithmes de classification dans la suite.
 
 ## K plus proches voisins
@@ -243,7 +243,7 @@ K plus proches voisins (*k-nearest neighbours* en anglais ou k-NN en abbrégé) 
 
 ![La classification par les k plus proches voisins compare un individu inconnu (en gris) avec les individus de classe connue du set d'apprentissage (bleus et rouges matérialisant deux classes différentes) du point de vue de la distance de Mahalanobis. Ici k = 3, et l'individu inconnu est considéré comme bleu puisqu'il est plus proche de deux bleus contre un seul rouge.](images/02-classification2/knn.png)
 
-En d’autres termes, il s’agit tout simplement de calculer la distance géométrique qui sépare un individu d’intérêt de tous les individus du set d'apprentissage dans un espace réduit, c’est-à-dire, un espace où chaque variable est mise à l’échelle de telle manière que sa variance soit unitaire. La classe attribuée à l'individu d’intérêt sera la même que celle du, ou des *k* individus les plus proches (d'où le nom de la méthode). Des variantes utilisent naturellement d’autres calculs de distances\ : Euclidiennes, Manhattan, etc.
+En d’autres termes, il s’agit tout simplement de calculer la distance géométrique qui sépare un individu d’intérêt de tous les individus du set d'apprentissage dans un espace réduit, c’est-à-dire, un espace où chaque variable est mise à l’échelle de telle manière que sa variance soit unitaire. La classe attribuée à l'individu d’intérêt sera la même que celle du, ou des *k* individus les plus proches (d'où le nom de la méthode). Des variantes utilisent naturellement d’autres calculs de distances\ : euclidiennes, manhattan, etc.
 
 Un seul paramètre doit donc être définit\ : *k*, représentant le nombre d'individus proches considérés. Un vote à la majorité permet de déterminer à quel groupe appartient l’objet testé. En cas d’ex-æquos, la classe de l'individu du set d'apprentissage le plus proche est utilisée. Pour minimiser le risque d’ex-æquos, *k* est généralement choisi impair. Dans notre schéma, nous utilisons *k* = 3, valeur qui s’est avérée optimale dans beaucoup de situations. La recherche de la valeur optimale de *k* dans le cadre de l’application finale sera évidemment possible ultérieurement.
 
@@ -340,13 +340,14 @@ plot(pima2_lvq_conf)
 summary(pima2_lvq_conf)
 ```
 
+##### A vous de jouer ! {-}
 
 ```{r, echo=FALSE, results='asis'}
 assignation("C02Ga_ml2", part = "II",
   url = "https://github.com/BioDataScience-Course/C02Ga_ml2",
   course.urls = c(
     'S-BIOG-025' = "https://classroom.github.com/a/CIKh1k6S"),
-  toc = "Assignation : Utilisation de la quantification vectorielle.")
+  toc = "Utilisation de la quantification vectorielle")
 ```
 
 ##  Partitionnement récursif
@@ -452,7 +453,7 @@ Les paramètres à définir sont le nombre d’arbres et le nombre de *p* attrib
 
 ![Schéma du principe de la forêt aléatoire pour la classification. Cet algorithme créé un ensemble d’arbres de partitionnement différents où, à chaque nœud, une variable discriminante et un seuil sont choisis comme les meilleures règles, mais seulement parmi un sous-ensemble aléatoire de tous les attributs. Lorsque la forêt est construite, le même individu est présenté à la base de chaque arbre. Le groupe auquel il appartient est obtenu par un vote à la majorité de tous les arbres.](images/02-classification2/rforest.png)
 
-### Pima avec random forest
+### Pima avec forêt aléatoire
 
 La méthode de forêt aléatoire est disponible dans {mlearning}. Son utilisation est similaire aux autres fonctions du package, avec ici les arguments `ntree =` pour le nombre d'arbres, et `mtry = ` pour le nombre de variables à sélectionne au hasard à chaque nœud. Par défaut, 500 arbres sont construits et les 2/3 des variables sont utilisées. Voyons ce que cela donne avec ces valeurs par défaut\ :
 
@@ -506,12 +507,14 @@ summary(pima1_rf2_conf)
 
 Effectivement, avec un petit peu plus de 21%, c'est notre meilleur score jusqu'ici, tout en réduisant le nombre d'attributs nécessaires et d'arbres à calculer. Dans le module suivant, nous étudierons encore quelques concepts autour de la classification supervisée afin de réaliser un choix éclairé du meilleur modèle.
 
+##### A vous de jouer ! {-}
+
 ```{r, echo=FALSE, results='asis'}
 assignation("C02Ga_ml2", part = "III",
   url = "https://github.com/BioDataScience-Course/C02Ga_ml2",
   course.urls = c(
     'S-BIOG-025' = "https://classroom.github.com/a/CIKh1k6S"),
-  toc = "Assignation : Utilisation de la forêt aléatoire.")
+  toc = "Utilisation de la forêt aléatoire")
 ```
 
 ##### Trucs et astuces {-}

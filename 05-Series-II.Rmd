@@ -18,7 +18,6 @@ SciViews::R
 
 Ce module nécessite que vous maîtrisiez parfaitement toutes les notions et techniques abordées dans le précédent module.
 
-
 ## Décomposition de séries
 
 Toutes les techniques présentées dans cette partie ont pour but de décomposer des séries spatio-temporelles régulières (donc, à pas de temps constant et sans trous) en deux ou plusieurs composantes. On extrait soit une composante issue d’un filtrage ou d’un lissage, ou alors correspondant à un modèle (variation cyclique, tendance linéaire, polynomiale, exponentielle, etc, …). Quel que soit le nombre de composantes obtenues, la dernière est toujours le résidu (*residuals* en anglais), c’est-à-dire, la fraction de la série initiale (*series*) qui ne se retrouve dans aucune des autres composantes (*components*) extraites.
@@ -61,7 +60,7 @@ Une fois qu’une décomposition est réalisée, il est possible d’extraire le
 
 ##### A vous de jouer ! {-}
 
-`r h5p(34, height = 270, toc = "But de la fonction tsd()")`
+`r h5p(34, height = 270, toc = "La fonction tsd()")`
 
 ##### Exemple {-}
 
@@ -98,6 +97,7 @@ class(co2_mts)
 colnames(co2_mts) # Nom des séries dans l'objet mts
 plot(co2_mts)
 ```
+
 En partant d'un objet **ts** qui contient une série unique, nous aboutissons donc à un objet **mts** qui contient deux composantes nommées `filtered` et `residuals` après avoir appliqué `tsd(method = "average")` suivi de `tseries()`. La composante `filtered` est essentiellement la tendance à long terme dans le cas présent, tandis que les résidus sont constitués par la série **stationnarisée** dont la tendance générale est retirée. Nous pouvons parfaitement continuer à travailler avec cet objet **mts**, et c'est d'ailleurs assez pratique de conserver les deux composantes dans un même objet. Les analyses se font comme d'habitude en sélectionnant la série à traiter à l'aide de l'opérateur `[,]`\ :
 
 ```{r}
@@ -106,7 +106,7 @@ acf(co2_mts[, "filtered"])
 
 Nous avons ici un parfait exemple de fonction d'autocorrelation pour une tendance pure.
 
-Nous pouvons aussi **extraire** une ou plusieurs composantes de `co2_tsd`. Si nous souhaitons extraire la composante résiduelle uniquement sous forme d'un objet **ts** que nous appelerons `co2_stat`, nous ferons ceci\ :
+Nous pouvons aussi **extraire** une ou plusieurs composantes de `co2_tsd`. Si nous souhaitons extraire la composante résiduelle uniquement sous forme d'un objet **ts** que nous appellerons `co2_stat`, nous ferons ceci\ :
 
 ```{r}
 co2_stat <- extract(co2_dec, components = "residuals")
@@ -172,11 +172,9 @@ Avec `tsd()` vous avez plusieurs méthodes de décomposition disponibles, même 
 - `"loess"` pour une décomposition plus complète en tendance générale, cycle saisonnier et résidus.
 ```
 
-
 ## Filtrage d’une série
 
 Le filtrage d’une série consiste à remplacer chaque valeur de cette série par une combinaison de ses diverses valeurs. Lorsque le filtre conduit à réduire la variance en éliminant notamment les très hautes fréquences, on parle aussi de **lissage** du signal (*smoothing* en anglais). Nous allons à présent aborder quelques techniques de filtrage et découvrir dans quelles situations elles sont utiles.
-
 
 ### Moyennes mobiles
 
@@ -207,10 +205,9 @@ Pour un effet accru, il est possible d'effectuer successivement plusieurs lissag
 
 Un autre phénomène qu'il faut connaître est l'**effet Slusky-Yule**. L'application d'un filtrage par moyenne mobile engendre une oscillation artificielle dont la période dépend à la fois de l'ordre de la fenêtre du lissage et le l'autocorrélation présente dans la série. Cette période peut se calculer (nous vous renvoyons au manuel de {pastecs} pour les détails de ce calcul).
 
-
 ##### A vous de jouer ! {-}
 
-`r h5p(33, height = 270, toc = "But de la méthode des moyennes mobiles")`
+`r h5p(33, height = 270, toc = "Méthode des moyennes mobiles")`
 
 ##### Exemple {-}
 
@@ -221,7 +218,7 @@ data("lynx", package = "datasets")
 plot(lynx)
 ```
 
-Nous voyons clairement des pics tous les 10 ans... mais aussi des pics plus importants tous les 40 ans, suggérant la présent d'un second cycle supéerposé au premier. Commençons par lisser notre série avec une moyenne mobile d'ordre 5 pour cibler le cycle de 10 ans.
+Nous voyons clairement des pics tous les 10 ans... mais aussi des pics plus importants tous les 40 ans, suggérant la présent d'un second cycle superposé au premier. Commençons par lisser notre série avec une moyenne mobile d'ordre 5 pour cibler le cycle de 10 ans.
 
 ```{r}
 library(pastecs)
@@ -261,7 +258,7 @@ Comme vous l'avez certainement deviné, les médianes mobiles fonctionnent comme
 
 ##### A vous de jouer ! {-}
 
-`r h5p(36, height = 270, toc = "But de la méthode des médianes mobiles")`
+`r h5p(36, height = 270, toc = "Méthode des médianes mobiles")`
 
 ##### Exemple {-}
 
@@ -314,7 +311,7 @@ A condition de ne pas avoir également un cycle important, le filtrage par diff�
 
 ##### A vous de jouer ! {-}
 
-`r h5p(32, height = 270, toc = "But de la méthode des différences")`
+`r h5p(32, height = 270, toc = "Méthode des différences")`
 
 ##### Exemple {-}
 
@@ -339,7 +336,7 @@ Comme nous pouvons le voir, la tendance a bien été éliminée, mais malheureus
 
 Le filtrage par les valeurs propres (*eigenvector filtering* en anglais, ou EVF en abrégé) consiste à décomposer le signal original de la série via une analyse en composantes principales.
 
-TODO: doit encore être rédigé!
+**TODO: doit encore être rédigé (pour l'an prochain)\ !**
 
 ## Régressions et séries
 
@@ -391,7 +388,7 @@ density_lindec <- tsd(density, method = "reg", xreg = trend_lin)
 plot(density_lindec, col = c(1, 3, 2), xlab = "Stations")
 ```
 
-ou mieux, nous représentons la série de départ et la tendance générale superposée en utilisant `stack = FALSE`\ :
+Ou mieux, nous représentons la série de départ et la tendance générale superposée en utilisant `stack = FALSE`\ :
 
 ```{r}
 plot(density_lindec, stack = FALSE, resid = FALSE, col = c(1, 3),

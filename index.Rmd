@@ -21,7 +21,6 @@ cover-image: "images/front-cover.png"
 
 # Préambule {-}
 
-
 ```{r setup, include=FALSE, cache=FALSE}
 knitr::write_bib(c(.packages(), 'bookdown', 'knitr', 'rmarkdown'), 'packages.bib')
 ```
@@ -50,11 +49,11 @@ sessioninfo::session_info()
 
 Cet ouvrage interactif est le troisième volume d'une série de trois ouvrages traitant de la science des données biologiques. L'écriture de cette suite de livres a débuté au cours de l'année académique 2018-2019. Pour l'année académique 2020-2021, cet ouvrage interactif est le support des cours suivants\ :
 
-- [Science des données III : exploration et prédiction](http://applications.umons.ac.be/web/fr/pde/2020-2021/ue/US-M1-BIOL60-004-M.htm) aux premiers Masters BBMC (Biochimie, Biologie Moléculaire et Cellulaire) et BOE (Biologie des Organismes et Écologie) en Faculté des Sciences de l'Université de Mons, et dont le responsable est Philippe Grosjean
+- [Science des données III\ : exploration et prédiction](http://applications.umons.ac.be/web/fr/pde/2020-2021/ue/US-M1-BIOL60-004-M.htm) aux premiers Masters BBMC (Biochimie, Biologie Moléculaire et Cellulaire) et BOE (Biologie des Organismes et Écologie) en Faculté des Sciences de l'Université de Mons, et dont le responsable est Philippe Grosjean
 
-- [Science des données IV : pratique](http://applications.umons.ac.be/web/fr/pde/2020-2021/ue/US-M2-BIOEFA-017-M.htm) cours à option donné aux deuxièmes années des mêmes Masters, et dont le responsable est Philippe Grosjean
+- [Science des données IV\ : pratique](http://applications.umons.ac.be/web/fr/pde/2020-2021/ue/US-M2-BIOEFA-017-M.htm) cours à option donné aux deuxièmes années des mêmes Masters, et dont le responsable est Philippe Grosjean
 
-- [Science des données V : recherche reproductible](http://applications.umons.ac.be/web/fr/pde/2020-2021/ue/US-M2-BIOEFA-015-M.htm) cours à option donné aux deuxièmes années des mêmes Masters, et dont le responsable est également Philippe Grosjean
+- [Science des données V\ : recherche reproductible](http://applications.umons.ac.be/web/fr/pde/2020-2021/ue/US-M2-BIOEFA-015-M.htm) cours à option donné aux deuxièmes années des mêmes Masters, et dont le responsable est également Philippe Grosjean
 
 La matière est divisée en six modules de 6h chacun en présentiel pour SDD III, deux modules plus une grosse partie de travail autour d'un projet en SDD IV, et enfin quatre modules en SDD V. Chaque module nécessitera environ un tiers de ce temps (voir plus, en fonction de votre rythme et de votre technique d'apprentissage) en travail à domicile. **Cette matière fait suite au deux premiers cours dont les contenus sont considérés comme assimilés (voir [cours SDD I](https://wp.sciviews.org/sdd-umons){target='top'} et [cours SDD II](https://wp.sciviews.org/sdd-umons2){target='top'}).**
 
@@ -90,9 +89,9 @@ Le matériel pédagogique, rassemblé dans ce syllabus interactif est aussi vari
 
 - des [dépôts GitHub Classroom](https://classroom.github.com/) dans la section [BioDataScience-Course](https://www.github.com/BioDataScience-Course) pour réaliser et documenter vos travaux personnels. Les liens vers ces dépôts sont repérables par l'icône GitHub [![assign](images/list-assign.png)](https://wp.sciviews.org/github_assignation/){target='top'},
 
-- des renvois vers des documents externes en ligne, types vidéos [Youtube](https://www.youtube.com/) ou [Vimeo](https://vimeo.com/), des ouvrages en ligne en anglais ou en français, des blogs, des tutoriels, des questions sur des sites comme [Stackoverflow](https://stackoverflow.com/) ou issues des [mailing lists R](https://www.r-project.org/mail.html), de [Tweeter](https://twitter.com/), ...
+- des renvois vers des documents externes en ligne, types vidéos [Youtube](https://www.youtube.com/) ou [Vimeo](https://vimeo.com/), des ouvrages en ligne en anglais ou en français, des blogs, des tutoriels, des questions sur des sites comme [Stackoverflow](https://stackoverflow.com/) ou issues des [mailing lists R](https://www.r-project.org/mail.html), de [Twitter](https://twitter.com/), ...
 
-- des diapositives de présentations distribuées via le dépôt [sdd_lesson sur BioDataScience-Course](https://github.com/BioDataScience-Course/sdd_lesson) viennent compléter le tout.
+- des diapositives de présentations distribuées via le dépôt [sdd_lessons sur BioDataScience-Course](https://github.com/BioDataScience-Course/sdd_lessons) viennent compléter le tout.
 
 ```{block, type='info'}
 Tout ce matériel est accessible à partir du [site Web du cours](https://wp.sciviews.org){target='top'}, du présent syllabus interactif (et de Moodle pour les étudiants de l'UMONS). Ces derniers ont aussi accès au dossier ` SDD` sur `StudentTemp` en Intranet à l'UMONS. Les aspects pratiques seront à réaliser en utilisant la **'SciViews Box'**, une machine virtuelle préconfigurée. Nous installerons ensemble la dernière version de cette SciViews Box au premier cours. Il est donc très important que vous soyez présent à ce cours, et vous pouvez venir aussi si vous le souhaitez avec votre propre ordinateur portable comme pour les cours précédents. Enfin, vous pourrez toujours poser vos questions par mail à l'adresse [sdd@sciviews.org](mailto:sdd@sciviews.org) ou sur [Discord](https://discord.com/invite/CuKdwzA).

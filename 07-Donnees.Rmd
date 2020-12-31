@@ -10,7 +10,6 @@ Le cours SDD IV, comme son nom l'indique, est essentiellement axé sur la pratiq
 
 À part cette partie pratique majoritaire, nous abordons tout de même deux modules supplémentaires. Le premier (celui-ci) s'intéresse aux données particulières\ : dates, données textuelles, données circulaires que vous rencontrerez certainement, si pas dans votre projet pratique, en tous cas plus tard durant votre carrière de biologiste. Le second module du cours (module 8) vous préparera à l'élaboration d'un gros projet scientifique qui diffère des projets que vous avez traités jusqu'ici par le nombre d'étapes et de fichiers plus importants.
 
-
 ##### Objectifs {-}
 
 - Gérer des données autres que numériques et facteurs
@@ -25,10 +24,9 @@ Le cours SDD IV, comme son nom l'indique, est essentiellement axé sur la pratiq
 
 Si ce n'est déjà fait, vous devez installer et vous familiariser avec la 'SciViews Box' nouvelle mouture. RStudio et (R) Markdown ne doivent plus avoir de secrets pour vous. Vous devez aussi maîtriser les bases de Git et de GitHub (avoir un compte GitHub, savoir cloner un dépôt localement, travailler avec GitHub Desktop pour faire ses "commits", "push" et "pull"). L'ensemble de ces outils a été abordé dans les cours précédents [SDD I](`r paste(learndown$baseurl, "sdd-umons", sep = "/")`), [SDD II](`r paste(learndown$baseurl, "sdd-umons2", sep = "/")`) et SDD III (les six premiers modules du présent cours) que vous devez avoir réalisé avant d'entamer la matière du cours SDD IV\ : pratique.
 
-
 ## Dates
 
-<!----- G.E.
+<!-- G.E.
 Tout ce dont on veut parler dans ce module
 
 - date, POSIXlt (POSIXct), lubridate, difftime
@@ -40,7 +38,7 @@ Tout ce dont on veut parler dans ce module
 - nanotime
 
 - benchmark
---->
+-->
 
 La gestion du temps et les variables de temps peuvent sembler simples d'apparence. Nous pouvons facilement déterminer la date et l'heure qu'il est en regardant une montre et un calendrier. Répondez à la question suivante \:
 
@@ -58,7 +56,7 @@ En pratique, une échelle de temps est utilisée comme référence par la majori
 
 UTC est un compromis entre le temps atomique international et temps universel. Il faut savoir que le temps universel coordonné est synchronisé avec la rotation de la Terre qui n'est pas fixe. Le service international de la rotation terrestre et des systèmes de référence décide de l'ajout de seconde, une seconde intercalaire (*leap second*) à UTC comme le premier janvier 2009. 
 
-![Les Fuseaux horaires usuels](images/07-donnees/world_time_zones_map.png)
+![Fuseaux horaires usuels.](images/07-donnees/world_time_zones_map.png)
 
 Après avoir lu ces quelques notions, pensez-vous toujours que le temps est simple\ ? 
 
@@ -99,7 +97,9 @@ ymd("2015-Jan-25")
 mdy("01/25/15")
 ```
 
-`r h5p(19, height = 270, toc = "Sélectionnez la bonne réponse")`
+##### A vous de jouer ! {-}
+
+`r h5p(19, height = 270, toc = "Fonctions de conversion en dates")`
 
 - Les heures\ :
 
@@ -116,7 +116,9 @@ ymd_hm("2010-10-01T2010")
 ymd_hms("2015-Jan-25 12:25:35")
 ```
 
-`r h5p(20, height = 270, toc = "Complétez le blanc.")`
+##### A vous de jouer ! {-}
+
+`r h5p(20, height = 270, toc = "Conversion en date (2)")`
 
 Par défaut, ce package utilise le temps universel coordonné. Il est cependant possible de définir le fuseau horaire avec l'argument `tz=`.
 
@@ -220,6 +222,7 @@ b <- chart(corals, weight ~ nb) +
 
 combine_charts(list(a,b), nrow = 2)
 ```
+
 On comprend rapidement que le second graphique est plus intéressant. Il n'est pas nécessaire de connaître les dates précises lorsque l'on étudie al croissance d'un organisme dans un aquarium sur 30 jours.
 
 - Le temps perdu dans les embouteillages.
@@ -383,7 +386,7 @@ Les expressions régulières servent à manipuler du texte. Elle permettent de r
 
 Si je veux rechercher un point je dois écrire `\\.`, car sinon, j'indique que je veux n'importe quel caractère à cet emplacement-là.
 
-##### A vous de jouer {-}
+##### Exercez-vous {-}
 
 ```{block2, type='bdd'}
 Il n'est possible de véritablement comprendre les expressions régulières qu'en réalisant des exercices. Nous vous proposons donc de réaliser les exercices proposés sur le site [RegexOne](https://regexone.com/). Les exercices interactifs offrent un niveau de difficulté croissant et balayent les nomtions principales à connaitre pour manipuler les expressions régulières. 
@@ -676,11 +679,9 @@ assignation("D07Ga_data", part = "III",
   toc = "Données, partie III : variables circulaires")
 ```
 
-
 ##### Pour en savoir plus {-}
 
 - [Answering biological questions using circular data and analysis in R](https://bigdata.duke.edu/sites/bigdata.duke.edu/files/site-images/FullLesson.html) introduction aux variables circulaires avec R en anglais (exemples intéressants pour le biologiste).
-
 
 ## Récapitulatif des exercices
 
