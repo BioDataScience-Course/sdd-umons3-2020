@@ -270,7 +270,7 @@ $$ball\ acc = \frac{(specificity + recall)}{2}$$
 
 ##### A vous de jouer ! {-}
 
-`r learnr("C01La_confusion", title = "Matrice de confusion", toc = Matrice de confusion")`
+`r learnr("C01La_confusion", title = "Matrice de confusion", toc = "Matrice de confusion")`
 
 ##### Pour en savoir plus {-}
 
