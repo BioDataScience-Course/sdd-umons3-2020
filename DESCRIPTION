@@ -1,7 +1,51 @@
-Package: placeholder
 Type: Book
+Package: placeholder
 Title: SDD III UMONS version 2020
-Version: 1.0.0
-Imports: bookdown
-Depends: learndown
-Remotes: rstudio/bookdown
+Version: 2020.0.0
+Depends:
+    learndown
+Imports:
+    aurelhy,
+    automap,
+    bookdown,
+    boot,
+    cartography,
+    chart,
+    circular,
+    dplyr,
+    ggsn,
+    gstat,
+    ipred,
+    knitr,
+    lubridate,
+    mlearning,
+    naniar,
+    pastecs,
+    pROC,
+    purrr,
+    randomForest,
+    raster,
+    rlang,
+    ROCR,
+    rpart,
+    SciViews,
+    sessioninfo,
+    sf,
+    skimr,
+    stars,
+    stats,
+    stringr,
+    tibble,
+    tidyr,
+    tmap,
+    vembedr
+Remotes:
+    phgrosjean/aurelhy,
+    phgrosjean/pastecs,
+    rstudio/bookdown,
+    SciViews/flow,
+    SciViews/data.io,
+    SciViews/chart,
+    SciViews/learndown,
+    SciViews/mlearning,
+    SciViews/SciViews
